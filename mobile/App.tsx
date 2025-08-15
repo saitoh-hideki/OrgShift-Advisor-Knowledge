@@ -38,6 +38,17 @@ interface Theory {
   key_concepts: string[];
   when_to_use: string[];
   examples: string[];
+  related_theories?: Array<{
+    id: string;
+    name: string;
+    description: string;
+    relevance: string;
+    academic_field: string;
+    key_concepts: string[];
+    when_to_use: string[];
+    examples: string[];
+    practical_tips: string[];
+  }>;
 }
 
 interface RecentAdvice {
@@ -61,25 +72,51 @@ export default function App() {
   const [participants, setParticipants] = useState<number>(2);
   const [relationship, setRelationship] = useState<string>('');
   // シーン固有の詳細設定を独立したフィールドとして管理
+  // 会議・ミーティング用
   const [meetingType, setMeetingType] = useState<string>('');
   const [meetingFormat, setMeetingFormat] = useState<string>('');
+  const [meetingUrgency, setMeetingUrgency] = useState<string>('');
+  const [meetingFrequency, setMeetingFrequency] = useState<string>('');
+  const [meetingParticipants, setMeetingParticipants] = useState<string>('');
+  const [meetingTools, setMeetingTools] = useState<string>('');
+  const [meetingChallenges, setMeetingChallenges] = useState<string>('');
+  
+  // 営業・商談用
   const [customerType, setCustomerType] = useState<string>('');
   const [industry, setIndustry] = useState<string>('');
   const [customerPosition, setCustomerPosition] = useState<string>('');
   const [companySize, setCompanySize] = useState<string>('');
   const [salesStage, setSalesStage] = useState<string>('');
+  const [dealSize, setDealSize] = useState<string>('');
+  const [competitionLevel, setCompetitionLevel] = useState<string>('');
+  const [customerPainPoints, setCustomerPainPoints] = useState<string>('');
+  
+  // プレゼンテーション用
   const [presentationPurpose, setPresentationPurpose] = useState<string>('');
   const [audienceType, setAudienceType] = useState<string>('');
   const [presentationFormat, setPresentationFormat] = useState<string>('');
+  const [presentationTopics, setPresentationTopics] = useState<string>('');
+  const [audienceExpertise, setAudienceExpertise] = useState<string>('');
+  const [presentationConstraints, setPresentationConstraints] = useState<string>('');
+  
+  // 面談用
   const [interviewType, setInterviewType] = useState<string>('');
   const [interviewRelationship, setInterviewRelationship] = useState<string>('');
   const [interviewPurpose, setInterviewPurpose] = useState<string>('');
+  const [interviewContext, setInterviewContext] = useState<string>('');
+  const [interviewOutcomes, setInterviewOutcomes] = useState<string>('');
+  
+  // チーム構築用
   const [teamBuildingType, setTeamBuildingType] = useState<string>('');
   const [teamMaturity, setTeamMaturity] = useState<string>('');
   const [teamContext, setTeamContext] = useState<string>('');
+  const [teamSize, setTeamSize] = useState<string>('');
+  const [teamDiversity, setTeamDiversity] = useState<string>('');
+  const [teamChallenges, setTeamChallenges] = useState<string>('');
   const [advices, setAdvices] = useState<Advice[]>([]);
   const [currentTheory, setCurrentTheory] = useState<Theory | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingTheory, setIsLoadingTheory] = useState(false);
   const [recentAdvices, setRecentAdvices] = useState<RecentAdvice[]>([]);
 
   // 最近使用したアドバイスを保存
@@ -125,8 +162,22 @@ export default function App() {
       console.log('Recent advice saved to database successfully:', saveResult);
     } catch (error) {
       console.error('Failed to save recent advice to database:', error);
+      
+      // エラーの詳細をログに出力
+      if (error instanceof Error) {
+        console.error('Error details:', {
+          message: error.message,
+          stack: error.stack,
+          name: error.name
+        });
+      }
+      
       // データベース保存に失敗してもローカル状態は保持
       // ユーザーには静かに失敗を隠す（UXを損なわないため）
+      // ただし、開発時には詳細なエラー情報を表示
+      if (__DEV__) {
+        console.warn('Development mode: Recent advice save failed, but local state is maintained');
+      }
     }
   };
 
@@ -163,7 +214,21 @@ export default function App() {
         }
       } catch (error) {
         console.error('Failed to load recent advices from database:', error);
+        
+        // エラーの詳細をログに出力
+        if (error instanceof Error) {
+          console.error('Error details:', {
+            message: error.message,
+            stack: error.stack,
+            name: error.name
+          });
+        }
+        
         // データベースからの読み込みに失敗してもアプリは動作する
+        // ただし、開発時には詳細なエラー情報を表示
+        if (__DEV__) {
+          console.warn('Development mode: Recent advices load failed, but app continues to work');
+        }
       }
     };
 
@@ -193,25 +258,41 @@ export default function App() {
       if (scene === 'meeting') {
         if (meetingType) payload.meeting_type = meetingType;
         if (meetingFormat) payload.meeting_format = meetingFormat;
+        if (meetingUrgency) payload.meeting_urgency = meetingUrgency;
+        if (meetingFrequency) payload.meeting_frequency = meetingFrequency;
+        if (meetingParticipants) payload.meeting_participants = meetingParticipants;
+        if (meetingTools) payload.meeting_tools = meetingTools;
+        if (meetingChallenges) payload.meeting_challenges = meetingChallenges;
       } else if (scene === 'sales') {
         if (customerType) payload.customer_type = customerType;
         if (industry) payload.industry = industry;
         if (customerPosition) payload.customer_position = customerPosition;
         if (companySize) payload.company_size = companySize;
         if (salesStage) payload.sales_stage = salesStage;
+        if (dealSize) payload.deal_size = dealSize;
+        if (competitionLevel) payload.competition_level = competitionLevel;
+        if (customerPainPoints) payload.customer_pain_points = customerPainPoints;
       } else if (scene === 'presentation') {
         if (presentationPurpose) payload.presentation_purpose = presentationPurpose;
         if (audienceType) payload.audience_type = audienceType;
         if (audienceType) payload.audience_count = participants;
         if (presentationFormat) payload.presentation_format = presentationFormat;
+        if (presentationTopics) payload.presentation_topics = presentationTopics;
+        if (audienceExpertise) payload.audience_expertise = audienceExpertise;
+        if (presentationConstraints) payload.presentation_constraints = presentationConstraints;
       } else if (scene === 'interview') {
         if (interviewType) payload.interview_type = interviewType;
         if (interviewPurpose) payload.interview_purpose = interviewPurpose;
         if (interviewRelationship) payload.interview_relationship = interviewRelationship;
+        if (interviewContext) payload.interview_context = interviewContext;
+        if (interviewOutcomes) payload.interview_outcomes = interviewOutcomes;
       } else if (scene === 'team_building') {
         if (teamBuildingType) payload.team_building_type = teamBuildingType;
         if (teamMaturity) payload.team_maturity = teamMaturity;
         if (teamContext) payload.team_context = teamContext;
+        if (teamSize) payload.team_size = teamSize;
+        if (teamDiversity) payload.team_diversity = teamDiversity;
+        if (teamChallenges) payload.team_challenges = teamChallenges;
       }
 
       console.log('Sending request with payload:', payload);
@@ -231,10 +312,21 @@ export default function App() {
       }
     } catch (error) {
       console.error('Error getting advice:', error);
+      
       let errorMessage = 'アドバイスの取得に失敗しました';
       
+      // エラーの詳細情報をログに出力
       if (error instanceof Error) {
+        console.error('Error details:', {
+          name: error.name,
+          message: error.message,
+          stack: error.stack,
+          cause: error.cause
+        });
         errorMessage = `エラー: ${error.message}`;
+      } else {
+        console.error('Unknown error type:', typeof error);
+        console.error('Error value:', error);
       }
       
       Alert.alert('エラー', errorMessage);
@@ -243,15 +335,66 @@ export default function App() {
     }
   };
 
-  // 理論を取得
-  const getTheory = async (theoryId: string, theoryName: string, theoryNameJa: string) => {
+  // アドバイスに関連する理論を取得
+  const getRelatedTheories = async (advice: Advice) => {
+    console.log('getRelatedTheories called with advice:', advice);
+    console.log('Current context:', { scene, goal });
+    
+    setIsLoadingTheory(true);
+    
     try {
-      const response = await api.getTheory(theoryId);
-      setCurrentTheory(response);
-      setCurrentView('theory');
+      const requestPayload = {
+        scene,
+        goal,
+        shortAdvice: advice.short_advice,
+        additionalContext: `${advice.expected_effect} ${advice.caution || ''} ${advice.tips || ''}`
+      };
+      
+      console.log('Sending request to getRelatedTheories with payload:', requestPayload);
+      
+      const response = await api.getRelatedTheories(requestPayload);
+      
+      console.log('getRelatedTheories response:', response);
+      
+      if (response.related_theories) {
+        console.log('Setting related theories:', response.related_theories);
+        setCurrentTheory({
+          id: 'related_theories',
+          name: '関連理論',
+          description: response.summary || 'アドバイスに関連する理論を表示します',
+          key_concepts: [],
+          when_to_use: [],
+          examples: [],
+          related_theories: response.related_theories
+        });
+        setCurrentView('theory');
+      } else {
+        console.log('No related theories found, falling back to single theory');
+        // 従来の方法で理論を取得
+        const theoryResponse = await api.getTheory(advice.theory_id);
+        setCurrentTheory(theoryResponse);
+        setCurrentView('theory');
+      }
     } catch (error) {
-      console.error('Error getting theory:', error);
-      Alert.alert('エラー', '理論の取得に失敗しました');
+      console.error('Error getting related theories:', error);
+      console.error('Error details:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined,
+        name: error instanceof Error ? error.name : 'Unknown'
+      });
+      
+      // フォールバック: 従来の方法で理論を取得
+      try {
+        console.log('Attempting fallback to single theory fetch');
+        const theoryResponse = await api.getTheory(advice.theory_id);
+        setCurrentTheory(theoryResponse);
+        setCurrentView('theory');
+      } catch (fallbackError) {
+        console.error('Fallback theory fetch also failed:', fallbackError);
+        Alert.alert('エラー', '理論の取得に失敗しました');
+      }
+    } finally {
+      setIsLoadingTheory(false);
     }
   };
 
@@ -278,22 +421,47 @@ export default function App() {
 
   // シーン固有の詳細設定をリセット
   const resetSceneDetails = () => {
+    // 会議・ミーティング用
     setMeetingType('');
     setMeetingFormat('');
+    setMeetingUrgency('');
+    setMeetingFrequency('');
+    setMeetingParticipants('');
+    setMeetingTools('');
+    setMeetingChallenges('');
+    
+    // 営業・商談用
     setCustomerType('');
     setIndustry('');
     setCustomerPosition('');
     setCompanySize('');
     setSalesStage('');
+    setDealSize('');
+    setCompetitionLevel('');
+    setCustomerPainPoints('');
+    
+    // プレゼンテーション用
     setPresentationPurpose('');
     setAudienceType('');
     setPresentationFormat('');
+    setPresentationTopics('');
+    setAudienceExpertise('');
+    setPresentationConstraints('');
+    
+    // 面談用
     setInterviewType('');
     setInterviewRelationship('');
     setInterviewPurpose('');
+    setInterviewContext('');
+    setInterviewOutcomes('');
+    
+    // チーム構築用
     setTeamBuildingType('');
     setTeamMaturity('');
     setTeamContext('');
+    setTeamSize('');
+    setTeamDiversity('');
+    setTeamChallenges('');
   };
 
   // シーン変更時に詳細設定をリセット
@@ -420,6 +588,8 @@ export default function App() {
           {scene === 'meeting' && (
             <View style={styles.detailSection}>
               <Text style={styles.detailSectionTitle}>会議の詳細</Text>
+              
+              {/* 会議の種類 */}
               <View style={styles.detailRow}>
                 <Text style={styles.detailLabel}>会議の種類:</Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -444,6 +614,8 @@ export default function App() {
                   </View>
                 </ScrollView>
               </View>
+              
+              {/* 会議形式 */}
               <View style={styles.detailRow}>
                 <Text style={styles.detailLabel}>会議形式:</Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -468,12 +640,144 @@ export default function App() {
                   </View>
                 </ScrollView>
               </View>
+              
+              {/* 緊急度 */}
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>緊急度:</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  <View style={styles.detailOptions}>
+                    {sceneConfig.meetingUrgency?.map((urgency) => (
+                      <TouchableOpacity
+                        key={urgency}
+                        style={[
+                          styles.detailOption,
+                          meetingUrgency === urgency && styles.selectedDetailOption
+                        ]}
+                        onPress={() => setMeetingUrgency(urgency)}
+                      >
+                        <Text style={[
+                          styles.detailOptionText,
+                          meetingUrgency === urgency && styles.selectedDetailOptionText
+                        ]}>
+                          {urgency}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </ScrollView>
+              </View>
+              
+              {/* 頻度 */}
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>頻度:</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  <View style={styles.detailOptions}>
+                    {sceneConfig.meetingFrequency?.map((frequency) => (
+                      <TouchableOpacity
+                        key={frequency}
+                        style={[
+                          styles.detailOption,
+                          meetingFrequency === frequency && styles.selectedDetailOption
+                        ]}
+                        onPress={() => setMeetingFrequency(frequency)}
+                      >
+                        <Text style={[
+                          styles.detailOptionText,
+                          meetingFrequency === frequency && styles.selectedDetailOptionText
+                        ]}>
+                          {frequency}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </ScrollView>
+              </View>
+              
+              {/* 参加者タイプ */}
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>参加者タイプ:</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  <View style={styles.detailOptions}>
+                    {sceneConfig.meetingParticipants?.map((participantType) => (
+                      <TouchableOpacity
+                        key={participantType}
+                        style={[
+                          styles.detailOption,
+                          meetingParticipants === participantType && styles.selectedDetailOption
+                        ]}
+                        onPress={() => setMeetingParticipants(participantType)}
+                      >
+                        <Text style={[
+                          styles.detailOptionText,
+                          meetingParticipants === participantType && styles.selectedDetailOptionText
+                        ]}>
+                          {participantType}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </ScrollView>
+              </View>
+              
+              {/* 使用ツール */}
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>使用ツール:</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  <View style={styles.detailOptions}>
+                    {sceneConfig.meetingTools?.map((tool) => (
+                      <TouchableOpacity
+                        key={tool}
+                        style={[
+                          styles.detailOption,
+                          meetingTools === tool && styles.selectedDetailOption
+                        ]}
+                        onPress={() => setMeetingTools(tool)}
+                      >
+                        <Text style={[
+                          styles.detailOptionText,
+                          meetingTools === tool && styles.selectedDetailOptionText
+                        ]}>
+                          {tool}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </ScrollView>
+              </View>
+              
+              {/* 想定される課題 */}
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>想定される課題:</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  <View style={styles.detailOptions}>
+                    {sceneConfig.meetingChallenges?.map((challenge) => (
+                      <TouchableOpacity
+                        key={challenge}
+                        style={[
+                          styles.detailOption,
+                          meetingChallenges === challenge && styles.selectedDetailOption
+                        ]}
+                        onPress={() => setMeetingChallenges(challenge)}
+                      >
+                        <Text style={[
+                          styles.detailOptionText,
+                          meetingChallenges === challenge && styles.selectedDetailOptionText
+                        ]}>
+                          {challenge}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </ScrollView>
+              </View>
             </View>
           )}
 
           {scene === 'sales' && (
             <View style={styles.detailSection}>
               <Text style={styles.detailSectionTitle}>営業の詳細</Text>
+              
+              {/* 顧客タイプ */}
               <View style={styles.detailRow}>
                 <Text style={styles.detailLabel}>顧客タイプ:</Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -498,6 +802,8 @@ export default function App() {
                   </View>
                 </ScrollView>
               </View>
+              
+              {/* 業界 */}
               <View style={styles.detailRow}>
                 <Text style={styles.detailLabel}>業界:</Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -522,6 +828,8 @@ export default function App() {
                   </View>
                 </ScrollView>
               </View>
+              
+              {/* 顧客の役職 */}
               <View style={styles.detailRow}>
                 <Text style={styles.detailLabel}>顧客の役職:</Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -546,6 +854,8 @@ export default function App() {
                   </View>
                 </ScrollView>
               </View>
+              
+              {/* 会社規模 */}
               <View style={styles.detailRow}>
                 <Text style={styles.detailLabel}>会社規模:</Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -570,6 +880,8 @@ export default function App() {
                   </View>
                 </ScrollView>
               </View>
+              
+              {/* 営業段階 */}
               <View style={styles.detailRow}>
                 <Text style={styles.detailLabel}>営業段階:</Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -588,6 +900,246 @@ export default function App() {
                           salesStage === stage && styles.selectedDetailOptionText
                         ]}>
                           {stage}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </ScrollView>
+              </View>
+              
+              {/* 商談規模 */}
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>商談規模:</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  <View style={styles.detailOptions}>
+                    {sceneConfig.dealSize?.map((size) => (
+                      <TouchableOpacity
+                        key={size}
+                        style={[
+                          styles.detailOption,
+                          dealSize === size && styles.selectedDetailOption
+                        ]}
+                        onPress={() => setDealSize(size)}
+                      >
+                        <Text style={[
+                          styles.detailOptionText,
+                          dealSize === size && styles.selectedDetailOptionText
+                        ]}>
+                          {size}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </ScrollView>
+              </View>
+              
+              {/* 競合レベル */}
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>競合レベル:</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  <View style={styles.detailOptions}>
+                    {sceneConfig.competitionLevel?.map((level) => (
+                      <TouchableOpacity
+                        key={level}
+                        style={[
+                          styles.detailOption,
+                          competitionLevel === level && styles.selectedDetailOption
+                        ]}
+                        onPress={() => setCompetitionLevel(level)}
+                      >
+                        <Text style={[
+                          styles.detailOptionText,
+                          competitionLevel === level && styles.selectedDetailOptionText
+                        ]}>
+                          {level}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </ScrollView>
+              </View>
+              
+              {/* 顧客の課題 */}
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>顧客の課題:</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  <View style={styles.detailOptions}>
+                    {sceneConfig.customerPainPoints?.map((painPoint) => (
+                      <TouchableOpacity
+                        key={painPoint}
+                        style={[
+                          styles.detailOption,
+                          customerPainPoints === painPoint && styles.selectedDetailOption
+                        ]}
+                        onPress={() => setCustomerPainPoints(painPoint)}
+                      >
+                        <Text style={[
+                          styles.detailOptionText,
+                          customerPainPoints === painPoint && styles.selectedDetailOptionText
+                        ]}>
+                          {painPoint}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </ScrollView>
+              </View>
+            </View>
+          )}
+
+          {scene === 'presentation' && (
+            <View style={styles.detailSection}>
+              <Text style={styles.detailSectionTitle}>プレゼンテーションの詳細</Text>
+              
+              {/* プレゼンテーションの目的 */}
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>プレゼンテーションの目的:</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  <View style={styles.detailOptions}>
+                    {sceneConfig.presentationPurposes?.map((purpose) => (
+                      <TouchableOpacity
+                        key={purpose}
+                        style={[
+                          styles.detailOption,
+                          presentationPurpose === purpose && styles.selectedDetailOption
+                        ]}
+                        onPress={() => setPresentationPurpose(purpose)}
+                      >
+                        <Text style={[
+                          styles.detailOptionText,
+                          presentationPurpose === purpose && styles.selectedDetailOptionText
+                        ]}>
+                          {purpose}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </ScrollView>
+              </View>
+              
+              {/* 聴衆のタイプ */}
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>聴衆のタイプ:</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  <View style={styles.detailOptions}>
+                    {sceneConfig.audienceTypes?.map((type) => (
+                      <TouchableOpacity
+                        key={type}
+                        style={[
+                          styles.detailOption,
+                          audienceType === type && styles.selectedDetailOption
+                        ]}
+                        onPress={() => setAudienceType(type)}
+                      >
+                        <Text style={[
+                          styles.detailOptionText,
+                          audienceType === type && styles.selectedDetailOptionText
+                        ]}>
+                          {type}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </ScrollView>
+              </View>
+              
+              {/* プレゼンテーション形式 */}
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>プレゼンテーション形式:</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  <View style={styles.detailOptions}>
+                    {sceneConfig.presentationFormats?.map((format) => (
+                      <TouchableOpacity
+                        key={format}
+                        style={[
+                          styles.detailOption,
+                          presentationFormat === format && styles.selectedDetailOption
+                        ]}
+                        onPress={() => setPresentationFormat(format)}
+                      >
+                        <Text style={[
+                          styles.detailOptionText,
+                          presentationFormat === format && styles.selectedDetailOptionText
+                        ]}>
+                          {format}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </ScrollView>
+              </View>
+              
+              {/* プレゼン内容 */}
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>プレゼン内容:</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  <View style={styles.detailOptions}>
+                    {sceneConfig.presentationTopics?.map((topic) => (
+                      <TouchableOpacity
+                        key={topic}
+                        style={[
+                          styles.detailOption,
+                          presentationTopics === topic && styles.selectedDetailOption
+                        ]}
+                        onPress={() => setPresentationTopics(topic)}
+                      >
+                        <Text style={[
+                          styles.detailOptionText,
+                          presentationTopics === topic && styles.selectedDetailOptionText
+                        ]}>
+                          {topic}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </ScrollView>
+              </View>
+              
+              {/* 聴衆の専門性 */}
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>聴衆の専門性:</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  <View style={styles.detailOptions}>
+                    {sceneConfig.audienceExpertise?.map((expertise) => (
+                      <TouchableOpacity
+                        key={expertise}
+                        style={[
+                          styles.detailOption,
+                          audienceExpertise === expertise && styles.selectedDetailOption
+                        ]}
+                        onPress={() => setAudienceExpertise(expertise)}
+                      >
+                        <Text style={[
+                          styles.detailOptionText,
+                          audienceExpertise === expertise && styles.selectedDetailOptionText
+                        ]}>
+                          {expertise}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </ScrollView>
+              </View>
+              
+              {/* 制約事項 */}
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>制約事項:</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  <View style={styles.detailOptions}>
+                    {sceneConfig.presentationConstraints?.map((constraint) => (
+                      <TouchableOpacity
+                        key={constraint}
+                        style={[
+                          styles.detailOption,
+                          presentationConstraints === constraint && styles.selectedDetailOption
+                        ]}
+                        onPress={() => setPresentationConstraints(constraint)}
+                      >
+                        <Text style={[
+                          styles.detailOptionText,
+                          presentationConstraints === constraint && styles.selectedDetailOptionText
+                        ]}>
+                          {constraint}
                         </Text>
                       </TouchableOpacity>
                     ))}
@@ -828,10 +1380,21 @@ export default function App() {
             
             <View style={styles.adviceActions}>
               <TouchableOpacity
-                style={styles.theoryButton}
-                onPress={() => getTheory(advice.theory_id, advice.theory_id, advice.theory_name_ja || '')}
+                style={[
+                  styles.theoryButton,
+                  isLoadingTheory && styles.theoryButtonDisabled
+                ]}
+                onPress={() => getRelatedTheories(advice)}
+                disabled={isLoadingTheory}
               >
-                <Text style={styles.theoryButtonText}>理論を学ぶ</Text>
+                {isLoadingTheory ? (
+                  <View style={styles.theoryButtonLoading}>
+                    <ActivityIndicator color="#fff" size="small" />
+                    <Text style={styles.theoryButtonText}>理論を検索中...</Text>
+                  </View>
+                ) : (
+                  <Text style={styles.theoryButtonText}>理論を学ぶ</Text>
+                )}
               </TouchableOpacity>
             </View>
           </View>
@@ -854,39 +1417,101 @@ export default function App() {
             >
               <Text style={styles.backButtonText}>← 戻る</Text>
             </TouchableOpacity>
-            <Text style={styles.theoryHeaderTitle}>理論: {currentTheory.name}</Text>
+            <Text style={styles.theoryHeaderTitle}>関連理論</Text>
           </View>
 
-          <View style={styles.theoryCard}>
-            <Text style={styles.theoryDescription}>{currentTheory.description}</Text>
-            
-            {currentTheory.key_concepts && currentTheory.key_concepts.length > 0 && (
-              <>
-                <Text style={styles.theorySubtitle}>主要概念</Text>
-                {currentTheory.key_concepts.map((concept, index) => (
-                  <Text key={index} style={styles.theoryConcept}>• {concept}</Text>
-                ))}
-              </>
-            )}
-            
-            {currentTheory.when_to_use && currentTheory.when_to_use.length > 0 && (
-              <>
-                <Text style={styles.theorySubtitle}>使用場面</Text>
-                {currentTheory.when_to_use.map((use, index) => (
-                  <Text key={index} style={styles.theoryUse}>• {use}</Text>
-                ))}
-              </>
-            )}
-            
-            {currentTheory.examples && currentTheory.examples.length > 0 && (
-              <>
-                <Text style={styles.theorySubtitle}>具体例</Text>
-                {currentTheory.examples.map((example, index) => (
-                  <Text key={index} style={styles.theoryExample}>• {example}</Text>
-                ))}
-              </>
-            )}
-          </View>
+          {isLoadingTheory ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color="#007bff" />
+              <Text style={styles.loadingText}>AIが関連理論を検索中...</Text>
+              <Text style={styles.loadingSubtext}>しばらくお待ちください</Text>
+            </View>
+          ) : (
+            <View style={styles.theoryCard}>
+              {/* 関連理論がある場合は最初に表示 */}
+              {currentTheory.related_theories && currentTheory.related_theories.length > 0 ? (
+                <>
+                  <Text style={styles.theorySubtitle}>関連理論</Text>
+                  {currentTheory.related_theories.map((theory, index) => (
+                    <View key={index} style={styles.relatedTheoryCard}>
+                      <Text style={styles.relatedTheoryTitle}>{theory.name}</Text>
+                      <View style={styles.theoryMeta}>
+                        <Text style={styles.theoryAcademicField}>{theory.academic_field}</Text>
+                      </View>
+                      <Text style={styles.relatedTheoryDescription}>{theory.description}</Text>
+                      
+                      {theory.key_concepts && theory.key_concepts.length > 0 && (
+                        <>
+                          <Text style={styles.relatedTheorySubtitle}>主要概念</Text>
+                          {theory.key_concepts.map((concept, conceptIndex) => (
+                            <Text key={conceptIndex} style={styles.relatedTheoryConcept}>• {concept}</Text>
+                          ))}
+                        </>
+                      )}
+                      
+                      {theory.when_to_use && theory.when_to_use.length > 0 && (
+                        <>
+                          <Text style={styles.relatedTheorySubtitle}>使用場面</Text>
+                          {theory.when_to_use.map((use, useIndex) => (
+                            <Text key={useIndex} style={styles.theoryUse}>• {use}</Text>
+                          ))}
+                        </>
+                      )}
+                      
+                      {theory.examples && theory.examples.length > 0 && (
+                        <>
+                          <Text style={styles.theorySubtitle}>具体例</Text>
+                          {theory.examples.map((example, exampleIndex) => (
+                            <Text key={exampleIndex} style={styles.theoryExample}>• {example}</Text>
+                          ))}
+                        </>
+                      )}
+                      
+                      {theory.practical_tips && theory.practical_tips.length > 0 && (
+                        <>
+                          <Text style={styles.relatedTheorySubtitle}>実践のコツ</Text>
+                          {theory.practical_tips.map((tip, tipIndex) => (
+                            <Text key={tipIndex} style={styles.relatedTheoryTip}>• {tip}</Text>
+                          ))}
+                        </>
+                      )}
+                    </View>
+                  ))}
+                </>
+              ) : (
+                <>
+                  <Text style={styles.theoryDescription}>{currentTheory.description}</Text>
+                  
+                  {currentTheory.key_concepts && currentTheory.key_concepts.length > 0 && (
+                    <>
+                      <Text style={styles.theorySubtitle}>主要概念</Text>
+                      {currentTheory.key_concepts.map((concept, index) => (
+                        <Text key={index} style={styles.theoryConcept}>• {concept}</Text>
+                      ))}
+                    </>
+                  )}
+                  
+                  {currentTheory.when_to_use && currentTheory.when_to_use.length > 0 && (
+                    <>
+                      <Text style={styles.theorySubtitle}>使用場面</Text>
+                      {currentTheory.when_to_use.map((use, index) => (
+                        <Text key={index} style={styles.theoryUse}>• {use}</Text>
+                      ))}
+                    </>
+                  )}
+                  
+                  {currentTheory.examples && currentTheory.examples.length > 0 && (
+                    <>
+                      <Text style={styles.theorySubtitle}>具体例</Text>
+                      {currentTheory.examples.map((example, index) => (
+                        <Text key={index} style={styles.theoryExample}>• {example}</Text>
+                      ))}
+                    </>
+                  )}
+                </>
+              )}
+            </View>
+          )}
         </ScrollView>
       </SafeAreaView>
     );
@@ -1351,4 +1976,94 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     lineHeight: 20,
   },
+  relatedTheoryCard: {
+    backgroundColor: '#f8f9fa',
+    borderRadius: 8,
+    padding: 16,
+    marginTop: 16,
+    marginBottom: 16,
+    borderLeftWidth: 4,
+    borderLeftColor: '#007bff',
+  },
+  relatedTheoryTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#212529',
+    marginBottom: 8,
+  },
+
+  relatedTheoryDescription: {
+    fontSize: 14,
+    color: '#495057',
+    marginBottom: 16,
+    lineHeight: 20,
+  },
+  relatedTheorySubtitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#212529',
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  relatedTheoryConcept: {
+    fontSize: 14,
+    color: '#495057',
+    marginBottom: 8,
+    lineHeight: 20,
+  },
+  relatedTheoryUse: {
+    fontSize: 14,
+    color: '#495057',
+    marginBottom: 8,
+    lineHeight: 20,
+  },
+  relatedTheoryTip: {
+    fontSize: 14,
+    color: '#495057',
+    marginBottom: 8,
+    lineHeight: 20,
+  },
+  theoryButtonDisabled: {
+    opacity: 0.6,
+  },
+  theoryButtonLoading: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 40,
+  },
+  loadingText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#212529',
+    marginTop: 16,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  loadingSubtext: {
+    fontSize: 14,
+    color: '#6c757d',
+    textAlign: 'center',
+  },
+  theoryMeta: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  theoryAcademicField: {
+    fontSize: 12,
+    color: '#28a745',
+    backgroundColor: '#d4edda',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    fontWeight: '600',
+  },
+
 });

@@ -31,9 +31,27 @@ serve(async (req) => {
   }
 
   try {
+    console.log('Recent-advices function called with method:', req.method);
+    
     // Supabaseクライアントの作成
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+    
+    console.log('Environment variables check:', {
+      hasUrl: !!supabaseUrl,
+      hasKey: !!supabaseServiceKey,
+      urlLength: supabaseUrl?.length || 0,
+      keyLength: supabaseServiceKey?.length || 0
+    });
+    
+    if (!supabaseUrl || !supabaseServiceKey) {
+      console.error('Missing environment variables:', { supabaseUrl, supabaseServiceKey });
+      return new Response(
+        JSON.stringify({ error: 'Missing environment variables' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+    
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
     // プロトタイプ版: 認証なしで固定ユーザーIDを使用
@@ -43,13 +61,18 @@ serve(async (req) => {
       case 'POST':
         // 最近のアドバイスを保存
         const payload: RecentAdvicePayload = await req.json()
+        console.log('Received payload:', JSON.stringify(payload, null, 2));
         
         // 既存の同じtheory_idのレコードを削除（重複防止）
-        await supabase
+        const { error: deleteExistingError } = await supabase
           .from('recent_advices')
           .delete()
           .eq('user_id', prototypeUserId)
           .eq('theory_id', payload.theory_id)
+
+        if (deleteExistingError) {
+          console.error('Delete existing record error:', deleteExistingError);
+        }
 
         // 新しいレコードを挿入
         const { data: newAdvice, error: insertError } = await supabase
@@ -64,24 +87,32 @@ serve(async (req) => {
         if (insertError) {
           console.error('Insert error:', insertError)
           return new Response(
-            JSON.stringify({ error: 'Failed to save recent advice' }),
+            JSON.stringify({ error: 'Failed to save recent advice', details: insertError }),
             { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
           )
         }
 
+        console.log('Successfully inserted new advice:', newAdvice);
+
         // 古いレコードを削除（最新10件のみ保持）
-        const { data: allAdvices } = await supabase
+        const { data: allAdvices, error: fetchAllError } = await supabase
           .from('recent_advices')
           .select('id')
           .eq('user_id', prototypeUserId)
           .order('created_at', { ascending: false })
 
-        if (allAdvices && allAdvices.length > 10) {
+        if (fetchAllError) {
+          console.error('Fetch all advices error:', fetchAllError);
+        } else if (allAdvices && allAdvices.length > 10) {
           const idsToDelete = allAdvices.slice(10).map(advice => advice.id)
-          await supabase
+          const { error: cleanupError } = await supabase
             .from('recent_advices')
             .delete()
             .in('id', idsToDelete)
+          
+          if (cleanupError) {
+            console.error('Cleanup old records error:', cleanupError);
+          }
         }
 
         return new Response(
@@ -101,11 +132,12 @@ serve(async (req) => {
         if (fetchError) {
           console.error('Fetch error:', fetchError)
           return new Response(
-            JSON.stringify({ error: 'Failed to fetch recent advices' }),
+            JSON.stringify({ error: 'Failed to fetch recent advices', details: fetchError }),
             { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
           )
         }
 
+        console.log('Successfully fetched recent advices:', recentAdvices?.length || 0);
         return new Response(
           JSON.stringify({ data: recentAdvices || [] }),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -122,16 +154,16 @@ serve(async (req) => {
           )
         }
 
-        const { error: deleteError } = await supabase
+        const { error: deleteSpecificError } = await supabase
           .from('recent_advices')
           .delete()
           .eq('id', id)
           .eq('user_id', prototypeUserId)
 
-        if (deleteError) {
-          console.error('Delete error:', deleteError)
+        if (deleteSpecificError) {
+          console.error('Delete error:', deleteSpecificError)
           return new Response(
-            JSON.stringify({ error: 'Failed to delete recent advice' }),
+            JSON.stringify({ error: 'Failed to delete recent advice', details: deleteSpecificError }),
             { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
           )
         }
@@ -151,7 +183,7 @@ serve(async (req) => {
   } catch (error) {
     console.error('Function error:', error)
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: error.message, stack: error.stack }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }

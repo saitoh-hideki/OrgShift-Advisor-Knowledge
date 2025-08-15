@@ -16,6 +16,8 @@ interface InterviewContext {
   interview_type?: string;
   interview_purpose?: string;
   interview_relationship?: string;
+  interview_context?: string;
+  interview_outcomes?: string;
 }
 
 interface AIAdvice {
@@ -50,44 +52,65 @@ serve(async (req) => {
 
     // 面談専用の詳細プロンプト
     const prompt = `あなたは面談の専門家です。
-以下の面談の詳細に基づいて、具体的で実践的なアドバイスを3つ提供してください。
+以下の詳細な面談状況に基づいて、具体的で実践的なアドバイスを3つ提供してください。
 
-面談の詳細:
+**基本情報:**
 - 目標: ${context.goal}
 - 時間制限: ${context.time_limit}
 - 重要度: ${context.stakes}
 - 参加者数: ${context.participants || '未指定'}人
 - 関係性: ${context.relationship || '未指定'}
-${context.interview_type ? `- 面談の種類: ${context.interview_type}` : ''}
-${context.interview_purpose ? `- 面談の目的: ${context.interview_purpose}` : ''}
-${context.interview_relationship ? `- 面談での関係性: ${context.interview_relationship}` : ''}
+
+**面談の詳細設定:**
+- 面談の種類: ${context.interview_type || '未指定'}
+- 目的: ${context.interview_purpose || '未指定'}
+- 面談での関係性: ${context.interview_relationship || '未指定'}
+- 面談の文脈: ${context.interview_context || '未指定'}
+- 期待される成果: ${context.interview_outcomes || '未指定'}
+
+**重要:**
+上記の詳細設定を踏まえて、以下の点を考慮した具体的で実践的なアドバイスを提供してください：
+
+1. **面談タイプ特化**: 採用面接、評価面談、1on1、メンタリングなど種類に応じた最適なアプローチ
+2. **目的対応**: 評価、指導、相談解決、関係構築など目的に応じた進行方法
+3. **関係性構築**: 上司-部下、人事-従業員、メンター-メンティーなど関係性に応じた信頼構築
+4. **文脈理解**: 定期面談、問題対応、キャリア相談など文脈に応じた準備と進行
+5. **成果導出**: 目標の明確化、行動計画の策定、課題の解決など期待される成果への導線
+6. **時間管理**: 時間制限内での効果的なコミュニケーションと結論の導出
+
+**具体的な要求:**
+${context.interview_type ? `- 面談の種類「${context.interview_type}」に特化した準備方法、進行のポイント、フォローアップ方法を具体的に示してください。` : ''}
+${context.interview_purpose ? `- 目的「${context.interview_purpose}」を達成するための最適な構成、質問設計、結論の導き方を提案してください。` : ''}
+${context.interview_relationship ? `- 関係性「${context.interview_relationship}」での効果的なコミュニケーション方法、信頼構築のポイント、長期的な関係性の築き方を示してください。` : ''}
+${context.interview_context ? `- 文脈「${context.interview_context}」に応じた準備レベル、進行の柔軟性、緊急度への対応を考慮してください。` : ''}
+${context.interview_outcomes ? `- 期待される成果「${context.interview_outcomes}」を確実に得るための具体的な手法、測定方法、継続的な改善策を提案してください。` : ''}
 
 各アドバイスは以下の形式で提供してください：
-1. 理論名（英語）
-2. 日本語理論名
-3. 具体的な行動指針（150文字以内）
-4. 期待される効果（80文字以内）
-5. 注意点（60文字以内）
-6. 実践のコツ（50文字以内）
-7. 関連する理論や研究（30文字以内）
-8. 実装ステップ（3ステップ）
-9. 成功指標（3つ）
-10. よくある間違い（3つ）
-
-JSON形式で返してください：
 {
   "advices": [
     {
-      "theory_id": "理論名",
+      "theory_id": "理論名（英語）",
       "theory_name_ja": "日本語理論名",
-      "short_advice": "具体的な行動指針",
-      "expected_effect": "期待される効果",
-      "caution": "注意点",
-      "tips": "実践のコツ",
-      "related_theory": "関連理論",
-      "implementation_steps": ["ステップ1", "ステップ2", "ステップ3"],
-      "success_indicators": ["指標1", "指標2", "指標3"],
-      "common_mistakes": ["間違い1", "間違い2", "間違い3"]
+      "short_advice": "詳細設定を反映した具体的な行動指針（200文字以内）",
+      "expected_effect": "設定された面談状況での期待される効果（100文字以内）",
+      "caution": "設定された面談状況での注意点（80文字以内）",
+      "tips": "実践のコツ（80文字以内）",
+      "related_theory": "関連理論（50文字以内）",
+      "implementation_steps": [
+        "ステップ1（詳細設定を考慮した具体的な行動）",
+        "ステップ2（詳細設定を考慮した具体的な行動）", 
+        "ステップ3（詳細設定を考慮した具体的な行動）"
+      ],
+      "success_indicators": [
+        "指標1（設定された面談状況での測定方法）",
+        "指標2（設定された面談状況での測定方法）",
+        "指標3（設定された面談状況での測定方法）"
+      ],
+      "common_mistakes": [
+        "間違い1（設定された面談状況での注意点）",
+        "間違い2（設定された面談状況での注意点）",
+        "間違い3（設定された面談状況での注意点）"
+      ]
     }
   ]
 }`

@@ -17,6 +17,9 @@ interface PresentationContext {
   audience_type?: string;
   audience_count?: number;
   presentation_format?: string;
+  presentation_topics?: string;
+  audience_expertise?: string;
+  presentation_constraints?: string;
 }
 
 interface AIAdvice {
@@ -42,7 +45,10 @@ serve(async (req) => {
   }
 
   try {
+    console.log('Presentation advice function called');
     const context: PresentationContext = await req.json()
+    console.log('Request context:', context);
+    
     const openaiApiKey = Deno.env.get("OPENAI_API_KEY")
     
     if (!openaiApiKey) {
@@ -51,45 +57,68 @@ serve(async (req) => {
 
     // プレゼンテーション専用の詳細プロンプト
     const prompt = `あなたはプレゼンテーションの専門家です。
-以下のプレゼンテーションの詳細に基づいて、具体的で実践的なアドバイスを3つ提供してください。
+以下の詳細なプレゼンテーション状況に基づいて、具体的で実践的なアドバイスを3つ提供してください。
 
-プレゼンテーションの詳細:
+**基本情報:**
 - 目標: ${context.goal}
 - 時間制限: ${context.time_limit}
 - 重要度: ${context.stakes}
 - 参加者数: ${context.participants || '未指定'}人
 - 関係性: ${context.relationship || '未指定'}
-${context.presentation_purpose ? `- プレゼンテーションの目的: ${context.presentation_purpose}` : ''}
-${context.audience_type ? `- 聴衆のタイプ: ${context.audience_type}` : ''}
-${context.audience_count ? `- 聴衆の人数: ${context.audience_count}人` : ''}
-${context.presentation_format ? `- プレゼンテーション形式: ${context.presentation_format}` : ''}
+
+**プレゼンテーションの詳細設定:**
+- 目的: ${context.presentation_purpose || '未指定'}
+- 聴衆のタイプ: ${context.audience_type || '未指定'}
+- 聴衆の人数: ${context.audience_count || '未指定'}人
+- 形式: ${context.presentation_format || '未指定'}
+- 内容: ${context.presentation_topics || '未指定'}
+- 聴衆の専門性: ${context.audience_expertise || '未指定'}
+- 制約事項: ${context.presentation_constraints || '未指定'}
+
+**重要:**
+上記の詳細設定を踏まえて、以下の点を考慮した具体的で実践的なアドバイスを提供してください：
+
+1. **目的特化**: 提案、報告、教育、説得など目的に応じた最適な構成
+2. **聴衆対応**: 聴衆のタイプ、専門性、人数に応じたコミュニケーション方法
+3. **形式最適化**: 対面、オンライン、ハイブリッドに応じた効果的な手法
+4. **内容設計**: 指定された内容に最適化されたストーリーテリング
+5. **制約対応**: 時間制限、技術的制約、文化的制約への対応策
+6. **エンゲージメント**: 聴衆の関心を引き、理解を促進する方法
+
+**具体的な要求:**
+${context.presentation_purpose ? `- 目的「${context.presentation_purpose}」に最適化された構成、ストーリーテリング、結論の設計を提案してください。` : ''}
+${context.audience_type ? `- 聴衆タイプ「${context.audience_type}」に特化したアプローチ方法、用語選択、例示方法を具体的に示してください。` : ''}
+${context.audience_expertise ? `- 聴衆の専門性「${context.audience_expertise}」に応じた内容の深さ、専門用語の使用、説明の詳細度を調整してください。` : ''}
+${context.presentation_format ? `- 形式「${context.presentation_format}」での効果的な進行方法、ツール活用、参加者とのインタラクション方法を提案してください。` : ''}
+${context.presentation_topics ? `- 内容「${context.presentation_topics}」に特化した構成、視覚資料、例示方法を具体的に示してください。` : ''}
+${context.presentation_constraints ? `- 制約事項「${context.presentation_constraints}」への対応策、リスク管理、代替案を提案してください。` : ''}
 
 各アドバイスは以下の形式で提供してください：
-1. 理論名（英語）
-2. 日本語理論名
-3. 具体的な行動指針（150文字以内）
-4. 期待される効果（80文字以内）
-5. 注意点（60文字以内）
-6. 実践のコツ（50文字以内）
-7. 関連する理論や研究（30文字以内）
-8. 実装ステップ（3ステップ）
-9. 成功指標（3つ）
-10. よくある間違い（3つ）
-
-JSON形式で返してください：
 {
   "advices": [
     {
-      "theory_id": "理論名",
+      "theory_id": "理論名（英語）",
       "theory_name_ja": "日本語理論名",
-      "short_advice": "具体的な行動指針",
-      "expected_effect": "期待される効果",
-      "caution": "注意点",
-      "tips": "実践のコツ",
-      "related_theory": "関連理論",
-      "implementation_steps": ["ステップ1", "ステップ2", "ステップ3"],
-      "success_indicators": ["指標1", "指標2", "指標3"],
-      "common_mistakes": ["間違い1", "間違い2", "間違い3"]
+      "short_advice": "詳細設定を反映した具体的な行動指針（200文字以内）",
+      "expected_effect": "設定されたプレゼン状況での期待される効果（100文字以内）",
+      "caution": "設定されたプレゼン状況での注意点（80文字以内）",
+      "tips": "実践のコツ（80文字以内）",
+      "related_theory": "関連理論（50文字以内）",
+      "implementation_steps": [
+        "ステップ1（詳細設定を考慮した具体的な行動）",
+        "ステップ2（詳細設定を考慮した具体的な行動）", 
+        "ステップ3（詳細設定を考慮した具体的な行動）"
+      ],
+      "success_indicators": [
+        "指標1（設定されたプレゼン状況での測定方法）",
+        "指標2（設定されたプレゼン状況での測定方法）",
+        "指標3（設定されたプレゼン状況での測定方法）"
+      ],
+      "common_mistakes": [
+        "間違い1（設定されたプレゼン状況での注意点）",
+        "間違い2（設定されたプレゼン状況での注意点）",
+        "間違い3（設定されたプレゼン状況での注意点）"
+      ]
     }
   ]
 }`
@@ -123,15 +152,19 @@ JSON形式で返してください：
 
     const data = await response.json()
     const content = data.choices[0].message.content
+    console.log('OpenAI response content:', content);
     
     // JSONレスポンスを抽出
     const jsonMatch = content.match(/\{[\s\S]*\}/)
     if (!jsonMatch) {
+      console.error('Failed to parse AI response, content:', content);
       throw new Error("Failed to parse AI response")
     }
     
     const aiResponse = JSON.parse(jsonMatch[0])
+    console.log('Parsed AI response:', aiResponse);
     const advices: AIAdvice[] = aiResponse.advices || []
+    console.log('Extracted advices:', advices);
 
     return new Response(JSON.stringify({ advices }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
