@@ -43,7 +43,9 @@ interface RecentAdvicePayload {
   common_mistakes: string[];
 }
 
-const BASE = "https://eqiqthlfjcbyqfudziar.supabase.co/functions/v1"
+const BASE = process.env.EXPO_PUBLIC_SUPABASE_URL 
+  ? `${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1`
+  : "http://127.0.0.1:54321/functions/v1"
 
 // Supabase認証情報を取得
 const getAuthHeaders = (): Record<string, string> => {
@@ -61,8 +63,8 @@ const getAuthHeaders = (): Record<string, string> => {
   if (!supabaseAnonKey) {
     console.warn('Supabase anon key not found in environment variables, using hardcoded fallback');
     
-    // フォールバック用の認証情報（本番環境のキー）
-    const fallbackKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVxaXF0aGxmamNieXFmdWR6aWFyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUxNzcxNzQsImV4cCI6MjA3MDc1MzE3NH0.chIYPG-jQty4Juev6ldx3382G4kl_KYfu-Dqb5JzV1Y";
+    // フォールバック用の認証情報（ローカル環境のキー）
+    const fallbackKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0";
     
     return {
       "Content-Type": "application/json",

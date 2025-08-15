@@ -33,24 +33,20 @@ interface Advice {
 
 interface Theory {
   id: string;
-  name: string;
-  description: string;
+  name_ja: string;
+  name_en: string;
+  domain: string;
+  academic_field: string;
+  one_liner: string;
+  definition: string;
+  content: string;
+  applicable_scenarios: string;
   key_concepts: string[];
-  when_to_use: string[];
   examples: string[];
-  practical_tips?: string[];
-  academic_field?: string;
-  related_theories?: Array<{
-    id: string;
-    name: string;
-    description: string;
-    relevance: string;
-    academic_field: string;
-    key_concepts: string[];
-    when_to_use: string[];
-    examples: string[];
-    practical_tips: string[];
-  }>;
+  practical_tips: string[];
+  mechanism: string;
+  how_to: string[];
+  tags: string[];
 }
 
 interface RecentAdvice {
@@ -66,6 +62,10 @@ interface RecentAdvice {
 }
 
 export default function App() {
+  // Supabase設定
+  const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL || 'http://127.0.0.1:54321';
+  const SUPABASE_ANON_KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0';
+
   const [currentView, setCurrentView] = useState<'main' | 'input' | 'checklist' | 'advices' | 'theory' | 'theoryMemo' | 'theoryDetail'>('main');
   const [scene, setScene] = useState<string>('');
   const [goal, setGoal] = useState<string>('');
@@ -124,6 +124,8 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [recentAdvices, setRecentAdvices] = useState<RecentAdvice[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [theoriesList, setTheoriesList] = useState<Theory[]>([]);
+  const [isLoadingTheories, setIsLoadingTheories] = useState(false);
 
   // ScrollViewのref
   const adviceScrollViewRef = useRef<ScrollView>(null);
@@ -400,14 +402,20 @@ export default function App() {
         
         setCurrentTheory({
           id: 'related_theories',
-          name: topTheory.name || '関連理論',
-          description: topTheory.description || '理論の説明がありません',
+          name_ja: topTheory.name || '関連理論',
+          name_en: topTheory.name || 'Related Theory',
+          domain: topTheory.domain || 'Theory',
+          academic_field: topTheory.academic_field || 'Theory',
+          one_liner: topTheory.one_liner || 'No one-liner available',
+          definition: topTheory.definition || 'No definition available',
+          content: topTheory.content || 'No content available',
+          applicable_scenarios: topTheory.applicable_scenarios || 'No scenarios available',
           key_concepts: topTheory.key_concepts || [],
-          when_to_use: topTheory.when_to_use || [],
           examples: topTheory.examples || [],
           practical_tips: topTheory.practical_tips || [],
-          academic_field: topTheory.academic_field || '理論',
-          related_theories: response.related_theories // 関連理論も含める
+          mechanism: topTheory.mechanism || 'No mechanism',
+          how_to: topTheory.how_to || [],
+          tags: topTheory.tags || []
         });
         setCurrentView('theory');
       } else {
@@ -469,11 +477,20 @@ export default function App() {
     const theoryData = {
       id: 'advice_theory',
       name: 'アドバイス理論',
-      description: advice.short_advice,
+      name_ja: advice.theory_name_ja || 'アドバイス理論',
+      name_en: 'Advice Theory',
+      domain: 'advice',
+      academic_field: 'アドバイス',
+      one_liner: advice.short_advice,
+      definition: advice.short_advice,
+      content: advice.short_advice,
+      applicable_scenarios: `${scene} - ${goal}`,
       key_concepts: [advice.expected_effect],
-      when_to_use: [scene, goal],
       examples: [advice.short_advice],
-      related_theories: []
+      practical_tips: [],
+      mechanism: '',
+      how_to: [],
+      tags: []
     };
     
     setCurrentTheory(theoryData);
@@ -601,7 +618,10 @@ export default function App() {
           <View style={styles.theoryCategories}>
             <TouchableOpacity 
               style={styles.categoryCard} 
-              onPress={() => setSelectedCategory('behavioral_economics')}
+              onPress={() => {
+                setSelectedCategory('behavioral_econ');
+                getTheoriesByCategory('behavioral_econ');
+              }}
             >
               <Text style={styles.categoryCardTitle}>行動経済学</Text>
               <Text style={styles.categoryCardDescription}>人間の意思決定と行動に関する理論</Text>
@@ -610,7 +630,10 @@ export default function App() {
 
             <TouchableOpacity 
               style={styles.categoryCard} 
-              onPress={() => setSelectedCategory('leadership_psychology')}
+              onPress={() => {
+                setSelectedCategory('leadership_org_psych');
+                getTheoriesByCategory('leadership_org_psych');
+              }}
             >
               <Text style={styles.categoryCardTitle}>リーダーシップ・組織心理</Text>
               <Text style={styles.categoryCardDescription}>リーダーシップと組織開発の理論</Text>
@@ -619,16 +642,22 @@ export default function App() {
 
             <TouchableOpacity 
               style={styles.categoryCard} 
-              onPress={() => setSelectedCategory('negotiation')}
+              onPress={() => {
+                setSelectedCategory('communication');
+                getTheoriesByCategory('communication');
+              }}
             >
-              <Text style={styles.categoryCardTitle}>交渉術・影響力</Text>
-              <Text style={styles.categoryCardDescription}>交渉と影響力に関する理論</Text>
+              <Text style={styles.categoryCardTitle}>コミュニケーション・交渉</Text>
+              <Text style={styles.categoryCardDescription}>コミュニケーションと交渉の理論</Text>
               <Text style={styles.categoryCardCount}>10件の理論</Text>
             </TouchableOpacity>
 
             <TouchableOpacity 
               style={styles.categoryCard} 
-              onPress={() => setSelectedCategory('strategy')}
+              onPress={() => {
+                setSelectedCategory('strategy');
+                getTheoriesByCategory('strategy');
+              }}
             >
               <Text style={styles.categoryCardTitle}>経営戦略</Text>
               <Text style={styles.categoryCardDescription}>戦略立案と競争優位の理論</Text>
@@ -637,7 +666,10 @@ export default function App() {
 
             <TouchableOpacity 
               style={styles.categoryCard} 
-              onPress={() => setSelectedCategory('innovation')}
+              onPress={() => {
+                setSelectedCategory('innovation');
+                getTheoriesByCategory('innovation');
+              }}
             >
               <Text style={styles.categoryCardTitle}>イノベーション・プロダクト</Text>
               <Text style={styles.categoryCardDescription}>革新と製品開発の理論</Text>
@@ -646,7 +678,10 @@ export default function App() {
 
             <TouchableOpacity 
               style={styles.categoryCard} 
-              onPress={() => setSelectedCategory('operations')}
+              onPress={() => {
+                setSelectedCategory('operations');
+                getTheoriesByCategory('operations');
+              }}
             >
               <Text style={styles.categoryCardTitle}>オペレーション・プロジェクト管理</Text>
               <Text style={styles.categoryCardDescription}>業務効率化とプロジェクト管理の理論</Text>
@@ -655,7 +690,10 @@ export default function App() {
 
             <TouchableOpacity 
               style={styles.categoryCard} 
-              onPress={() => setSelectedCategory('finance_metrics')}
+              onPress={() => {
+                setSelectedCategory('finance');
+                getTheoriesByCategory('finance');
+              }}
             >
               <Text style={styles.categoryCardTitle}>ファイナンス・メトリクス</Text>
               <Text style={styles.categoryCardDescription}>財務分析と指標の理論</Text>
@@ -664,10 +702,13 @@ export default function App() {
 
             <TouchableOpacity 
               style={styles.categoryCard} 
-              onPress={() => setSelectedCategory('communication_sales')}
+              onPress={() => {
+                setSelectedCategory('sales_marketing');
+                getTheoriesByCategory('sales_marketing');
+              }}
             >
-              <Text style={styles.categoryCardTitle}>コミュニケーション・営業</Text>
-              <Text style={styles.categoryCardDescription}>コミュニケーションと営業の理論</Text>
+              <Text style={styles.categoryCardTitle}>営業・マーケティング</Text>
+              <Text style={styles.categoryCardDescription}>営業とマーケティングの理論</Text>
               <Text style={styles.categoryCardCount}>10件の理論</Text>
             </TouchableOpacity>
           </View>
@@ -680,7 +721,26 @@ export default function App() {
   const renderTheoryList = () => {
     if (!selectedCategory) return null;
     
-    const theories = getTheoriesByCategory(selectedCategory);
+    if (isLoadingTheories) {
+      return (
+        <SafeAreaView style={styles.container}>
+          <View style={styles.theoryMemoHeader}>
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() => setSelectedCategory(null)}
+            >
+              <Text style={styles.backButtonText}>← 戻る</Text>
+            </TouchableOpacity>
+            <Text style={styles.theoryMemoHeaderTitle}>{getCategoryTitle(selectedCategory)}</Text>
+          </View>
+          
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#007bff" />
+            <Text style={styles.loadingText}>理論一覧を読み込み中...</Text>
+          </View>
+        </SafeAreaView>
+      );
+    }
     
     return (
       <SafeAreaView style={styles.container}>
@@ -696,7 +756,7 @@ export default function App() {
           </View>
 
           <View style={styles.theoryList}>
-            {theories.map((theory) => (
+            {theoriesList.map((theory) => (
               <TouchableOpacity 
                 key={theory.id}
                 style={styles.theoryListItem} 
@@ -705,6 +765,9 @@ export default function App() {
                 <Text style={styles.theoryListItemTitle}>{theory.name_ja}</Text>
                 <Text style={styles.theoryListItemSubtitle}>{theory.name_en}</Text>
                 <Text style={styles.theoryListItemField}>{theory.academic_field}</Text>
+                {theory.one_liner && (
+                  <Text style={styles.theoryListItemSubtitle}>{theory.one_liner}</Text>
+                )}
               </TouchableOpacity>
             ))}
           </View>
@@ -714,142 +777,73 @@ export default function App() {
   };
 
   // カテゴリー別理論データを取得
-  const getTheoriesByCategory = (category: string) => {
-    const theoryMap: { [key: string]: any[] } = {
-      'behavioral_economics': [
-        { id: 'anchoring_effect', name_ja: 'アンカリング効果', name_en: 'Anchoring Effect', academic_field: '行動経済学' },
-        { id: 'framing_effect', name_ja: 'フレーミング効果', name_en: 'Framing Effect', academic_field: '行動経済学' },
-        { id: 'loss_aversion', name_ja: '損失回避', name_en: 'Loss Aversion', academic_field: '行動経済学' },
-        { id: 'endowment_effect', name_ja: '保有効果', name_en: 'Endowment Effect', academic_field: '行動経済学' },
-        { id: 'status_quo_bias', name_ja: '現状維持バイアス', name_en: 'Status Quo Bias', academic_field: '行動経済学' },
-        { id: 'availability_heuristic', name_ja: '利用可能性ヒューリスティック', name_en: 'Availability Heuristic', academic_field: '行動経済学' },
-        { id: 'representativeness_heuristic', name_ja: '代表性ヒューリスティック', name_en: 'Representativeness', academic_field: '行動経済学' },
-        { id: 'confirmation_bias', name_ja: '確証バイアス', name_en: 'Confirmation Bias', academic_field: '行動経済学' },
-        { id: 'sunk_cost_fallacy', name_ja: 'サンクコスト効果', name_en: 'Sunk Cost Fallacy', academic_field: '行動経済学' },
-        { id: 'prospect_theory', name_ja: 'プロスペクト理論', name_en: 'Prospect Theory', academic_field: '行動経済学' },
-        { id: 'probability_weighting', name_ja: '確率加重', name_en: 'Probability Weighting', academic_field: '行動経済学' },
-        { id: 'mental_accounting', name_ja: 'メンタルアカウンティング', name_en: 'Mental Accounting', academic_field: '行動経済学' },
-        { id: 'hyperbolic_discounting', name_ja: '双曲割引', name_en: 'Hyperbolic Discounting', academic_field: '行動経済学' },
-        { id: 'paradox_of_choice', name_ja: '選択肢過多', name_en: 'Paradox of Choice', academic_field: '行動経済学' },
-        { id: 'decoy_effect', name_ja: 'デコイ効果', name_en: 'Decoy Effect', academic_field: '行動経済学' },
-        { id: 'scarcity_effect', name_ja: '希少性効果', name_en: 'Scarcity Effect', academic_field: '行動経済学' },
-        { id: 'social_proof', name_ja: '社会的証明', name_en: 'Social Proof', academic_field: '行動経済学' },
-        { id: 'reciprocity', name_ja: '返報性の原理', name_en: 'Reciprocity', academic_field: '行動経済学' },
-        { id: 'commitment_consistency', name_ja: '一貫性の原理', name_en: 'Commitment & Consistency', academic_field: '行動経済学' },
-        { id: 'peak_end_rule', name_ja: 'ピーク・エンドの法則', name_en: 'Peak-End Rule', academic_field: '行動経済学' }
-      ],
-      'leadership_psychology': [
-        { id: 'servant_leadership', name_ja: 'サーバント・リーダーシップ', name_en: 'Servant Leadership', academic_field: 'リーダーシップ理論' },
-        { id: 'transformational_leadership', name_ja: 'トランスフォーメーショナル・リーダーシップ', name_en: 'Transformational Leadership', academic_field: 'リーダーシップ理論' },
-        { id: 'situational_leadership', name_ja: 'シチュエーショナル・リーダーシップ', name_en: 'Situational Leadership', academic_field: 'リーダーシップ理論' },
-        { id: 'level5_leadership', name_ja: 'レベル5リーダーシップ', name_en: 'Level 5 Leadership', academic_field: 'リーダーシップ理論' },
-        { id: 'emotional_intelligence', name_ja: 'エモーショナルインテリジェンス', name_en: 'Emotional Intelligence', academic_field: '組織心理学' },
-        { id: 'lmx_theory', name_ja: 'LMX理論', name_en: 'Leader-Member Exchange', academic_field: '組織心理学' },
-        { id: 'authentic_leadership', name_ja: 'オーセンティック・リーダーシップ', name_en: 'Authentic Leadership', academic_field: 'リーダーシップ理論' },
-        { id: 'grow_model', name_ja: 'GROWモデル', name_en: 'GROW Model', academic_field: 'コーチング理論' },
-        { id: 'psychological_safety', name_ja: '心理的安全性', name_en: 'Psychological Safety', academic_field: '組織心理学' },
-        { id: 'groupthink', name_ja: '集団浅慮', name_en: 'Groupthink', academic_field: '組織心理学' },
-        { id: 'social_loafing', name_ja: '社会的手抜き', name_en: 'Social Loafing', academic_field: '組織心理学' },
-        { id: 'tuckman_stages', name_ja: 'タックマンモデル', name_en: 'Tuckman\'s Stages', academic_field: 'チーム開発理論' },
-        { id: 'pygmalion_effect', name_ja: 'ピグマリオン効果', name_en: 'Pygmalion Effect', academic_field: '組織心理学' },
-        { id: 'equity_theory', name_ja: '公平理論', name_en: 'Equity Theory', academic_field: '動機付け理論' },
-        { id: 'expectancy_theory', name_ja: '期待理論', name_en: 'Expectancy Theory', academic_field: '動機付け理論' },
-        { id: 'herzberg_two_factor', name_ja: '二要因理論', name_en: 'Herzberg Two-Factor', academic_field: '動機付け理論' },
-        { id: 'job_characteristics', name_ja: '職務特性モデル', name_en: 'Job Characteristics Model', academic_field: '職務設計理論' },
-        { id: 'self_determination', name_ja: '自己決定理論', name_en: 'Self-Determination Theory', academic_field: '動機付け理論' },
-        { id: 'goal_setting', name_ja: '目標設定理論', name_en: 'Goal-Setting Theory', academic_field: '目標管理理論' },
-        { id: 'procedural_justice', name_ja: '手続き的公正', name_en: 'Procedural Justice', academic_field: '組織正義理論' }
-      ],
-      'negotiation': [
-        { id: 'batna', name_ja: 'BATNA', name_en: 'Best Alternative to Negotiated Agreement', academic_field: '交渉理論' },
-        { id: 'zopa', name_ja: 'ZOPA', name_en: 'Zone of Possible Agreement', academic_field: '交渉理論' },
-        { id: 'principled_negotiation', name_ja: 'プリンシプル・ネゴシエーション', name_en: 'Principled Negotiation', academic_field: '交渉理論' },
-        { id: 'meso', name_ja: 'MESO', name_en: 'Multiple Equivalent Simultaneous Offers', academic_field: '交渉戦術' },
-        { id: 'rollover_tactic', name_ja: 'ロールオーバー戦術', name_en: 'Roll-over Tactic', academic_field: '交渉戦術' },
-        { id: 'concession_strategies', name_ja: '譲歩戦略', name_en: 'Concession Strategies', academic_field: '交渉戦術' },
-        { id: 'tactical_empathy', name_ja: '戦術的共感', name_en: 'Tactical Empathy', academic_field: '交渉心理学' },
-        { id: 'foot_in_door', name_ja: 'フット・イン・ザ・ドア', name_en: 'Foot-in-the-Door', academic_field: '影響力理論' },
-        { id: 'door_in_face', name_ja: 'ドア・イン・ザ・フェイス', name_en: 'Door-in-the-Face', academic_field: '影響力理論' },
-        { id: 'negotiation_anchoring', name_ja: '交渉アンカリング', name_en: 'Negotiation Anchoring', academic_field: '交渉戦術' }
-      ],
-      'strategy': [
-        { id: 'five_forces', name_ja: 'ファイブフォース分析', name_en: 'Porter\'s Five Forces', academic_field: '競争戦略論' },
-        { id: 'value_chain', name_ja: 'バリューチェーン分析', name_en: 'Value Chain Analysis', academic_field: '競争戦略論' },
-        { id: 'generic_strategies', name_ja: '基本戦略', name_en: 'Generic Strategies', academic_field: '競争戦略論' },
-        { id: 'blue_ocean', name_ja: 'ブルーオーシャン戦略', name_en: 'Blue Ocean Strategy', academic_field: 'イノベーション戦略' },
-        { id: 'rbv', name_ja: '資源ベース理論', name_en: 'Resource-Based View', academic_field: '競争戦略論' },
-        { id: 'core_competence', name_ja: 'コア・コンピタンス', name_en: 'Core Competence', academic_field: '競争戦略論' },
-        { id: 'swot', name_ja: 'SWOT分析', name_en: 'SWOT Analysis', academic_field: '戦略分析' },
-        { id: 'pestel', name_ja: 'PESTEL分析', name_en: 'PESTEL Analysis', academic_field: '環境分析' },
-        { id: 'balanced_scorecard', name_ja: 'バランススコアカード', name_en: 'Balanced Scorecard', academic_field: '経営管理' },
-        { id: 'okr', name_ja: 'OKR', name_en: 'Objectives and Key Results', academic_field: '目標管理' }
-      ],
-      'innovation': [
-        { id: 'design_thinking', name_ja: 'デザイン思考', name_en: 'Design Thinking', academic_field: 'イノベーション手法' },
-        { id: 'lean_startup', name_ja: 'リーンスタートアップ', name_en: 'Lean Startup', academic_field: '起業手法' },
-        { id: 'jobs_to_be_done', name_ja: 'ジョブ理論', name_en: 'Jobs to Be Done', academic_field: 'マーケティング理論' },
-        { id: 'kano_model', name_ja: 'KANOモデル', name_en: 'Kano Model', academic_field: '品質管理' },
-        { id: 'diffusion_innovations', name_ja: 'イノベーション普及理論', name_en: 'Diffusion of Innovations', academic_field: '普及理論' },
-        { id: 'aarrr_funnel', name_ja: 'AARRRファネル', name_en: 'AARRR Funnel', academic_field: 'グロースハッキング' },
-        { id: 'north_star_metric', name_ja: 'ノーススターメトリクス', name_en: 'North Star Metric', academic_field: 'KPI設計' },
-        { id: 'rice_scoring', name_ja: 'RICEスコアリング', name_en: 'RICE Scoring', academic_field: '優先度評価' },
-        { id: 'moscow', name_ja: 'MoSCoW法', name_en: 'MoSCoW Method', academic_field: '要件定義' },
-        { id: 'mvp', name_ja: 'MVP', name_en: 'Minimum Viable Product', academic_field: 'プロダクト開発' }
-      ],
-      'operations': [
-        { id: 'kanban', name_ja: 'カンバン', name_en: 'Kanban', academic_field: 'プロジェクト管理' },
-        { id: 'scrum', name_ja: 'スクラム', name_en: 'Scrum', academic_field: 'アジャイル開発' },
-        { id: 'lean', name_ja: 'リーン', name_en: 'Lean', academic_field: '業務改善' },
-        { id: 'six_sigma', name_ja: 'シックスシグマ', name_en: 'Six Sigma', academic_field: '品質管理' },
-        { id: 'tqm', name_ja: 'TQM', name_en: 'Total Quality Management', academic_field: '品質管理' },
-        { id: 'critical_path', name_ja: 'クリティカルパス', name_en: 'Critical Path Method', academic_field: 'プロジェクト管理' },
-        { id: 'pert', name_ja: 'PERT', name_en: 'Program Evaluation Review Technique', academic_field: 'プロジェクト管理' },
-        { id: 'gantt_chart', name_ja: 'ガントチャート', name_en: 'Gantt Chart', academic_field: 'プロジェクト管理' },
-        { id: 'agile', name_ja: 'アジャイル', name_en: 'Agile', academic_field: 'プロジェクト管理' },
-        { id: 'waterfall', name_ja: 'ウォーターフォール', name_en: 'Waterfall', academic_field: 'プロジェクト管理' }
-      ],
-      'finance_metrics': [
-        { id: 'roi', name_ja: 'ROI分析', name_en: 'Return on Investment', academic_field: '財務分析' },
-        { id: 'npv', name_ja: 'NPV', name_en: 'Net Present Value', academic_field: '財務分析' },
-        { id: 'irr', name_ja: 'IRR', name_en: 'Internal Rate of Return', academic_field: '財務分析' },
-        { id: 'payback_period', name_ja: '回収期間', name_en: 'Payback Period', academic_field: '財務分析' },
-        { id: 'break_even', name_ja: '損益分岐点', name_en: 'Break-Even Point', academic_field: '財務分析' },
-        { id: 'customer_lifetime_value', name_ja: '顧客生涯価値', name_en: 'Customer Lifetime Value', academic_field: 'マーケティング指標' },
-        { id: 'churn_rate', name_ja: 'チャーン率', name_en: 'Churn Rate', academic_field: 'マーケティング指標' },
-        { id: 'conversion_rate', name_ja: 'コンバージョン率', name_en: 'Conversion Rate', academic_field: 'マーケティング指標' },
-        { id: 'cac', name_ja: '顧客獲得コスト', name_en: 'Customer Acquisition Cost', academic_field: 'マーケティング指標' },
-        { id: 'ltv_cac_ratio', name_ja: 'LTV/CAC比率', name_en: 'LTV/CAC Ratio', academic_field: 'マーケティング指標' }
-      ],
-      'communication_sales': [
-        { id: 'active_listening', name_ja: 'アクティブリスニング', name_en: 'Active Listening', academic_field: 'コミュニケーション' },
-        { id: 'nonviolent_communication', name_ja: '非暴力コミュニケーション', name_en: 'Nonviolent Communication', academic_field: 'コミュニケーション' },
-        { id: 'feedback_sandwich', name_ja: 'フィードバックサンドイッチ', name_en: 'Feedback Sandwich', academic_field: 'フィードバック技法' },
-        { id: 'spin_selling', name_ja: 'SPINセリング', name_en: 'SPIN Selling', academic_field: '営業手法' },
-        { id: 'solution_selling', name_ja: 'ソリューションセリング', name_en: 'Solution Selling', academic_field: '営業手法' },
-        { id: 'consultative_selling', name_ja: 'コンサルティブセリング', name_en: 'Consultative Selling', academic_field: '営業手法' },
-        { id: 'challenger_sale', name_ja: 'チャレンジャーセール', name_en: 'The Challenger Sale', academic_field: '営業手法' },
-        { id: 'sandler_selling', name_ja: 'サンドラーセリング', name_en: 'Sandler Selling', academic_field: '営業手法' },
-        { id: 'neil_rackham', name_ja: 'ニール・ラッカム理論', name_en: 'Neil Rackham Theory', academic_field: '営業研究' },
-        { id: 'sales_funnel', name_ja: 'セールスファネル', name_en: 'Sales Funnel', academic_field: '営業プロセス' }
-      ]
-    };
+  const getTheoriesByCategory = async (category: string) => {
+    try {
+      setIsLoadingTheories(true);
+      const response = await fetch(`${SUPABASE_URL}/functions/v1/theory-memo?action=list&domain=${category}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json',
+        },
+      });
 
-    return theoryMap[category] || [];
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setTheoriesList(data.theories || []);
+    } catch (error) {
+      console.error('Error fetching theories:', error);
+      setTheoriesList([]);
+    } finally {
+      setIsLoadingTheories(false);
+    }
+  };
+
+  // 理論詳細を表示
+  const showTheoryDetail = async (theoryId: string) => {
+    try {
+      setIsLoadingTheory(true);
+      setSelectedTheoryId(theoryId);
+      setCurrentView('theoryDetail');
+
+      const response = await fetch(`${SUPABASE_URL}/functions/v1/theory-memo?action=get&theory_id=${theoryId}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const theoryData = await response.json();
+      setSelectedTheoryData(theoryData);
+    } catch (error) {
+      console.error('Error fetching theory detail:', error);
+      setSelectedTheoryData(null);
+    } finally {
+      setIsLoadingTheory(false);
+    }
   };
 
   // カテゴリータイトルを取得
   const getCategoryTitle = (category: string) => {
-    const titleMap: { [key: string]: string } = {
-      'behavioral_economics': '行動経済学',
-      'leadership_psychology': 'リーダーシップ・組織心理',
-      'negotiation': '交渉術・影響力',
+    const titles: { [key: string]: string } = {
+      'behavioral_econ': '行動経済学',
+      'leadership_org_psych': 'リーダーシップ・組織心理',
+      'communication': 'コミュニケーション・交渉',
       'strategy': '経営戦略',
       'innovation': 'イノベーション・プロダクト',
       'operations': 'オペレーション・プロジェクト管理',
-      'finance_metrics': 'ファイナンス・メトリクス',
-      'communication_sales': 'コミュニケーション・営業'
+      'finance': 'ファイナンス・メトリクス',
+      'sales_marketing': '営業・マーケティング'
     };
-    return titleMap[category] || '理論一覧';
+    return titles[category] || category;
   };
 
   // シーンアイコンを取得
@@ -2085,7 +2079,7 @@ export default function App() {
               <Text style={styles.backButtonText}>← 戻る</Text>
             </TouchableOpacity>
             <Text style={styles.adviceHeaderTitle}>
-              {currentTheory.name || '関連理論'}
+              {currentTheory.name_ja || '関連理論'}
             </Text>
           </View>
 
@@ -2101,7 +2095,7 @@ export default function App() {
                 {/* メインの理論（一番上）を表示 */}
                 <Text style={styles.adviceTitle}>メイン理論</Text>
                 <Text style={styles.adviceText}>
-                  {currentTheory.description || '理論の説明がありません'}
+                  {currentTheory.one_liner || '理論の説明がありません'}
                 </Text>
                   
                 {currentTheory.key_concepts && currentTheory.key_concepts.length > 0 && (
@@ -2113,12 +2107,10 @@ export default function App() {
                   </>
                 )}
                 
-                {currentTheory.when_to_use && currentTheory.when_to_use.length > 0 && (
+                {currentTheory.applicable_scenarios && (
                   <>
-                    <Text style={styles.adviceSubtitle}>使用場面</Text>
-                    {currentTheory.when_to_use.map((use, useIndex) => (
-                      <Text key={useIndex} style={styles.adviceStep}>• {use}</Text>
-                    ))}
+                    <Text style={styles.adviceSubtitle}>適用場面</Text>
+                    <Text style={styles.adviceStep}>• {currentTheory.applicable_scenarios}</Text>
                   </>
                 )}
                 
@@ -2141,186 +2133,12 @@ export default function App() {
                 )}
               </View>
 
-              {/* 関連理論がある場合はリストアップ */}
-              {currentTheory.related_theories && currentTheory.related_theories.length > 1 && (
-                <>
-                  {currentTheory.related_theories.slice(1).map((theory, index) => (
-                    <View key={index} style={styles.adviceCard}>
-                      <Text style={styles.adviceTitle}>
-                        {theory.name || `理論 ${index + 2}`}
-                      </Text>
-                      <Text style={styles.adviceText}>
-                        {theory.description || '理論の説明がありません'}
-                      </Text>
-                      
-                      {theory.key_concepts && theory.key_concepts.length > 0 && (
-                        <>
-                          <Text style={styles.adviceSubtitle}>主要概念</Text>
-                          {theory.key_concepts.map((concept, conceptIndex) => (
-                            <Text key={conceptIndex} style={styles.adviceStep}>• {concept}</Text>
-                          ))}
-                        </>
-                      )}
-                      
-                      {theory.when_to_use && theory.when_to_use.length > 0 && (
-                        <>
-                          <Text style={styles.adviceSubtitle}>使用場面</Text>
-                          {theory.when_to_use.map((use, useIndex) => (
-                            <Text key={useIndex} style={styles.adviceStep}>• {use}</Text>
-                          ))}
-                        </>
-                      )}
-                      
-                      {theory.examples && theory.examples.length > 0 && (
-                        <>
-                          <Text style={styles.adviceSubtitle}>具体例</Text>
-                          {theory.examples.map((example, exampleIndex) => (
-                            <Text key={exampleIndex} style={styles.adviceStep}>• {example}</Text>
-                          ))}
-                        </>
-                      )}
-                      
-                      {theory.practical_tips && theory.practical_tips.length > 0 && (
-                        <>
-                          <Text style={styles.adviceSubtitle}>実践のコツ</Text>
-                          {theory.practical_tips.map((tip, tipIndex) => (
-                            <Text key={tipIndex} style={styles.adviceStep}>• {tip}</Text>
-                          ))}
-                        </>
-                      )}
-                    </View>
-                  ))}
-                </>
-              )}
+              {/* 関連理論の表示は現在のTheory型ではサポートしていないため、コメントアウト */}
             </>
           )}
         </ScrollView>
       </SafeAreaView>
     );
-  };
-
-  // 理論詳細を表示
-  const showTheoryDetail = async (theoryId: string) => {
-    console.log('showTheoryDetail called with theoryId:', theoryId);
-    setIsLoadingTheory(true);
-    
-    try {
-      // エッジファンクションから理論詳細を取得
-      const response = await fetch('https://eqiqthlfjcbyqfudziar.supabase.co/functions/v1/theory-detail', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ theory_id: theoryId })
-      });
-
-      if (response.ok) {
-        const theoryData = await response.json();
-        console.log('Theory data fetched from API:', theoryData);
-        setSelectedTheoryData(theoryData);
-        setCurrentView('theoryDetail'); // 理論詳細画面に移動
-      } else {
-        console.error('Failed to fetch theory data from API:', response.status);
-        // フォールバック: ハードコードされた情報を使用
-        const theoryInfo = await getTheoryInfo(theoryId);
-        setSelectedTheoryData(theoryInfo);
-        setCurrentView('theoryDetail'); // 理論詳細画面に移動
-      }
-    } catch (error) {
-      console.error('Error fetching theory data from API:', error);
-      // フォールバック: ハードコードされた情報を使用
-      const theoryInfo = await getTheoryInfo(theoryId);
-      setSelectedTheoryData(theoryInfo);
-      setCurrentView('theoryDetail'); // 理論詳細画面に移動
-    } finally {
-      setIsLoadingTheory(false);
-    }
-  };
-
-  // 理論IDから基本情報を取得する関数
-  const getTheoryInfo = async (theoryId: string) => {
-    try {
-      // エッジファンクションから理論詳細を取得
-      const response = await fetch('https://eqiqthlfjcbyqfudziar.supabase.co/functions/v1/theory-detail', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ theory_id: theoryId })
-      });
-
-      if (response.ok) {
-        const theoryData = await response.json();
-        console.log('Theory data fetched:', theoryData);
-        return theoryData;
-      } else {
-        console.error('Failed to fetch theory data:', response.status);
-        // フォールバック: ハードコードされた情報を使用
-        return getFallbackTheoryInfo(theoryId);
-      }
-    } catch (error) {
-      console.error('Error fetching theory data:', error);
-      // フォールバック: ハードコードされた情報を使用
-      return getFallbackTheoryInfo(theoryId);
-    }
-  };
-
-  // フォールバック用の理論情報（ハードコード）
-  const getFallbackTheoryInfo = (theoryId: string) => {
-    const theoryMap: { [key: string]: any } = {
-      'anchoring_effect': {
-        name_ja: 'アンカリング効果',
-        name_en: 'Anchoring Effect',
-        academic_field: '行動経済学',
-        one_liner: '冒頭の基準提示で判断の軸を作る',
-        definition: '最初に提示された基準がその後の判断を左右する心理効果',
-        content: '価格や条件の初提示は、その後の交渉や評価の基準点として強く影響を与える',
-        applicable_scenarios: ['価格交渉', '予算策定', 'KPI設定', '評価面談'],
-        key_concepts: ['基準点の設定', '比較効果', '認知バイアス', '意思決定の歪み'],
-        practical_tips: ['複数の選択肢を同時提示', '客観的な基準を事前に設定', 'アンカーの影響を認識する'],
-        examples: ['価格交渉での初期提示', '予算会議での基準値', '人事評価での基準設定']
-      },
-      'framing_effect': {
-        name_ja: 'フレーミング効果',
-        name_en: 'Framing Effect',
-        academic_field: '行動経済学',
-        one_liner: '同じ事実でも見せ方で選好が変わる',
-        definition: '同じ情報でも提示の仕方によって受け取られ方や選好が変わる',
-        content: '利得枠と損失枠の両面から事実を提示することで意思決定をコントロールする',
-        applicable_scenarios: ['企画提案', '稟議承認', '営業トーク', '変更提案'],
-        key_concepts: ['表現方法', '認知フレーム', '意思決定バイアス', 'コミュニケーション効果'],
-        practical_tips: ['ポジティブな表現を心がける', '具体的な数値を示す', '相手の立場に立って表現する'],
-        examples: ['成功率90% vs 失敗率10%', '節約効果 vs コスト削減', '成長機会 vs リスク回避']
-      },
-      'loss_aversion': {
-        name_ja: '損失回避',
-        name_en: 'Loss Aversion',
-        academic_field: '行動経済学',
-        one_liner: '導入しない損失を可視化して行動を促す',
-        definition: '人は利益を得るより損失を避けることを優先する傾向がある',
-        content: '未導入時の損失額を明示することで行動を促す',
-        applicable_scenarios: ['導入提案', '解約抑止', '業務改善', '変更推進'],
-        key_concepts: ['損失の重み', '利益の軽視', '現状維持バイアス', 'リスク回避'],
-        practical_tips: ['損失の具体的な金額を示す', '現状維持のコストを明示', '段階的な改善を提案'],
-        examples: ['システム導入による損失回避', '現状維持の機会損失', '改善によるリスク軽減']
-      }
-    };
-
-    // 理論IDに対応する情報があれば返す、なければデフォルト情報を返す
-    if (theoryMap[theoryId]) {
-      return theoryMap[theoryId];
-    }
-
-    // デフォルト情報（理論IDから推測）
-    const theoryName = theoryId.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-    return {
-      name_ja: theoryId,
-      name_en: theoryName,
-      academic_field: '理論',
-      one_liner: `${theoryName}について学びましょう`,
-      definition: `理論「${theoryName}」は、組織変革とリーダーシップにおいて重要な概念です。`,
-      content: 'この理論は、実践的なビジネスシーンで活用できる重要な知見を提供します。',
-      applicable_scenarios: ['組織変革', 'リーダーシップ開発', 'チームビルディング', '業務改善'],
-      key_concepts: ['理論の核心概念', '実践的な応用', '効果的な活用方法', '成功のポイント'],
-      practical_tips: ['段階的な導入', '継続的な評価', 'チーム全体での共有', '定期的な見直し'],
-      examples: ['成功事例', '実践例', '応用例', '改善例']
-    };
   };
 
   // 理論詳細画面
@@ -2537,151 +2355,22 @@ export default function App() {
           </View>
         </View>
 
-        {/* 理論メモ（軽量なカード表示） */}
+        {/* 理論メモ */}
         <View style={styles.theoryMemoSection}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>📚 理論メモ</Text>
-            <Text style={styles.sectionSubtitle}>100の理論をカテゴリー別に学習</Text>
-          </View>
-          
-          <View style={styles.theoryCategoriesGrid}>
-            <TouchableOpacity 
-              style={styles.theoryCategoryCard} 
-              onPress={() => {
-                setSelectedCategory('behavioral_economics');
-                setCurrentView('theoryMemo');
-              }}
-            >
-              <View style={styles.categoryIconContainer}>
-                <Text style={styles.categoryIcon}>🧠</Text>
-              </View>
-              <View style={styles.categoryContent}>
-                <Text style={styles.categoryTitle}>行動経済学</Text>
-                <Text style={styles.categoryDescription}>20件の理論</Text>
-              </View>
-              <Text style={styles.categoryArrow}>›</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity 
-              style={styles.theoryCategoryCard} 
-              onPress={() => {
-                setSelectedCategory('leadership_psychology');
-                setCurrentView('theoryMemo');
-              }}
-            >
-              <View style={styles.categoryIconContainer}>
-                <Text style={styles.categoryIcon}>👥</Text>
-              </View>
-              <View style={styles.categoryContent}>
-                <Text style={styles.categoryTitle}>リーダーシップ・組織心理</Text>
-                <Text style={styles.categoryDescription}>20件の理論</Text>
-              </View>
-              <Text style={styles.categoryArrow}>›</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity 
-              style={styles.theoryCategoryCard} 
-              onPress={() => {
-                setSelectedCategory('negotiation');
-                setCurrentView('theoryMemo');
-              }}
-            >
-              <View style={styles.categoryIconContainer}>
-                <Text style={styles.categoryIcon}>🤝</Text>
-              </View>
-              <View style={styles.categoryContent}>
-                <Text style={styles.categoryTitle}>交渉術・影響力</Text>
-                <Text style={styles.categoryDescription}>10件の理論</Text>
-              </View>
-              <Text style={styles.categoryArrow}>›</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity 
-              style={styles.theoryCategoryCard} 
-              onPress={() => {
-                setSelectedCategory('strategy');
-                setCurrentView('theoryMemo');
-              }}
-            >
-              <View style={styles.categoryIconContainer}>
-                <Text style={styles.categoryIcon}>🎯</Text>
-              </View>
-              <View style={styles.categoryContent}>
-                <Text style={styles.categoryTitle}>経営戦略</Text>
-                <Text style={styles.categoryDescription}>10件の理論</Text>
-              </View>
-              <Text style={styles.categoryArrow}>›</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity 
-              style={styles.theoryCategoryCard} 
-              onPress={() => {
-                setSelectedCategory('innovation');
-                setCurrentView('theoryMemo');
-              }}
-            >
-              <View style={styles.categoryIconContainer}>
-                <Text style={styles.categoryIcon}>💡</Text>
-              </View>
-              <View style={styles.categoryContent}>
-                <Text style={styles.categoryTitle}>イノベーション・プロダクト</Text>
-                <Text style={styles.categoryDescription}>10件の理論</Text>
-              </View>
-              <Text style={styles.categoryArrow}>›</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity 
-              style={styles.theoryCategoryCard} 
-              onPress={() => {
-                setSelectedCategory('operations');
-                setCurrentView('theoryMemo');
-              }}
-            >
-              <View style={styles.categoryIconContainer}>
-                <Text style={styles.categoryIcon}>⚙️</Text>
-              </View>
-              <View style={styles.categoryContent}>
-                <Text style={styles.categoryTitle}>オペレーション・プロジェクト管理</Text>
-                <Text style={styles.categoryDescription}>10件の理論</Text>
-              </View>
-              <Text style={styles.categoryArrow}>›</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity 
-              style={styles.theoryCategoryCard} 
-              onPress={() => {
-                setSelectedCategory('finance_metrics');
-                setCurrentView('theoryMemo');
-              }}
-            >
-              <View style={styles.categoryIconContainer}>
-                <Text style={styles.categoryIcon}>📊</Text>
-              </View>
-              <View style={styles.categoryContent}>
-                <Text style={styles.categoryTitle}>ファイナンス・メトリクス</Text>
-                <Text style={styles.categoryDescription}>10件の理論</Text>
-              </View>
-              <Text style={styles.categoryArrow}>›</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity 
-              style={styles.theoryCategoryCard} 
-              onPress={() => {
-                setSelectedCategory('communication_sales');
-                setCurrentView('theoryMemo');
-              }}
-            >
-              <View style={styles.categoryIconContainer}>
-                <Text style={styles.categoryIcon}>💬</Text>
-              </View>
-              <View style={styles.categoryContent}>
-                <Text style={styles.categoryTitle}>コミュニケーション・営業</Text>
-                <Text style={styles.categoryDescription}>10件の理論</Text>
-              </View>
-              <Text style={styles.categoryArrow}>›</Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity 
+            style={styles.theoryMemoButton}
+            onPress={() => setCurrentView('theoryMemo')}
+          >
+            <View style={styles.theoryMemoButtonContent}>
+              <Text style={styles.theoryMemoIcon}>📚</Text>
+              <Text style={styles.theoryMemoButtonText}>理論メモ</Text>
+              <Text style={styles.theoryMemoButtonSubtext}>100の理論をカテゴリー別に学習</Text>
+            </View>
+            <Text style={styles.theoryMemoButtonArrow}>›</Text>
+          </TouchableOpacity>
         </View>
+
+
       </ScrollView>
     </SafeAreaView>
   );
@@ -3308,7 +2997,7 @@ const styles = StyleSheet.create({
     lineHeight: 16,
   },
   theoryMemoButton: {
-    backgroundColor: '#007bff',
+    backgroundColor: '#fff',
     borderRadius: 12,
     padding: 20,
     alignItems: 'center',
@@ -3318,22 +3007,38 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
   },
   theoryMemoButtonText: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#fff',
+    color: '#212529',
     marginBottom: 4,
   },
   theoryMemoButtonSubtext: {
     fontSize: 14,
-    color: '#b3d9ff',
+    color: '#6c757d',
+  },
+  theoryMemoButtonContent: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  theoryMemoIcon: {
+    fontSize: 24,
+    marginBottom: 8,
+  },
+  theoryMemoButtonArrow: {
+    fontSize: 18,
+    color: '#007bff',
+    fontWeight: 'bold',
   },
   theoryMemoSection: {
     padding: 20,
     backgroundColor: '#fff',
     marginTop: 12,
   },
+
   theoryScrollView: {
     flexDirection: 'row',
     flexWrap: 'wrap',

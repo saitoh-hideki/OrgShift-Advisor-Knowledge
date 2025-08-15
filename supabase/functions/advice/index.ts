@@ -57,11 +57,11 @@ type Payload = {
 // シーン別の専門アドバイザーにルーティング
 async function routeToSpecialist(scene: string, context: any): Promise<any[]> {
   const specialistUrls = {
-    'meeting': 'https://eqiqthlfjcbyqfudziar.supabase.co/functions/v1/advice-meeting',
-    'sales': 'https://eqiqthlfjcbyqfudziar.supabase.co/functions/v1/advice-sales',
-    'presentation': 'https://eqiqthlfjcbyqfudziar.supabase.co/functions/v1/advice-presentation',
-    'interview': 'https://eqiqthlfjcbyqfudziar.supabase.co/functions/v1/advice-interview',
-    'team_building': 'https://eqiqthlfjcbyqfudziar.supabase.co/functions/v1/advice-team-building'
+    'meeting': `${Deno.env.get('SUPABASE_URL') || 'http://127.0.0.1:54321'}/functions/v1/advice-meeting`,
+    'sales': `${Deno.env.get('SUPABASE_URL') || 'http://127.0.0.1:54321'}/functions/v1/advice-sales`,
+    'presentation': `${Deno.env.get('SUPABASE_URL') || 'http://127.0.0.1:54321'}/functions/v1/advice-presentation`,
+    'interview': `${Deno.env.get('SUPABASE_URL') || 'http://127.0.0.1:54321'}/functions/v1/advice-interview`,
+    'team_building': `${Deno.env.get('SUPABASE_URL') || 'http://127.0.0.1:54321'}/functions/v1/advice-team-building`
   };
 
   const specialistUrl = specialistUrls[scene as keyof typeof specialistUrls];

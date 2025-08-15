@@ -101,11 +101,11 @@ serve(async (req) => {
 // シーン別の専門チェックリスト関数にルーティング
 async function routeToSpecialistChecklist(scene: string, context: AIContext, additionalContext?: string): Promise<ChecklistResponse> {
   const specialistUrls = {
-    'meeting': 'https://eqiqthlfjcbyqfudziar.supabase.co/functions/v1/checklist-meeting',
-    'sales': 'https://eqiqthlfjcbyqfudziar.supabase.co/functions/v1/checklist-sales',
-    'presentation': 'https://eqiqthlfjcbyqfudziar.supabase.co/functions/v1/checklist-presentation',
-    'interview': 'https://eqiqthlfjcbyqfudziar.supabase.co/functions/v1/checklist-interview',
-    'team_building': 'https://eqiqthlfjcbyqfudziar.supabase.co/functions/v1/checklist-team-building'
+    'meeting': `${Deno.env.get('SUPABASE_URL') || 'http://127.0.0.1:54321'}/functions/v1/checklist-meeting`,
+    'sales': `${Deno.env.get('SUPABASE_URL') || 'http://127.0.0.1:54321'}/functions/v1/checklist-sales`,
+    'presentation': `${Deno.env.get('SUPABASE_URL') || 'http://127.0.0.1:54321'}/functions/v1/checklist-presentation`,
+    'interview': `${Deno.env.get('SUPABASE_URL') || 'http://127.0.0.1:54321'}/functions/v1/checklist-interview`,
+    'team_building': `${Deno.env.get('SUPABASE_URL') || 'http://127.0.0.1:54321'}/functions/v1/checklist-team-building`
   };
 
   const specialistUrl = specialistUrls[scene as keyof typeof specialistUrls];

@@ -1,6 +1,6 @@
 // 認証なしで理論詳細を取得するエッジファンクション
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { adminClient } from "../_shared/client.ts"
+import { adminClient, diagnoseEnvironment } from "../_shared/client.ts"
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -17,6 +17,10 @@ serve(async (req) => {
   }
 
   try {
+    // 環境変数の診断
+    const envDiagnosis = diagnoseEnvironment();
+    console.log('Environment diagnosis:', envDiagnosis);
+    
     console.log('Theory detail function called with method:', req.method);
     
     if (req.method !== 'POST') {
