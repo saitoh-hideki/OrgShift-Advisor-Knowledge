@@ -119,6 +119,12 @@ export default function App() {
   const [teamSize, setTeamSize] = useState<string>('');
   const [teamDiversity, setTeamDiversity] = useState<string>('');
   const [teamChallenges, setTeamChallenges] = useState<string>('');
+  const [teamGoals, setTeamGoals] = useState<string>('');
+  const [teamActivities, setTeamActivities] = useState<string>('');
+  const [teamTools, setTeamTools] = useState<string>('');
+  const [teamSuccessMetrics, setTeamSuccessMetrics] = useState<string>('');
+  const [teamTimeframe, setTeamTimeframe] = useState<string>('');
+  const [teamBudget, setTeamBudget] = useState<string>('');
   const [advices, setAdvices] = useState<Advice[]>([]);
   const [currentTheory, setCurrentTheory] = useState<Theory | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -127,6 +133,7 @@ export default function App() {
   const [theoriesList, setTheoriesList] = useState<Theory[]>([]);
   const [isLoadingTheories, setIsLoadingTheories] = useState(false);
   const [relatedTheories, setRelatedTheories] = useState<Theory[]>([]);
+  const [theoryCounts, setTheoryCounts] = useState<{ [key: string]: number }>({});
 
   // ScrollViewのref
   const adviceScrollViewRef = useRef<ScrollView>(null);
@@ -257,6 +264,13 @@ export default function App() {
     }
   }, [currentView]);
 
+  // 理論メモ画面に移動した時に理論数を取得
+  useEffect(() => {
+    if (currentView === 'theoryMemo') {
+      getAllTheoryCounts();
+    }
+  }, [currentView]);
+
   // アドバイスを取得
   const getAdvice = async () => {
     if (!scene || !goal) {
@@ -315,6 +329,12 @@ export default function App() {
         if (teamSize) payload.team_size = teamSize;
         if (teamDiversity) payload.team_diversity = teamDiversity;
         if (teamChallenges) payload.team_challenges = teamChallenges;
+        if (teamGoals) payload.team_goals = teamGoals;
+        if (teamActivities) payload.team_activities = teamActivities;
+        if (teamTools) payload.team_tools = teamTools;
+        if (teamSuccessMetrics) payload.team_success_metrics = teamSuccessMetrics;
+        if (teamTimeframe) payload.team_timeframe = teamTimeframe;
+        if (teamBudget) payload.team_budget = teamBudget;
       }
 
       console.log('Sending request with payload:', payload);
@@ -602,6 +622,12 @@ export default function App() {
     setTeamSize('');
     setTeamDiversity('');
     setTeamChallenges('');
+    setTeamGoals('');
+    setTeamActivities('');
+    setTeamTools('');
+    setTeamSuccessMetrics('');
+    setTeamTimeframe('');
+    setTeamBudget('');
   };
 
   // シーン変更時に詳細設定をリセット
@@ -647,7 +673,7 @@ export default function App() {
             >
               <Text style={styles.categoryCardTitle}>行動経済学</Text>
               <Text style={styles.categoryCardDescription}>人間の意思決定と行動に関する理論</Text>
-              <Text style={styles.categoryCardCount}>20件の理論</Text>
+              <Text style={styles.categoryCardCount}>{theoryCounts.behavioral_econ || 20}件の理論</Text>
             </TouchableOpacity>
 
             <TouchableOpacity 
@@ -659,7 +685,7 @@ export default function App() {
             >
               <Text style={styles.categoryCardTitle}>リーダーシップ・組織心理</Text>
               <Text style={styles.categoryCardDescription}>リーダーシップと組織開発の理論</Text>
-              <Text style={styles.categoryCardCount}>20件の理論</Text>
+              <Text style={styles.categoryCardCount}>{theoryCounts.leadership || 15}件の理論</Text>
             </TouchableOpacity>
 
             <TouchableOpacity 
@@ -669,21 +695,9 @@ export default function App() {
                 getTheoriesByCategory('communication');
               }}
             >
-              <Text style={styles.categoryCardTitle}>コミュニケーション・交渉</Text>
-              <Text style={styles.categoryCardDescription}>コミュニケーションと交渉の理論</Text>
-              <Text style={styles.categoryCardCount}>10件の理論</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity 
-              style={styles.categoryCard} 
-              onPress={() => {
-                setSelectedCategory('strategy');
-                getTheoriesByCategory('strategy');
-              }}
-            >
-              <Text style={styles.categoryCardTitle}>経営戦略</Text>
-              <Text style={styles.categoryCardDescription}>戦略立案と競争優位の理論</Text>
-              <Text style={styles.categoryCardCount}>10件の理論</Text>
+              <Text style={styles.categoryCardTitle}>交渉・コミュニケーション・営業</Text>
+              <Text style={styles.categoryCardDescription}>交渉、コミュニケーション、営業の理論</Text>
+              <Text style={styles.categoryCardCount}>{theoryCounts.communication || 20}件の理論</Text>
             </TouchableOpacity>
 
             <TouchableOpacity 
@@ -693,10 +707,12 @@ export default function App() {
                 getTheoriesByCategory('innovation');
               }}
             >
-              <Text style={styles.categoryCardTitle}>イノベーション・プロダクト</Text>
-              <Text style={styles.categoryCardDescription}>革新と製品開発の理論</Text>
-              <Text style={styles.categoryCardCount}>10件の理論</Text>
+              <Text style={styles.categoryCardTitle}>経営戦略・イノベーション</Text>
+              <Text style={styles.categoryCardDescription}>経営戦略とイノベーションの理論</Text>
+              <Text style={styles.categoryCardCount}>{theoryCounts.innovation || 20}件の理論</Text>
             </TouchableOpacity>
+
+
 
             <TouchableOpacity 
               style={styles.categoryCard} 
@@ -707,7 +723,7 @@ export default function App() {
             >
               <Text style={styles.categoryCardTitle}>オペレーション・プロジェクト管理</Text>
               <Text style={styles.categoryCardDescription}>業務効率化とプロジェクト管理の理論</Text>
-              <Text style={styles.categoryCardCount}>10件の理論</Text>
+              <Text style={styles.categoryCardCount}>{theoryCounts.operations || 10}件の理論</Text>
             </TouchableOpacity>
 
             <TouchableOpacity 
@@ -719,20 +735,10 @@ export default function App() {
             >
               <Text style={styles.categoryCardTitle}>ファイナンス・メトリクス</Text>
               <Text style={styles.categoryCardDescription}>財務分析と指標の理論</Text>
-              <Text style={styles.categoryCardCount}>10件の理論</Text>
+              <Text style={styles.categoryCardCount}>{theoryCounts.finance || 10}件の理論</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity 
-              style={styles.categoryCard} 
-              onPress={() => {
-                setSelectedCategory('sales_marketing');
-                getTheoriesByCategory('sales_marketing');
-              }}
-            >
-              <Text style={styles.categoryCardTitle}>営業・マーケティング</Text>
-              <Text style={styles.categoryCardDescription}>営業とマーケティングの理論</Text>
-              <Text style={styles.categoryCardCount}>10件の理論</Text>
-            </TouchableOpacity>
+
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -816,11 +822,69 @@ export default function App() {
 
       const data = await response.json();
       setTheoriesList(data.theories || []);
+      
+      // 理論数を更新
+      setTheoryCounts(prev => ({
+        ...prev,
+        [category]: data.theories?.length || 0
+      }));
     } catch (error) {
       console.error('Error fetching theories:', error);
       setTheoriesList([]);
     } finally {
       setIsLoadingTheories(false);
+    }
+  };
+
+  // 全カテゴリーの理論数を取得
+  const getAllTheoryCounts = async () => {
+    const categories = ['behavioral_econ', 'leadership', 'communication', 'strategy', 'innovation', 'operations', 'finance', 'sales_marketing'];
+    
+    // デフォルトの理論数を設定（実際のJSONファイルの理論数に基づく）
+    const defaultCounts = {
+      behavioral_econ: 25,  // behavioral_economics_theories.json: 25個
+      leadership: 15,        // leadership_theories.sql: 15個
+      communication: 20,     // communication + negotiation: 20個
+      strategy: 10,          // strategy_theories.json: 10個
+      innovation: 20,        // strategy + innovation: 20個
+      operations: 10,        // operations_theories.json: 10個
+      finance: 10,           // finance_theories.json: 10個
+      sales_marketing: 10    // sales_marketing_theories.json: 10個
+    };
+    
+    // まずデフォルト値を設定
+    setTheoryCounts(defaultCounts);
+    
+    // データベースから実際の理論数を取得
+    for (const category of categories) {
+      try {
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/theory-memo?action=list&domain=${category}`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const actualCount = data.theories?.length || 0;
+          
+          console.log(`Category ${category}: Found ${actualCount} theories in database`);
+          
+          // 実際の理論数が0より大きい場合のみ更新
+          if (actualCount > 0) {
+            setTheoryCounts(prev => ({
+              ...prev,
+              [category]: actualCount
+            }));
+          } else {
+            console.log(`Category ${category}: No theories found in database, using default count`);
+          }
+        }
+      } catch (error) {
+        console.error(`Error fetching theory count for ${category}:`, error);
+      }
     }
   };
 
@@ -858,12 +922,11 @@ export default function App() {
     const titles: { [key: string]: string } = {
       'behavioral_econ': '行動経済学',
               'leadership': 'リーダーシップ・組織心理',
-      'communication': 'コミュニケーション・交渉',
-      'strategy': '経営戦略',
-      'innovation': 'イノベーション・プロダクト',
+      'communication': '交渉・コミュニケーション・営業',
+      'innovation': '経営戦略・イノベーション',
       'operations': 'オペレーション・プロジェクト管理',
       'finance': 'ファイナンス・メトリクス',
-      'sales_marketing': '営業・マーケティング'
+      'negotiation': '交渉術・影響力'
     };
     return titles[category] || category;
   };
@@ -1892,6 +1955,156 @@ export default function App() {
                           teamChallenges === challenge && styles.selectedDetailOptionText
                         ]}>
                           {challenge}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </ScrollView>
+              </View>
+              {/* チームの目標 */}
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>チームの目標:</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  <View style={styles.detailOptions}>
+                    {sceneConfig.teamGoals?.map((goal) => (
+                      <TouchableOpacity
+                        key={goal}
+                        style={[
+                          styles.detailOption,
+                          teamGoals === goal && styles.selectedDetailOption
+                        ]}
+                        onPress={() => setTeamGoals(goal)}
+                      >
+                        <Text style={[
+                          styles.detailOptionText,
+                          teamGoals === goal && styles.selectedDetailOptionText
+                        ]}>
+                          {goal}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </ScrollView>
+              </View>
+              {/* チームの活動 */}
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>チームの活動:</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  <View style={styles.detailOptions}>
+                    {sceneConfig.teamActivities?.map((activity) => (
+                      <TouchableOpacity
+                        key={activity}
+                        style={[
+                          styles.detailOption,
+                          teamActivities === activity && styles.selectedDetailOption
+                        ]}
+                        onPress={() => setTeamActivities(activity)}
+                      >
+                        <Text style={[
+                          styles.detailOptionText,
+                          teamActivities === activity && styles.selectedDetailOptionText
+                        ]}>
+                          {activity}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </ScrollView>
+              </View>
+              {/* チームのツール */}
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>チームのツール:</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  <View style={styles.detailOptions}>
+                    {sceneConfig.teamTools?.map((tool) => (
+                      <TouchableOpacity
+                        key={tool}
+                        style={[
+                          styles.detailOption,
+                          teamTools === tool && styles.selectedDetailOption
+                        ]}
+                        onPress={() => setTeamTools(tool)}
+                      >
+                        <Text style={[
+                          styles.detailOptionText,
+                          teamTools === tool && styles.selectedDetailOptionText
+                        ]}>
+                          {tool}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </ScrollView>
+              </View>
+              {/* チームの成功指標 */}
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>チームの成功指標:</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  <View style={styles.detailOptions}>
+                    {sceneConfig.teamSuccessMetrics?.map((metric) => (
+                      <TouchableOpacity
+                        key={metric}
+                        style={[
+                          styles.detailOption,
+                          teamSuccessMetrics === metric && styles.selectedDetailOption
+                        ]}
+                        onPress={() => setTeamSuccessMetrics(metric)}
+                      >
+                        <Text style={[
+                          styles.detailOptionText,
+                          teamSuccessMetrics === metric && styles.selectedDetailOptionText
+                        ]}>
+                          {metric}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </ScrollView>
+              </View>
+              {/* チームの時間枠 */}
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>チームの時間枠:</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  <View style={styles.detailOptions}>
+                    {sceneConfig.teamTimeframe?.map((timeframe) => (
+                      <TouchableOpacity
+                        key={timeframe}
+                        style={[
+                          styles.detailOption,
+                          teamTimeframe === timeframe && styles.selectedDetailOption
+                        ]}
+                        onPress={() => setTeamTimeframe(timeframe)}
+                      >
+                        <Text style={[
+                          styles.detailOptionText,
+                          teamTimeframe === timeframe && styles.selectedDetailOptionText
+                        ]}>
+                          {timeframe}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </ScrollView>
+              </View>
+              {/* チームの予算 */}
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>チームの予算:</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  <View style={styles.detailOptions}>
+                    {sceneConfig.teamBudget?.map((budget) => (
+                      <TouchableOpacity
+                        key={budget}
+                        style={[
+                          styles.detailOption,
+                          teamBudget === budget && styles.selectedDetailOption
+                        ]}
+                        onPress={() => setTeamBudget(budget)}
+                      >
+                        <Text style={[
+                          styles.detailOptionText,
+                          teamBudget === budget && styles.selectedDetailOptionText
+                        ]}>
+                          {budget}
                         </Text>
                       </TouchableOpacity>
                     ))}
@@ -3376,3 +3589,4 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
 });
+

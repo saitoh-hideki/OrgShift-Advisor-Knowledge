@@ -50,6 +50,12 @@ export interface SceneConfig {
   teamSize?: string[]; // チーム規模
   teamDiversity?: string[]; // チームの多様性
   teamChallenges?: string[]; // チームの課題
+  teamGoals?: string[]; // チームの具体的な目標
+  teamActivities?: string[]; // チームビルディング活動
+  teamTools?: string[]; // 使用ツール・手法
+  teamSuccessMetrics?: string[]; // 成功指標
+  teamTimeframe?: string[]; // 実施期間
+  teamBudget?: string[]; // 予算規模
 }
 
 export const sceneConfigs: SceneConfig[] = [
@@ -238,6 +244,66 @@ export const sceneConfigs: SceneConfig[] = [
       '文化的な違い',
       'リモートワークの課題',
       'メンバーの離脱'
+    ],
+    teamGoals: [
+      'チームの結束力向上',
+      'コミュニケーション改善',
+      '役割分担の明確化',
+      '信頼関係の構築',
+      'チーム文化の醸成',
+      'パフォーマンス向上',
+      'イノベーション促進',
+      '問題解決能力向上'
+    ],
+    teamActivities: [
+      'アイスブレイク',
+      'チームビルディングゲーム',
+      'ワークショップ',
+      'グループディスカッション',
+      'ロールプレイ',
+      'チームチャレンジ',
+      '振り返りセッション',
+      'チームランチ・懇親会'
+    ],
+    teamTools: [
+      'Miro',
+      'Mural',
+      'Slack',
+      'Teams',
+      'Zoom',
+      'Google Workspace',
+      'Notion',
+      'Trello',
+      'Asana',
+      'フィードバックツール'
+    ],
+    teamSuccessMetrics: [
+      'チーム満足度',
+      'コミュニケーション頻度',
+      '意思決定の速度',
+      '問題解決時間',
+      'チーム目標達成率',
+      'メンバー定着率',
+      'イノベーション創出数',
+      '顧客満足度'
+    ],
+    teamTimeframe: [
+      '1日',
+      '1週間',
+      '1ヶ月',
+      '3ヶ月',
+      '6ヶ月',
+      '1年',
+      '継続的',
+      'プロジェクト期間'
+    ],
+    teamBudget: [
+      '予算なし',
+      '低予算（5万円以下）',
+      '中予算（5-20万円）',
+      '高予算（20-100万円）',
+      '超高予算（100万円以上）',
+      '予算応相談'
     ]
   }
 ];
