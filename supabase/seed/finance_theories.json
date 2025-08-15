@@ -1,0 +1,312 @@
+[
+  {
+    "id": "npv",
+    "name_ja": "NPV",
+    "name_en": "Net Present Value",
+    "domain": "finance",
+    "academic_field": "財務理論",
+    "one_liner": "将来キャッシュフローを割引現在価値で評価",
+    "definition": "将来キャッシュフローを割引現在価値で評価",
+    "content": "投資案件の価値判断基準",
+    "applicable_scenarios": "設備投資判断",
+    "key_concepts": ["将来キャッシュフロー", "割引現在価値", "投資判断", "価値評価"],
+    "examples": [
+      "将来の収益を現在価値に換算して投資価値を評価する",
+      "複数の投資案件のNPVを比較して選択する",
+      "NPVが正の案件に投資する"
+    ],
+    "practical_tips": [
+      "適切な割引率を設定する",
+      "将来キャッシュフローを正確に予測する",
+      "リスクを考慮した評価を行う"
+    ],
+    "mechanism": "時間価値を考慮した将来キャッシュフローの現在価値評価",
+    "how_to": ["将来CF予測→割引率設定→現在価値計算→投資判断"],
+    "templates": {
+      "meeting": "NPV{{npv}}により投資案件{{investment_project}}の価値{{value}}を現在価値{{present_value}}で評価",
+      "presentation": "将来キャッシュフロー{{future_cash_flows}}の割引現在価値{{discounted_present_value}}による投資判断{{investment_decision}}を説明",
+      "sales": "NPV{{npv}}に基づく投資価値{{investment_value}}と収益性{{profitability}}を提案"
+    },
+    "tags": ["ファイナンス", "NPV", "投資判断", "価値評価"],
+    "related_theories": ["irr", "roi"]
+  },
+  {
+    "id": "irr",
+    "name_ja": "IRR",
+    "name_en": "Internal Rate of Return",
+    "domain": "finance",
+    "academic_field": "財務理論",
+    "one_liner": "NPVがゼロとなる割引率",
+    "definition": "NPVがゼロとなる割引率",
+    "content": "投資収益率の比較",
+    "applicable_scenarios": "複数投資案件評価",
+    "key_concepts": ["内部収益率", "NPVゼロ", "投資収益率", "比較評価"],
+    "examples": [
+      "複数の投資案件のIRRを計算して比較する",
+      "IRRが資本コストを上回る案件に投資する",
+      "IRRの高い案件を優先する"
+    ],
+    "practical_tips": [
+      "IRRの計算式を理解する",
+      "資本コストと比較する",
+      "複数案件のIRRを比較する"
+    ],
+    "mechanism": "NPVがゼロとなる割引率による投資収益率の測定",
+    "how_to": ["IRR計算→資本コスト比較→投資案件選択"],
+    "templates": {
+      "meeting": "IRR{{irr}}により複数投資案件{{multiple_investments}}の収益率{{return_rate}}を比較",
+      "presentation": "NPVがゼロとなる割引率{{discount_rate}}としてのIRR{{irr}}の計算{{calculation}}と活用{{utilization}}を説明",
+      "sales": "IRR{{irr}}に基づく投資収益率{{investment_return}}の比較{{comparison}}と選択{{selection}}を提案"
+    },
+    "tags": ["ファイナンス", "IRR", "投資収益率", "比較評価"],
+    "related_theories": ["npv", "roi"]
+  },
+  {
+    "id": "roi",
+    "name_ja": "ROI",
+    "name_en": "Return on Investment",
+    "domain": "finance",
+    "academic_field": "財務理論",
+    "one_liner": "投資額に対する利益率",
+    "definition": "投資額に対する利益率",
+    "content": "投資効率の評価",
+    "applicable_scenarios": "広告施策評価",
+    "key_concepts": ["投資額", "利益率", "投資効率", "評価指標"],
+    "examples": [
+      "広告投資に対する売上増加率を計算する",
+      "異なる施策のROIを比較して効果を評価する",
+      "ROIの高い施策に投資を集中する"
+    ],
+    "practical_tips": [
+      "投資額と利益を正確に測定する",
+      "期間を明確に設定する",
+      "複数施策のROIを比較する"
+    ],
+    "mechanism": "投資額に対する利益の比率による投資効率の測定",
+    "how_to": ["投資額測定→利益測定→ROI計算→効率評価"],
+    "templates": {
+      "meeting": "ROI{{roi}}により投資施策{{investment_initiative}}の効率{{efficiency}}を評価",
+      "presentation": "投資額{{investment_amount}}に対する利益率{{profit_rate}}としてのROI{{roi}}の計算{{calculation}}と活用{{utilization}}を説明",
+      "sales": "ROI{{roi}}に基づく投資効率{{investment_efficiency}}の評価{{evaluation}}と改善{{improvement}}を提案"
+    },
+    "tags": ["ファイナンス", "ROI", "投資効率", "評価指標"],
+    "related_theories": ["npv", "irr"]
+  },
+  {
+    "id": "break_even_analysis",
+    "name_ja": "損益分岐点分析",
+    "name_en": "Break-even Analysis",
+    "domain": "finance",
+    "academic_field": "財務理論",
+    "one_liner": "利益がゼロになる売上水準を求める",
+    "definition": "利益がゼロになる売上水準を求める",
+    "content": "固定費・変動費と利益の関係を明確化",
+    "applicable_scenarios": "価格設定、事業採算性分析",
+    "key_concepts": ["損益分岐点", "固定費", "変動費", "利益関係"],
+    "examples": [
+      "固定費と変動費から損益分岐点売上を計算する",
+      "価格変更が損益分岐点に与える影響を分析する",
+      "事業の採算性を評価する"
+    ],
+    "practical_tips": [
+      "固定費と変動費を正確に分類する",
+      "損益分岐点の計算式を理解する",
+      "価格戦略に活用する"
+    ],
+    "mechanism": "固定費・変動費の分析による損益分岐点の特定",
+    "how_to": ["費用分類→損益分岐点計算→価格戦略策定"],
+    "templates": {
+      "meeting": "損益分岐点分析{{break_even_analysis}}により利益{{profit}}がゼロになる売上水準{{sales_level}}を特定",
+      "presentation": "固定費{{fixed_costs}}・変動費{{variable_costs}}と利益{{profit}}の関係{{relationship}}を明確化{{clarification}}",
+      "sales": "損益分岐点{{break_even_point}}に基づく価格設定{{pricing}}と採算性{{profitability}}を提案"
+    },
+    "tags": ["ファイナンス", "損益分岐点分析", "価格設定", "採算性分析"],
+    "related_theories": ["roi", "unit_economics"]
+  },
+  {
+    "id": "unit_economics",
+    "name_ja": "ユニットエコノミクス",
+    "name_en": "Unit Economics",
+    "domain": "finance",
+    "academic_field": "財務理論",
+    "one_liner": "単位顧客あたりの収益性",
+    "definition": "単位顧客あたりの収益性",
+    "content": "LTVとCACの関係分析",
+    "applicable_scenarios": "SaaSビジネス評価",
+    "key_concepts": ["単位顧客", "収益性", "LTV", "CAC"],
+    "examples": [
+      "顧客1人あたりの生涯価値（LTV）を計算する",
+      "顧客獲得コスト（CAC）を測定する",
+      "LTV/CAC比で事業の収益性を評価する"
+    ],
+    "practical_tips": [
+      "LTVとCACを正確に計算する",
+      "LTV/CAC比を3以上に保つ",
+      "継続的に改善する"
+    ],
+    "mechanism": "単位顧客の収益性分析による事業モデルの評価",
+    "how_to": ["LTV計算→CAC測定→収益性評価→改善施策"],
+    "templates": {
+      "meeting": "ユニットエコノミクス{{unit_economics}}により単位顧客{{unit_customer}}の収益性{{profitability}}を分析",
+      "presentation": "LTV{{ltv}}とCAC{{cac}}の関係{{relationship}}による事業モデル{{business_model}}の評価{{evaluation}}を説明",
+      "sales": "ユニットエコノミクス{{unit_economics}}に基づく収益性{{profitability}}と成長戦略{{growth_strategy}}を提案"
+    },
+    "tags": ["ファイナンス", "ユニットエコノミクス", "SaaS", "収益性分析"],
+    "related_theories": ["break_even_analysis", "cac"]
+  },
+  {
+    "id": "cac",
+    "name_ja": "CAC",
+    "name_en": "Customer Acquisition Cost",
+    "domain": "finance",
+    "academic_field": "財務理論",
+    "one_liner": "新規顧客獲得コスト",
+    "definition": "新規顧客獲得コスト",
+    "content": "マーケ効率の評価",
+    "applicable_scenarios": "広告投資判断",
+    "key_concepts": ["顧客獲得", "コスト", "マーケ効率", "投資効率"],
+    "examples": [
+      "広告費を新規顧客数で割ってCACを計算する",
+      "異なるチャネルのCACを比較する",
+      "CACの低いチャネルに投資を集中する"
+    ],
+    "practical_tips": [
+      "顧客獲得コストを正確に測定する",
+      "チャネル別のCACを比較する",
+      "継続的に改善する"
+    ],
+    "mechanism": "顧客獲得コストの測定によるマーケティング効率の評価",
+    "how_to": ["コスト測定→顧客数測定→CAC計算→効率評価"],
+    "templates": {
+      "meeting": "CAC{{cac}}により新規顧客獲得{{new_customer_acquisition}}の効率{{efficiency}}を評価",
+      "presentation": "顧客獲得コスト{{customer_acquisition_cost}}の測定{{measurement}}とマーケティング効率{{marketing_efficiency}}の評価{{evaluation}}を説明",
+      "sales": "CAC{{cac}}に基づくマーケティング投資{{marketing_investment}}の最適化{{optimization}}を提案"
+    },
+    "tags": ["ファイナンス", "CAC", "顧客獲得", "マーケティング効率"],
+    "related_theories": ["unit_economics", "ltv"]
+  },
+  {
+    "id": "ltv",
+    "name_ja": "LTV",
+    "name_en": "Customer Lifetime Value",
+    "domain": "finance",
+    "academic_field": "財務理論",
+    "one_liner": "顧客生涯価値",
+    "definition": "顧客生涯価値",
+    "content": "長期収益性の評価",
+    "applicable_scenarios": "顧客維持戦略",
+    "key_concepts": ["顧客生涯", "価値", "長期収益性", "顧客維持"],
+    "examples": [
+      "顧客の平均購入金額と購入頻度からLTVを計算する",
+      "顧客維持期間を考慮してLTVを予測する",
+      "LTVの高い顧客セグメントに投資する"
+    ],
+    "practical_tips": [
+      "顧客の行動データを活用する",
+      "長期の視点でLTVを予測する",
+      "顧客維持施策に投資する"
+    ],
+    "mechanism": "顧客の生涯価値予測による長期収益性の評価",
+    "how_to": ["行動データ分析→LTV予測→顧客維持施策→長期収益向上"],
+    "templates": {
+      "meeting": "LTV{{ltv}}により顧客生涯{{customer_lifetime}}の価値{{value}}を評価",
+      "presentation": "顧客の長期収益性{{long_term_profitability}}を示すLTV{{ltv}}の計算{{calculation}}と活用{{utilization}}を説明",
+      "sales": "LTV{{ltv}}に基づく顧客維持戦略{{customer_retention_strategy}}と投資{{investment}}を提案"
+    },
+    "tags": ["ファイナンス", "LTV", "顧客生涯価値", "長期収益性"],
+    "related_theories": ["cac", "ltv_cac_ratio"]
+  },
+  {
+    "id": "ltv_cac_ratio",
+    "name_ja": "LTV/CAC比",
+    "name_en": "LTV/CAC Ratio",
+    "domain": "finance",
+    "academic_field": "財務理論",
+    "one_liner": "顧客価値と獲得コストの比率",
+    "definition": "顧客価値と獲得コストの比率",
+    "content": "3以上が望ましい",
+    "applicable_scenarios": "成長戦略可否判断",
+    "key_concepts": ["LTV", "CAC", "比率", "成長戦略", "可否判断"],
+    "examples": [
+      "LTVをCACで割って比率を計算する",
+      "3以上の比率を維持する",
+      "比率が低い場合は改善施策を実施する"
+    ],
+    "practical_tips": [
+      "LTV/CAC比を定期的に監視する",
+      "3以上の比率を目標にする",
+      "改善施策を継続的に実施する"
+    ],
+    "mechanism": "LTVとCACの比率による事業モデルの収益性評価",
+    "how_to": ["LTV/CAC計算→比率評価→改善施策→継続監視"],
+    "templates": {
+      "meeting": "LTV/CAC比{{ltv_cac_ratio}}により顧客価値{{customer_value}}と獲得コスト{{acquisition_cost}}の比率{{ratio}}を評価",
+      "presentation": "3以上が望ましい{{desirable}}LTV/CAC比{{ltv_cac_ratio}}による成長戦略{{growth_strategy}}の可否判断{{feasibility_assessment}}を説明",
+      "sales": "LTV/CAC比{{ltv_cac_ratio}}に基づく事業モデル{{business_model}}の収益性{{profitability}}と改善施策{{improvement_measures}}を提案"
+    },
+    "tags": ["ファイナンス", "LTV/CAC比", "成長戦略", "収益性評価"],
+    "related_theories": ["ltv", "cac"]
+  },
+  {
+    "id": "nrr",
+    "name_ja": "NRR",
+    "name_en": "Net Revenue Retention",
+    "domain": "finance",
+    "academic_field": "財務理論",
+    "one_liner": "既存顧客売上の純増減率",
+    "definition": "既存顧客売上の純増減率",
+    "content": "拡張売上・解約率の総合評価",
+    "applicable_scenarios": "SaaS成長性評価",
+    "key_concepts": ["既存顧客", "売上", "純増減率", "拡張売上", "解約率"],
+    "examples": [
+      "既存顧客の売上変化を測定する",
+      "拡張売上と解約による売上減少を考慮する",
+      "NRRの高い事業モデルを構築する"
+    ],
+    "practical_tips": [
+      "既存顧客の売上変化を正確に測定する",
+      "拡張売上を促進する",
+      "解約率を抑制する"
+    ],
+    "mechanism": "既存顧客売上の純増減による事業成長性の評価",
+    "how_to": ["売上変化測定→拡張促進→解約抑制→NRR向上"],
+    "templates": {
+      "meeting": "NRR{{nrr}}により既存顧客{{existing_customers}}の売上{{revenue}}の純増減率{{net_change_rate}}を評価",
+      "presentation": "拡張売上{{expansion_revenue}}・解約率{{churn_rate}}の総合評価{{comprehensive_evaluation}}としてのNRR{{nrr}}を説明",
+      "sales": "NRR{{nrr}}に基づくSaaS成長性{{saas_growth}}と改善施策{{improvement_measures}}を提案"
+    },
+    "tags": ["ファイナンス", "NRR", "SaaS", "成長性評価"],
+    "related_theories": ["ltv_cac_ratio", "payback_period"]
+  },
+  {
+    "id": "payback_period",
+    "name_ja": "回収期間",
+    "name_en": "Payback Period",
+    "domain": "finance",
+    "academic_field": "財務理論",
+    "one_liner": "投資額を回収するまでの期間",
+    "definition": "投資額を回収するまでの期間",
+    "content": "短いほど資金効率が良い",
+    "applicable_scenarios": "投資判断、キャッシュ管理",
+    "key_concepts": ["投資額", "回収", "期間", "資金効率"],
+    "examples": [
+      "投資額を年間キャッシュフローで割って回収期間を計算する",
+      "回収期間の短い案件を優先する",
+      "キャッシュフロー管理に活用する"
+    ],
+    "practical_tips": [
+      "回収期間を正確に計算する",
+      "短い回収期間を目標にする",
+      "キャッシュフロー管理に活用する"
+    ],
+    "mechanism": "投資額回収期間による資金効率の評価",
+    "how_to": ["投資額測定→年間CF測定→回収期間計算→効率評価"],
+    "templates": {
+      "meeting": "回収期間{{payback_period}}により投資額{{investment_amount}}の回収{{recovery}}までの期間{{period}}を評価",
+      "presentation": "短いほど資金効率{{capital_efficiency}}が良い{{better}}回収期間{{payback_period}}による投資判断{{investment_decision}}を説明",
+      "sales": "回収期間{{payback_period}}に基づく資金効率{{capital_efficiency}}とキャッシュ管理{{cash_management}}を提案"
+    },
+    "tags": ["ファイナンス", "回収期間", "投資判断", "キャッシュ管理"],
+    "related_theories": ["nrr", "npv"]
+  }
+]

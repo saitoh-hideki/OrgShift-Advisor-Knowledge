@@ -64,13 +64,17 @@ interface RecentAdvice {
 }
 
 export default function App() {
-  const [currentView, setCurrentView] = useState<'main' | 'input' | 'checklist' | 'advices' | 'theory'>('main');
+  const [currentView, setCurrentView] = useState<'main' | 'input' | 'checklist' | 'advices' | 'theory' | 'theoryMemo' | 'theoryDetail'>('main');
   const [scene, setScene] = useState<string>('');
   const [goal, setGoal] = useState<string>('');
   const [timeLimit, setTimeLimit] = useState<string>('');
   const [stakes, setStakes] = useState<string>('');
   const [participants, setParticipants] = useState<number>(2);
   const [relationship, setRelationship] = useState<string>('');
+  // 理論詳細用の状態
+  const [selectedTheoryId, setSelectedTheoryId] = useState<string>('');
+  const [selectedTheoryData, setSelectedTheoryData] = useState<any>(null);
+  const [isLoadingTheory, setIsLoadingTheory] = useState<boolean>(false);
   // シーン固有の詳細設定を独立したフィールドとして管理
   // 会議・ミーティング用
   const [meetingType, setMeetingType] = useState<string>('');
@@ -116,7 +120,6 @@ export default function App() {
   const [advices, setAdvices] = useState<Advice[]>([]);
   const [currentTheory, setCurrentTheory] = useState<Theory | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [isLoadingTheory, setIsLoadingTheory] = useState(false);
   const [recentAdvices, setRecentAdvices] = useState<RecentAdvice[]>([]);
 
   // 最近使用したアドバイスを保存
@@ -343,14 +346,20 @@ export default function App() {
     setIsLoadingTheory(true);
     
     try {
+      // アドバイス内容から一意のIDを生成（一貫性を保つため）
+      const adviceContent = `${advice.short_advice} ${advice.expected_effect} ${advice.caution || ''} ${advice.tips || ''}`;
+      const adviceId = generateAdviceId(adviceContent);
+      
       const requestPayload = {
         scene,
         goal,
         shortAdvice: advice.short_advice,
-        additionalContext: `${advice.expected_effect} ${advice.caution || ''} ${advice.tips || ''}`
+        additionalContext: `${advice.expected_effect} ${advice.caution || ''} ${advice.tips || ''}`,
+        adviceId: adviceId // アドバイスIDを追加
       };
       
       console.log('Sending request to getRelatedTheories with payload:', requestPayload);
+      console.log('Generated advice ID:', adviceId);
       
       const response = await api.getRelatedTheories(requestPayload);
       
@@ -396,6 +405,18 @@ export default function App() {
     } finally {
       setIsLoadingTheory(false);
     }
+  };
+
+  // アドバイス内容から一意のIDを生成する関数
+  const generateAdviceId = (content: string): string => {
+    // 簡単なハッシュ関数で一意のIDを生成
+    let hash = 0;
+    for (let i = 0; i < content.length; i++) {
+      const char = content.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // 32ビット整数に変換
+    }
+    return `advice_${Math.abs(hash)}`;
   };
 
   // チェックリストに移動
@@ -471,6 +492,490 @@ export default function App() {
     setCurrentView('input');
   };
 
+  // 理論メモ画面
+  const renderTheoryMemo = () => (
+    <SafeAreaView style={styles.container}>
+      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+        <View style={styles.theoryMemoHeader}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => setCurrentView('main')}
+          >
+            <Text style={styles.backButtonText}>← 戻る</Text>
+          </TouchableOpacity>
+          <Text style={styles.theoryMemoHeaderTitle}>理論メモ</Text>
+        </View>
+
+        {/* カテゴリー別理論一覧 */}
+        <View style={styles.theoryCategories}>
+          {/* 行動経済学 */}
+          <View style={styles.categorySection}>
+            <Text style={styles.categoryTitle}>行動経済学</Text>
+            <Text style={styles.categoryDescription}>人間の意思決定と行動に関する理論</Text>
+            <View style={styles.theoryGrid}>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('anchoring_effect')}>
+                <Text style={styles.theoryItemTitle}>アンカリング効果</Text>
+                <Text style={styles.theoryItemSubtitle}>Anchoring Effect</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('framing_effect')}>
+                <Text style={styles.theoryItemTitle}>フレーミング効果</Text>
+                <Text style={styles.theoryItemSubtitle}>Framing Effect</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('loss_aversion')}>
+                <Text style={styles.theoryItemTitle}>損失回避</Text>
+                <Text style={styles.theoryItemSubtitle}>Loss Aversion</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('endowment_effect')}>
+                <Text style={styles.theoryItemTitle}>保有効果</Text>
+                <Text style={styles.theoryItemSubtitle}>Endowment Effect</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('status_quo_bias')}>
+                <Text style={styles.theoryItemTitle}>現状維持バイアス</Text>
+                <Text style={styles.theoryItemSubtitle}>Status Quo Bias</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('availability_heuristic')}>
+                <Text style={styles.theoryItemTitle}>利用可能性ヒューリスティック</Text>
+                <Text style={styles.theoryItemSubtitle}>Availability Heuristic</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('representativeness_heuristic')}>
+                <Text style={styles.theoryItemTitle}>代表性ヒューリスティック</Text>
+                <Text style={styles.theoryItemSubtitle}>Representativeness</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('confirmation_bias')}>
+                <Text style={styles.theoryItemTitle}>確証バイアス</Text>
+                <Text style={styles.theoryItemSubtitle}>Confirmation Bias</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('sunk_cost_fallacy')}>
+                <Text style={styles.theoryItemTitle}>サンクコスト効果</Text>
+                <Text style={styles.theoryItemSubtitle}>Sunk Cost Fallacy</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('prospect_theory')}>
+                <Text style={styles.theoryItemTitle}>プロスペクト理論</Text>
+                <Text style={styles.theoryItemSubtitle}>Prospect Theory</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('probability_weighting')}>
+                <Text style={styles.theoryItemTitle}>確率加重</Text>
+                <Text style={styles.theoryItemSubtitle}>Probability Weighting</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('mental_accounting')}>
+                <Text style={styles.theoryItemTitle}>メンタルアカウンティング</Text>
+                <Text style={styles.theoryItemSubtitle}>Mental Accounting</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('hyperbolic_discounting')}>
+                <Text style={styles.theoryItemTitle}>双曲割引</Text>
+                <Text style={styles.theoryItemSubtitle}>Hyperbolic Discounting</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('paradox_of_choice')}>
+                <Text style={styles.theoryItemTitle}>選択肢過多</Text>
+                <Text style={styles.theoryItemSubtitle}>Paradox of Choice</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('decoy_effect')}>
+                <Text style={styles.theoryItemTitle}>デコイ効果</Text>
+                <Text style={styles.theoryItemSubtitle}>Decoy Effect</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('scarcity_effect')}>
+                <Text style={styles.theoryItemTitle}>希少性効果</Text>
+                <Text style={styles.theoryItemSubtitle}>Scarcity Effect</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('social_proof')}>
+                <Text style={styles.theoryItemTitle}>社会的証明</Text>
+                <Text style={styles.theoryItemSubtitle}>Social Proof</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('reciprocity')}>
+                <Text style={styles.theoryItemTitle}>返報性の原理</Text>
+                <Text style={styles.theoryItemSubtitle}>Reciprocity</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('commitment_consistency')}>
+                <Text style={styles.theoryItemTitle}>一貫性の原理</Text>
+                <Text style={styles.theoryItemSubtitle}>Commitment & Consistency</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('peak_end_rule')}>
+                <Text style={styles.theoryItemTitle}>ピーク・エンドの法則</Text>
+                <Text style={styles.theoryItemSubtitle}>Peak-End Rule</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* リーダーシップ・組織心理 */}
+          <View style={styles.categorySection}>
+            <Text style={styles.categoryTitle}>リーダーシップ・組織心理</Text>
+            <Text style={styles.categoryDescription}>リーダーシップと組織運営に関する理論</Text>
+            <View style={styles.theoryGrid}>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('servant_leadership')}>
+                <Text style={styles.theoryItemTitle}>サーバント・リーダーシップ</Text>
+                <Text style={styles.theoryItemSubtitle}>Servant Leadership</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('transformational_leadership')}>
+                <Text style={styles.theoryItemTitle}>トランスフォーメーショナル</Text>
+                <Text style={styles.theoryItemSubtitle}>Transformational</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('situational_leadership')}>
+                <Text style={styles.theoryItemTitle}>シチュエーショナル</Text>
+                <Text style={styles.theoryItemSubtitle}>Situational</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('level5_leadership')}>
+                <Text style={styles.theoryItemTitle}>レベル5リーダーシップ</Text>
+                <Text style={styles.theoryItemSubtitle}>Level 5 Leadership</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('emotional_intelligence')}>
+                <Text style={styles.theoryItemTitle}>エモーショナルインテリジェンス</Text>
+                <Text style={styles.theoryItemSubtitle}>Emotional Intelligence</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('lmx_theory')}>
+                <Text style={styles.theoryItemTitle}>LMX理論</Text>
+                <Text style={styles.theoryItemSubtitle}>Leader-Member Exchange</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('authentic_leadership')}>
+                <Text style={styles.theoryItemTitle}>オーセンティック・リーダーシップ</Text>
+                <Text style={styles.theoryItemSubtitle}>Authentic Leadership</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('grow_model')}>
+                <Text style={styles.theoryItemTitle}>GROWモデル</Text>
+                <Text style={styles.theoryItemSubtitle}>GROW Model</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('psychological_safety')}>
+                <Text style={styles.theoryItemTitle}>心理的安全性</Text>
+                <Text style={styles.theoryItemSubtitle}>Psychological Safety</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('groupthink')}>
+                <Text style={styles.theoryItemTitle}>集団浅慮</Text>
+                <Text style={styles.theoryItemSubtitle}>Groupthink</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('social_loafing')}>
+                <Text style={styles.theoryItemTitle}>社会的手抜き</Text>
+                <Text style={styles.theoryItemSubtitle}>Social Loafing</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('tuckman_stages')}>
+                <Text style={styles.theoryItemTitle}>タックマンモデル</Text>
+                <Text style={styles.theoryItemSubtitle}>Tuckman's Stages</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('pygmalion_effect')}>
+                <Text style={styles.theoryItemTitle}>ピグマリオン効果</Text>
+                <Text style={styles.theoryItemSubtitle}>Pygmalion Effect</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('equity_theory')}>
+                <Text style={styles.theoryItemTitle}>公平理論</Text>
+                <Text style={styles.theoryItemSubtitle}>Equity Theory</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('expectancy_theory')}>
+                <Text style={styles.theoryItemTitle}>期待理論</Text>
+                <Text style={styles.theoryItemSubtitle}>Expectancy Theory</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('herzberg_two_factor')}>
+                <Text style={styles.theoryItemTitle}>二要因理論</Text>
+                <Text style={styles.theoryItemSubtitle}>Herzberg Two-Factor</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('job_characteristics_model')}>
+                <Text style={styles.theoryItemTitle}>職務特性モデル</Text>
+                <Text style={styles.theoryItemSubtitle}>Job Characteristics</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('self_determination_theory')}>
+                <Text style={styles.theoryItemTitle}>自己決定理論</Text>
+                <Text style={styles.theoryItemSubtitle}>Self-Determination</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('goal_setting_theory')}>
+                <Text style={styles.theoryItemTitle}>目標設定理論</Text>
+                <Text style={styles.theoryItemSubtitle}>Goal-Setting Theory</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('procedural_justice')}>
+                <Text style={styles.theoryItemTitle}>手続き的公正</Text>
+                <Text style={styles.theoryItemSubtitle}>Procedural Justice</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* 交渉術・影響力 */}
+          <View style={styles.categorySection}>
+            <Text style={styles.categoryTitle}>交渉術・影響力</Text>
+            <Text style={styles.categoryDescription}>交渉と影響力に関する理論</Text>
+            <View style={styles.theoryGrid}>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('batna')}>
+                <Text style={styles.theoryItemTitle}>BATNA</Text>
+                <Text style={styles.theoryItemSubtitle}>Best Alternative</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('zopa')}>
+                <Text style={styles.theoryItemTitle}>ZOPA</Text>
+                <Text style={styles.theoryItemSubtitle}>Zone of Agreement</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('principled_negotiation')}>
+                <Text style={styles.theoryItemTitle}>プリンシプル・ネゴシエーション</Text>
+                <Text style={styles.theoryItemSubtitle}>Principled Negotiation</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('meso')}>
+                <Text style={styles.theoryItemTitle}>MESO</Text>
+                <Text style={styles.theoryItemSubtitle}>Multiple Offers</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('roll_over_tactic')}>
+                <Text style={styles.theoryItemTitle}>ロールオーバー戦術</Text>
+                <Text style={styles.theoryItemSubtitle}>Roll-over Tactic</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('concession_strategies')}>
+                <Text style={styles.theoryItemTitle}>譲歩戦略</Text>
+                <Text style={styles.theoryItemSubtitle}>Concession Strategies</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('tactical_empathy')}>
+                <Text style={styles.theoryItemTitle}>戦術的共感</Text>
+                <Text style={styles.theoryItemSubtitle}>Tactical Empathy</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('foot_in_door')}>
+                <Text style={styles.theoryItemTitle}>フット・イン・ザ・ドア</Text>
+                <Text style={styles.theoryItemSubtitle}>Foot-in-the-Door</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('door_in_face')}>
+                <Text style={styles.theoryItemTitle}>ドア・イン・ザ・フェイス</Text>
+                <Text style={styles.theoryItemSubtitle}>Door-in-the-Face</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('negotiation_anchoring')}>
+                <Text style={styles.theoryItemTitle}>交渉アンカリング</Text>
+                <Text style={styles.theoryItemSubtitle}>Negotiation Anchoring</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* 経営戦略 */}
+          <View style={styles.categorySection}>
+            <Text style={styles.categoryTitle}>経営戦略</Text>
+            <Text style={styles.categoryDescription}>企業戦略と競争優位に関する理論</Text>
+            <View style={styles.theoryGrid}>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('porters_five_forces')}>
+                <Text style={styles.theoryItemTitle}>ファイブフォース分析</Text>
+                <Text style={styles.theoryItemSubtitle}>Porter's Five Forces</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('value_chain_analysis')}>
+                <Text style={styles.theoryItemTitle}>バリューチェーン</Text>
+                <Text style={styles.theoryItemSubtitle}>Value Chain</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('generic_strategies')}>
+                <Text style={styles.theoryItemTitle}>基本戦略</Text>
+                <Text style={styles.theoryItemSubtitle}>Generic Strategies</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('blue_ocean_strategy')}>
+                <Text style={styles.theoryItemTitle}>ブルーオーシャン戦略</Text>
+                <Text style={styles.theoryItemSubtitle}>Blue Ocean Strategy</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('resource_based_view')}>
+                <Text style={styles.theoryItemTitle}>資源ベース理論</Text>
+                <Text style={styles.theoryItemSubtitle}>Resource-Based View</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('core_competence')}>
+                <Text style={styles.theoryItemTitle}>コア・コンピタンス</Text>
+                <Text style={styles.theoryItemSubtitle}>Core Competence</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('swot_analysis')}>
+                <Text style={styles.theoryItemTitle}>SWOT分析</Text>
+                <Text style={styles.theoryItemSubtitle}>SWOT Analysis</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('pestel_analysis')}>
+                <Text style={styles.theoryItemTitle}>PESTEL分析</Text>
+                <Text style={styles.theoryItemSubtitle}>PESTEL Analysis</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('balanced_scorecard')}>
+                <Text style={styles.theoryItemTitle}>バランススコアカード</Text>
+                <Text style={styles.theoryItemSubtitle}>Balanced Scorecard</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('okr')}>
+                <Text style={styles.theoryItemTitle}>OKR</Text>
+                <Text style={styles.theoryItemSubtitle}>Objectives & Key Results</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* イノベーション・プロダクト */}
+          <View style={styles.categorySection}>
+            <Text style={styles.categoryTitle}>イノベーション・プロダクト</Text>
+            <Text style={styles.categoryDescription}>イノベーションとプロダクト開発に関する理論</Text>
+            <View style={styles.theoryGrid}>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('design_thinking')}>
+                <Text style={styles.theoryItemTitle}>デザイン思考</Text>
+                <Text style={styles.theoryItemSubtitle}>Design Thinking</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('lean_startup')}>
+                <Text style={styles.theoryItemTitle}>リーンスタートアップ</Text>
+                <Text style={styles.theoryItemSubtitle}>Lean Startup</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('jobs_to_be_done')}>
+                <Text style={styles.theoryItemTitle}>ジョブ理論</Text>
+                <Text style={styles.theoryItemSubtitle}>Jobs to Be Done</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('kano_model')}>
+                <Text style={styles.theoryItemTitle}>KANOモデル</Text>
+                <Text style={styles.theoryItemSubtitle}>Kano Model</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('diffusion_of_innovations')}>
+                <Text style={styles.theoryItemTitle}>イノベーション普及理論</Text>
+                <Text style={styles.theoryItemSubtitle}>Diffusion of Innovations</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('aarrr_funnel')}>
+                <Text style={styles.theoryItemTitle}>AARRRファネル</Text>
+                <Text style={styles.theoryItemSubtitle}>AARRR Funnel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('north_star_metric')}>
+                <Text style={styles.theoryItemTitle}>ノーススターメトリクス</Text>
+                <Text style={styles.theoryItemSubtitle}>North Star Metric</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('rice_scoring')}>
+                <Text style={styles.theoryItemTitle}>RICEスコアリング</Text>
+                <Text style={styles.theoryItemSubtitle}>RICE Scoring</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('moscow_method')}>
+                <Text style={styles.theoryItemTitle}>MoSCoW法</Text>
+                <Text style={styles.theoryItemSubtitle}>MoSCoW Method</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('user_story_mapping')}>
+                <Text style={styles.theoryItemTitle}>ユーザーストーリーマッピング</Text>
+                <Text style={styles.theoryItemSubtitle}>User Story Mapping</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* オペレーション・プロジェクト管理 */}
+          <View style={styles.categorySection}>
+            <Text style={styles.categoryTitle}>オペレーション・プロジェクト管理</Text>
+            <Text style={styles.categoryDescription}>業務効率化とプロジェクト管理に関する理論</Text>
+            <View style={styles.theoryGrid}>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('agile_development')}>
+                <Text style={styles.theoryItemTitle}>アジャイル開発</Text>
+                <Text style={styles.theoryItemSubtitle}>Agile Development</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('scrum')}>
+                <Text style={styles.theoryItemTitle}>スクラム</Text>
+                <Text style={styles.theoryItemSubtitle}>Scrum</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('kanban')}>
+                <Text style={styles.theoryItemTitle}>カンバン</Text>
+                <Text style={styles.theoryItemSubtitle}>Kanban</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('critical_path')}>
+                <Text style={styles.theoryItemTitle}>クリティカルパス</Text>
+                <Text style={styles.theoryItemSubtitle}>Critical Path</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('gantt_chart')}>
+                <Text style={styles.theoryItemTitle}>ガントチャート</Text>
+                <Text style={styles.theoryItemSubtitle}>Gantt Chart</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('six_sigma')}>
+                <Text style={styles.theoryItemTitle}>シックスシグマ</Text>
+                <Text style={styles.theoryItemSubtitle}>Six Sigma</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('lean_management')}>
+                <Text style={styles.theoryItemTitle}>リーン管理</Text>
+                <Text style={styles.theoryItemSubtitle}>Lean Management</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('theory_of_constraints')}>
+                <Text style={styles.theoryItemTitle}>制約理論</Text>
+                <Text style={styles.theoryItemSubtitle}>Theory of Constraints</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('total_quality_management')}>
+                <Text style={styles.theoryItemTitle}>TQM</Text>
+                <Text style={styles.theoryItemSubtitle}>Total Quality Management</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('business_process_reengineering')}>
+                <Text style={styles.theoryItemTitle}>BPR</Text>
+                <Text style={styles.theoryItemSubtitle}>Business Process Reengineering</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* ファイナンス・メトリクス */}
+          <View style={styles.categorySection}>
+            <Text style={styles.categoryTitle}>ファイナンス・メトリクス</Text>
+            <Text style={styles.categoryDescription}>財務分析と指標に関する理論</Text>
+            <View style={styles.theoryGrid}>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('roi_analysis')}>
+                <Text style={styles.theoryItemTitle}>ROI分析</Text>
+                <Text style={styles.theoryItemSubtitle}>ROI Analysis</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('cash_flow')}>
+                <Text style={styles.theoryItemTitle}>キャッシュフロー</Text>
+                <Text style={styles.theoryItemSubtitle}>Cash Flow</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('cost_benefit_analysis')}>
+                <Text style={styles.theoryItemTitle}>コストベネフィット</Text>
+                <Text style={styles.theoryItemSubtitle}>Cost-Benefit</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('kpi_design')}>
+                <Text style={styles.theoryItemTitle}>KPI設計</Text>
+                <Text style={styles.theoryItemSubtitle}>KPI Design</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('balanced_scorecard_finance')}>
+                <Text style={styles.theoryItemTitle}>バランススコアカード</Text>
+                <Text style={styles.theoryItemSubtitle}>Balanced Scorecard</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('break_even_analysis')}>
+                <Text style={styles.theoryItemTitle}>損益分岐点分析</Text>
+                <Text style={styles.theoryItemSubtitle}>Break-Even Analysis</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('net_present_value')}>
+                <Text style={styles.theoryItemTitle}>NPV</Text>
+                <Text style={styles.theoryItemSubtitle}>Net Present Value</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('internal_rate_of_return')}>
+                <Text style={styles.theoryItemTitle}>IRR</Text>
+                <Text style={styles.theoryItemSubtitle}>Internal Rate of Return</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('payback_period')}>
+                <Text style={styles.theoryItemTitle}>回収期間</Text>
+                <Text style={styles.theoryItemSubtitle}>Payback Period</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('economic_value_added')}>
+                <Text style={styles.theoryItemTitle}>EVA</Text>
+                <Text style={styles.theoryItemSubtitle}>Economic Value Added</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* コミュニケーション・営業 */}
+          <View style={styles.categorySection}>
+            <Text style={styles.categoryTitle}>コミュニケーション・営業</Text>
+            <Text style={styles.categoryDescription}>コミュニケーションと営業に関する理論</Text>
+            <View style={styles.theoryGrid}>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('active_listening_comm')}>
+                <Text style={styles.theoryItemTitle}>アクティブリスニング</Text>
+                <Text style={styles.theoryItemSubtitle}>Active Listening</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('nonviolent_communication')}>
+                <Text style={styles.theoryItemTitle}>非暴力コミュニケーション</Text>
+                <Text style={styles.theoryItemSubtitle}>Nonviolent Communication</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('spin_selling')}>
+                <Text style={styles.theoryItemTitle}>SPINセリング</Text>
+                <Text style={styles.theoryItemSubtitle}>SPIN Selling</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('consultative_selling')}>
+                <Text style={styles.theoryItemTitle}>コンサルティングセールス</Text>
+                <Text style={styles.theoryItemSubtitle}>Consultative Selling</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('storytelling')}>
+                <Text style={styles.theoryItemTitle}>ストーリーテリング</Text>
+                <Text style={styles.theoryItemSubtitle}>Storytelling</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('persuasion_techniques')}>
+                <Text style={styles.theoryItemTitle}>説得技法</Text>
+                <Text style={styles.theoryItemSubtitle}>Persuasion</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('body_language')}>
+                <Text style={styles.theoryItemTitle}>ボディランゲージ</Text>
+                <Text style={styles.theoryItemSubtitle}>Body Language</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('feedback_skills')}>
+                <Text style={styles.theoryItemTitle}>フィードバックスキル</Text>
+                <Text style={styles.theoryItemSubtitle}>Feedback Skills</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('conflict_resolution_comm')}>
+                <Text style={styles.theoryItemTitle}>対立解消</Text>
+                <Text style={styles.theoryItemSubtitle}>Conflict Resolution</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.theoryItem} onPress={() => showTheoryDetail('presentation_skills')}>
+                <Text style={styles.theoryItemTitle}>プレゼンテーションスキル</Text>
+                <Text style={styles.theoryItemSubtitle}>Presentation Skills</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
+
   // メイン画面（Notion風UI）
   const renderMainView = () => (
     <SafeAreaView style={styles.container}>
@@ -541,24 +1046,14 @@ export default function App() {
           </View>
         </View>
 
-        {/* クイックスタート */}
-        <View style={styles.quickStartSection}>
-          <Text style={styles.sectionTitle}>クイックスタート</Text>
+        {/* 理論メモボタン（一番下） */}
+        <View style={styles.theoryMemoSection}>
           <TouchableOpacity
-            style={styles.quickStartButton}
-            onPress={() => {
-              setScene('meeting');
-              setGoal('議題の明確化と合意形成');
-              setTimeLimit('1時間以内');
-              setStakes('中');
-              setParticipants(5);
-              setRelationship('同僚');
-              resetSceneDetails();
-              getAdvice();
-            }}
+            style={styles.theoryMemoButton}
+            onPress={() => setCurrentView('theoryMemo')}
           >
-            <Text style={styles.quickStartButtonText}>会議の効率化</Text>
-            <Text style={styles.quickStartButtonSubtext}>すぐにアドバイスを取得</Text>
+            <Text style={styles.theoryMemoButtonText}>📚 理論メモ</Text>
+            <Text style={styles.theoryMemoButtonSubtext}>100の理論をカテゴリー別に学習</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -1819,6 +2314,219 @@ export default function App() {
     );
   };
 
+  // 理論詳細を表示
+  const showTheoryDetail = async (theoryId: string) => {
+    setSelectedTheoryId(theoryId);
+    setCurrentView('theoryDetail');
+    setIsLoadingTheory(true);
+    
+    // シンプルな理論情報を直接設定（API呼び出しなし）
+    const theoryInfo = getTheoryInfo(theoryId);
+    setSelectedTheoryData(theoryInfo);
+    setIsLoadingTheory(false);
+  };
+
+  // 理論IDから基本情報を取得する関数
+  const getTheoryInfo = (theoryId: string) => {
+    const theoryMap: { [key: string]: any } = {
+      'anchoring_effect': {
+        name_ja: 'アンカリング効果',
+        name_en: 'Anchoring Effect',
+        academic_field: '行動経済学',
+        one_liner: '最初に提示された基準がその後の判断を左右する心理効果',
+        definition: '価格や条件の初提示は、その後の交渉や評価の基準点として強く影響を与える',
+        content: '人間の意思決定において、最初に提示された情報（アンカー）が基準となり、その後の判断に大きな影響を与える現象です。',
+        applicable_scenarios: ['価格交渉', '予算策定', 'KPI設定', '評価面談'],
+        key_concepts: ['基準点の設定', '比較効果', '認知バイアス', '意思決定の歪み'],
+        practical_tips: ['複数の選択肢を同時提示', '客観的な基準を事前に設定', 'アンカーの影響を認識する'],
+        examples: ['価格交渉での初期提示', '予算会議での基準値', '人事評価での基準設定']
+      },
+      'framing_effect': {
+        name_ja: 'フレーミング効果',
+        name_en: 'Framing Effect',
+        academic_field: '行動経済学',
+        one_liner: '同じ情報でも提示の仕方によって受け取られ方や選好が変わる',
+        definition: '利得枠と損失枠の両面から事実を提示することで意思決定をコントロールする',
+        content: '同じ内容の情報でも、どのように表現するかによって受け手の印象や選択が大きく変わる現象です。',
+        applicable_scenarios: ['企画提案', '稟議承認', '営業トーク', '変更提案'],
+        key_concepts: ['表現方法', '認知フレーム', '意思決定バイアス', 'コミュニケーション効果'],
+        practical_tips: ['ポジティブな表現を心がける', '具体的な数値を示す', '相手の立場に立って表現する'],
+        examples: ['成功率90% vs 失敗率10%', '節約効果 vs コスト削減', '成長機会 vs リスク回避']
+      },
+      'loss_aversion': {
+        name_ja: '損失回避',
+        name_en: 'Loss Aversion',
+        academic_field: '行動経済学',
+        one_liner: '人は利益を得るより損失を避けることを優先する傾向がある',
+        definition: '未導入時の損失額を明示することで行動を促す',
+        content: '人間は利益を得ることよりも、損失を避けることを強く求める心理的傾向があります。',
+        applicable_scenarios: ['導入提案', '解約抑止', '業務改善', '変更推進'],
+        key_concepts: ['損失の重み', '利益の軽視', '現状維持バイアス', 'リスク回避'],
+        practical_tips: ['損失の具体的な金額を示す', '現状維持のコストを明示', '段階的な改善を提案'],
+        examples: ['システム導入による損失回避', '現状維持の機会損失', '改善によるリスク軽減']
+      }
+    };
+
+    // 理論IDに対応する情報があれば返す、なければデフォルト情報を返す
+    if (theoryMap[theoryId]) {
+      return theoryMap[theoryId];
+    }
+
+    // デフォルト情報（理論IDから推測）
+    const theoryName = theoryId.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    return {
+      name_ja: theoryId,
+      name_en: theoryName,
+      academic_field: '理論',
+      one_liner: `${theoryName}について学びましょう`,
+      definition: `理論「${theoryName}」は、組織変革とリーダーシップにおいて重要な概念です。`,
+      content: 'この理論は、実践的なビジネスシーンで活用できる重要な知見を提供します。',
+      applicable_scenarios: ['組織変革', 'リーダーシップ開発', 'チームビルディング', '業務改善'],
+      key_concepts: ['理論の核心概念', '実践的な応用', '効果的な活用方法', '成功のポイント'],
+      practical_tips: ['段階的な導入', '継続的な評価', 'チーム全体での共有', '定期的な見直し'],
+      examples: ['成功事例', '実践例', '応用例', '改善例']
+    };
+  };
+
+  // 理論詳細画面
+  const renderTheoryDetail = () => {
+    if (isLoadingTheory) {
+      return (
+        <SafeAreaView style={styles.container}>
+          <View style={styles.theoryDetailHeader}>
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() => setCurrentView('theoryMemo')}
+            >
+              <Text style={styles.backButtonText}>← 戻る</Text>
+            </TouchableOpacity>
+            <Text style={styles.theoryDetailHeaderTitle}>理論詳細</Text>
+          </View>
+          
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#007bff" />
+            <Text style={styles.loadingText}>理論の詳細情報を読み込み中...</Text>
+            <Text style={styles.loadingSubtext}>しばらくお待ちください</Text>
+          </View>
+        </SafeAreaView>
+      );
+    }
+
+    if (!selectedTheoryData) {
+      return (
+        <SafeAreaView style={styles.container}>
+          <View style={styles.theoryDetailHeader}>
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() => setCurrentView('theoryMemo')}
+            >
+              <Text style={styles.backButtonText}>← 戻る</Text>
+            </TouchableOpacity>
+            <Text style={styles.theoryDetailHeaderTitle}>理論詳細</Text>
+          </View>
+          
+          <View style={styles.theoryDetailCard}>
+            <Text style={styles.theoryDetailTitle}>エラー</Text>
+            <Text style={styles.theoryDetailDescription}>
+              理論の詳細情報を読み込めませんでした。
+            </Text>
+          </View>
+        </SafeAreaView>
+      );
+    }
+
+    return (
+      <SafeAreaView style={styles.container}>
+        <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+          <View style={styles.theoryDetailHeader}>
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() => setCurrentView('theoryMemo')}
+            >
+              <Text style={styles.backButtonText}>← 戻る</Text>
+            </TouchableOpacity>
+            <Text style={styles.theoryDetailHeaderTitle}>理論詳細</Text>
+          </View>
+          
+          <View style={styles.theoryDetailCard}>
+            <View style={styles.theoryMeta}>
+              <Text style={styles.theoryAcademicField}>
+                {selectedTheoryData.academic_field || '理論'}
+              </Text>
+            </View>
+            
+            <Text style={styles.theoryDetailTitle}>
+              {selectedTheoryData.name_ja || selectedTheoryId}
+            </Text>
+            
+            {selectedTheoryData.name_en && (
+              <Text style={styles.theoryDetailSubtitle}>
+                {selectedTheoryData.name_en}
+              </Text>
+            )}
+            
+            {selectedTheoryData.one_liner && (
+              <Text style={styles.theoryDetailDescription}>
+                {selectedTheoryData.one_liner}
+              </Text>
+            )}
+            
+            {selectedTheoryData.definition && (
+              <View style={styles.theorySection}>
+                <Text style={styles.theorySectionTitle}>定義</Text>
+                <Text style={styles.theorySectionContent}>
+                  {selectedTheoryData.definition}
+                </Text>
+              </View>
+            )}
+            
+            {selectedTheoryData.content && (
+              <View style={styles.theorySection}>
+                <Text style={styles.theorySectionTitle}>内容</Text>
+                <Text style={styles.theorySectionContent}>
+                  {selectedTheoryData.content}
+                </Text>
+              </View>
+            )}
+            
+            {selectedTheoryData.applicable_scenarios && selectedTheoryData.applicable_scenarios.length > 0 && (
+              <View style={styles.theorySection}>
+                <Text style={styles.theorySectionTitle}>適用場面</Text>
+                {selectedTheoryData.applicable_scenarios.map((scenario: string, index: number) => (
+                  <Text key={index} style={styles.theoryListItem}>
+                    • {scenario}
+                  </Text>
+                ))}
+              </View>
+            )}
+            
+            {selectedTheoryData.key_concepts && selectedTheoryData.key_concepts.length > 0 && (
+              <View style={styles.theorySection}>
+                <Text style={styles.theorySectionTitle}>キーコンセプト</Text>
+                {selectedTheoryData.key_concepts.map((concept: string, index: number) => (
+                  <Text key={index} style={styles.theoryListItem}>
+                    • {concept}
+                  </Text>
+                ))}
+              </View>
+            )}
+            
+            {selectedTheoryData.practical_tips && selectedTheoryData.practical_tips.length > 0 && (
+              <View style={styles.theorySection}>
+                <Text style={styles.theorySectionTitle}>実践的なヒント</Text>
+                {selectedTheoryData.practical_tips.map((tip: string, index: number) => (
+                  <Text key={index} style={styles.theoryListItem}>
+                    • {tip}
+                  </Text>
+                ))}
+              </View>
+            )}
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    );
+  };
+
   // メインのレンダリング
   switch (currentView) {
     case 'main':
@@ -1841,6 +2549,10 @@ export default function App() {
       return renderAdvices();
     case 'theory':
       return renderTheory();
+    case 'theoryMemo':
+      return renderTheoryMemo();
+    case 'theoryDetail':
+      return renderTheoryDetail();
     default:
       return renderMainView();
   }
@@ -2367,5 +3079,164 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     fontWeight: '600',
   },
-
+  theoryMemoHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 20,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e9ecef',
+  },
+  theoryMemoHeaderTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#212529',
+  },
+  theoryCategories: {
+    padding: 20,
+    backgroundColor: '#fff',
+    marginTop: 12,
+  },
+  categorySection: {
+    marginBottom: 20,
+  },
+  categoryTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#212529',
+    marginBottom: 8,
+  },
+  categoryDescription: {
+    fontSize: 14,
+    color: '#6c757d',
+    marginBottom: 12,
+    lineHeight: 18,
+  },
+  theoryGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  theoryItem: {
+    width: 120,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    marginRight: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+    minHeight: 120,
+  },
+  theoryItemTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#212529',
+    marginBottom: 8,
+    lineHeight: 18,
+  },
+  theoryItemSubtitle: {
+    fontSize: 12,
+    color: '#6c757d',
+    lineHeight: 16,
+  },
+  theoryMemoButton: {
+    backgroundColor: '#007bff',
+    borderRadius: 12,
+    padding: 20,
+    alignItems: 'center',
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  theoryMemoButtonText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#fff',
+    marginBottom: 4,
+  },
+  theoryMemoButtonSubtext: {
+    fontSize: 14,
+    color: '#b3d9ff',
+  },
+  theoryMemoSection: {
+    padding: 20,
+    backgroundColor: '#fff',
+    marginTop: 12,
+  },
+  theoryScrollView: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  theoryScrollContent: {
+    paddingHorizontal: 20,
+  },
+  theoryDetailHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 20,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e9ecef',
+  },
+  theoryDetailHeaderTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#212529',
+  },
+  theoryDetailCard: {
+    padding: 20,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  theoryDetailTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#212529',
+    marginBottom: 12,
+  },
+  theoryDetailDescription: {
+    fontSize: 16,
+    color: '#495057',
+    marginBottom: 16,
+    lineHeight: 24,
+  },
+  theoryDetailSubtitle: {
+    fontSize: 14,
+    color: '#6c757d',
+    marginBottom: 8,
+  },
+  theorySection: {
+    marginBottom: 16,
+  },
+  theorySectionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#212529',
+    marginBottom: 8,
+  },
+  theorySectionContent: {
+    fontSize: 14,
+    color: '#495057',
+    lineHeight: 20,
+  },
+  theoryListItem: {
+    fontSize: 14,
+    color: '#495057',
+    marginBottom: 8,
+    lineHeight: 20,
+  },
 });

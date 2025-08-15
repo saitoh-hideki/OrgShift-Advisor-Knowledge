@@ -1,0 +1,312 @@
+[
+  {
+    "id": "batna",
+    "name_ja": "BATNA",
+    "name_en": "Best Alternative to a Negotiated Agreement",
+    "domain": "negotiation",
+    "academic_field": "交渉学",
+    "one_liner": "交渉決裂時の最良代替案",
+    "definition": "交渉決裂時の最良代替案",
+    "content": "自分と相手のBATNAを理解すると交渉力が増す",
+    "applicable_scenarios": "価格交渉、契約更新",
+    "key_concepts": ["代替案", "交渉力", "決裂時", "最良選択"],
+    "examples": [
+      "他社からの提案を複数用意しておく",
+      "交渉決裂時の損失を事前に計算する",
+      "相手のBATNAを推測して交渉戦略を立てる"
+    ],
+    "practical_tips": [
+      "複数の代替案を準備する",
+      "決裂時の損失を計算する",
+      "相手のBATNAを推測する"
+    ],
+    "mechanism": "代替案の存在による交渉力の向上",
+    "how_to": ["代替案準備→損失計算→戦略立案"],
+    "templates": {
+      "meeting": "BATNA{{batna}}を確認し、交渉戦略{{negotiation_strategy}}を策定",
+      "sales": "他社提案{{alternative_proposal}}を準備し、交渉力{{negotiation_power}}を強化",
+      "presentation": "決裂時の損失{{breakdown_loss}}を計算し、リスク管理{{risk_management}}を実施"
+    },
+    "tags": ["交渉", "戦略", "代替案", "交渉力"],
+    "related_theories": ["zopa", "principled_negotiation"]
+  },
+  {
+    "id": "zopa",
+    "name_ja": "ZOPA",
+    "name_en": "Zone of Possible Agreement",
+    "domain": "negotiation",
+    "academic_field": "交渉学",
+    "one_liner": "合意可能な条件範囲",
+    "definition": "合意可能な条件範囲",
+    "content": "お互いのBATNAを元に合意の余地を探る",
+    "applicable_scenarios": "M&A、商談",
+    "key_concepts": ["合意範囲", "BATNA", "交渉余地", "合意可能性"],
+    "examples": [
+      "両者の要求を整理して合意可能な範囲を特定する",
+      "BATNAを考慮して現実的な条件を設定する",
+      "合意範囲内での最適解を探る"
+    ],
+    "practical_tips": [
+      "両者の要求を整理する",
+      "BATNAを考慮する",
+      "合意可能な範囲を特定する"
+    ],
+    "mechanism": "合意可能範囲の特定による効率的な交渉",
+    "how_to": ["要求整理→BATNA考慮→合意範囲特定"],
+    "templates": {
+      "meeting": "両者の要求{{requirements}}を整理し、ZOPA{{zopa}}を特定",
+      "sales": "BATNA{{batna}}を考慮して合意可能範囲{{agreement_range}}を設定",
+      "presentation": "合意可能性{{agreement_possibility}}を分析し、交渉戦略{{negotiation_strategy}}を策定"
+    },
+    "tags": ["交渉", "合意", "範囲", "戦略"],
+    "related_theories": ["batna", "principled_negotiation"]
+  },
+  {
+    "id": "principled_negotiation",
+    "name_ja": "プリンシプル・ネゴシエーション",
+    "name_en": "Principled Negotiation",
+    "domain": "negotiation",
+    "academic_field": "交渉学",
+    "one_liner": "立場でなく利益に基づく交渉",
+    "definition": "立場でなく利益に基づく交渉",
+    "content": "相互利益を追求し、客観基準を活用する",
+    "applicable_scenarios": "長期関係構築型交渉",
+    "key_concepts": ["利益", "客観基準", "相互利益", "関係構築"],
+    "examples": [
+      "立場ではなく根本的な利益を探る",
+      "客観的な基準やデータを活用する",
+      "Win-Winの解決策を模索する"
+    ],
+    "practical_tips": [
+      "根本的な利益を探る",
+      "客観基準を活用する",
+      "Win-Winを目指す"
+    ],
+    "mechanism": "利益ベースの交渉による相互満足の実現",
+    "how_to": ["利益探求→客観基準活用→Win-Win模索"],
+    "templates": {
+      "meeting": "根本的利益{{fundamental_interests}}を探り、客観基準{{objective_criteria}}を活用",
+      "sales": "相互利益{{mutual_benefits}}を追求し、Win-Win{{win_win}}の解決策を模索",
+      "presentation": "立場{{position}}ではなく利益{{interests}}に基づく交渉{{negotiation}}を実施"
+    },
+    "tags": ["交渉", "利益", "客観性", "Win-Win"],
+    "related_theories": ["batna", "zopa"]
+  },
+  {
+    "id": "meso",
+    "name_ja": "MESO",
+    "name_en": "Multiple Equivalent Simultaneous Offers",
+    "domain": "negotiation",
+    "academic_field": "交渉学",
+    "one_liner": "同等価値の複数提案を同時提示",
+    "definition": "同等価値の複数提案を同時提示",
+    "content": "相手の優先順位を引き出す",
+    "applicable_scenarios": "条件調整、複合提案",
+    "key_concepts": ["複数提案", "同等価値", "優先順位", "同時提示"],
+    "examples": [
+      "価格、納期、品質の異なる組み合わせを提示する",
+      "相手の選択から優先順位を読み取る",
+      "交渉の柔軟性を高める"
+    ],
+    "practical_tips": [
+      "同等価値の複数提案を準備する",
+      "相手の選択を観察する",
+      "優先順位を把握する"
+    ],
+    "mechanism": "複数選択肢による相手の選好の可視化",
+    "how_to": ["複数提案準備→同時提示→選好観察"],
+    "templates": {
+      "meeting": "同等価値の複数提案{{multiple_offers}}を同時提示し、優先順位{{priorities}}を把握",
+      "sales": "価格・納期・品質の組み合わせ{{combinations}}を提示し、選好{{preferences}}を観察",
+      "presentation": "MESO戦略{{meso_strategy}}により交渉の柔軟性{{flexibility}}を高める"
+    },
+    "tags": ["交渉", "複数提案", "優先順位", "戦略"],
+    "related_theories": ["concession_strategies", "negotiation_anchoring"]
+  },
+  {
+    "id": "rollover_tactic",
+    "name_ja": "ロールオーバー戦術",
+    "name_en": "Roll-over Tactic",
+    "domain": "negotiation",
+    "academic_field": "交渉学",
+    "one_liner": "一時的譲歩で関係を保ち後で利益回収",
+    "definition": "一時的譲歩で関係を保ち後で利益回収",
+    "content": "タイミングと信頼の維持が重要",
+    "applicable_scenarios": "長期取引先との条件交渉",
+    "key_concepts": ["一時的譲歩", "関係維持", "利益回収", "タイミング"],
+    "examples": [
+      "短期的には譲歩して関係を維持する",
+      "長期的な利益を優先する",
+      "信頼関係を築く"
+    ],
+    "practical_tips": [
+      "短期的譲歩を検討する",
+      "長期的利益を優先する",
+      "信頼関係を築く"
+    ],
+    "mechanism": "短期的譲歩による長期的関係と利益の確保",
+    "how_to": ["短期的譲歩→関係維持→長期的利益回収"],
+    "templates": {
+      "meeting": "短期的譲歩{{short_term_concession}}で関係{{relationship}}を維持し、長期的利益{{long_term_benefits}}を確保",
+      "sales": "一時的譲歩{{temporary_concession}}により信頼{{trust}}を築き、後で利益回収{{benefit_recovery}}を図る",
+      "presentation": "ロールオーバー戦術{{rollover_tactic}}の効果{{effectiveness}}とリスク{{risks}}を説明"
+    },
+    "tags": ["交渉", "戦術", "関係維持", "長期的視点"],
+    "related_theories": ["concession_strategies", "tactical_empathy"]
+  },
+  {
+    "id": "concession_strategies",
+    "name_ja": "譲歩戦略",
+    "name_en": "Concession Strategies",
+    "domain": "negotiation",
+    "academic_field": "交渉学",
+    "one_liner": "計画的に譲歩し見返りを得る",
+    "definition": "計画的に譲歩し見返りを得る",
+    "content": "譲歩のタイミング・幅を事前設計",
+    "applicable_scenarios": "販売交渉、大口契約",
+    "key_concepts": ["計画的譲歩", "見返り", "タイミング", "幅の設計"],
+    "examples": [
+      "譲歩のタイミングを計画的に設定する",
+      "譲歩の幅を段階的に調整する",
+      "見返りを明確に要求する"
+    ],
+    "practical_tips": [
+      "譲歩のタイミングを計画する",
+      "譲歩の幅を調整する",
+      "見返りを要求する"
+    ],
+    "mechanism": "計画的譲歩による効率的な合意形成",
+    "how_to": ["譲歩計画→段階的調整→見返り要求"],
+    "templates": {
+      "meeting": "譲歩のタイミング{{concession_timing}}と幅{{concession_range}}を事前設計し、見返り{{compensation}}を要求",
+      "sales": "段階的譲歩{{gradual_concessions}}により効率的な合意{{efficient_agreement}}を形成",
+      "presentation": "譲歩戦略{{concession_strategy}}の設計{{design}}と効果{{effectiveness}}を説明"
+    },
+    "tags": ["交渉", "譲歩", "戦略", "効率性"],
+    "related_theories": ["meso", "rollover_tactic"]
+  },
+  {
+    "id": "tactical_empathy",
+    "name_ja": "戦術的共感",
+    "name_en": "Tactical Empathy",
+    "domain": "negotiation",
+    "academic_field": "交渉学",
+    "one_liner": "相手の感情を理解し言語化する",
+    "definition": "相手の感情を理解し言語化する",
+    "content": "心理的距離を縮め合意形成を促す",
+    "applicable_scenarios": "対立解消、価格交渉",
+    "key_concepts": ["感情理解", "言語化", "心理的距離", "合意形成"],
+    "examples": [
+      "相手の感情を正確に理解する",
+      "感情を適切に言語化する",
+      "心理的距離を縮める"
+    ],
+    "practical_tips": [
+      "感情を観察する",
+      "適切に言語化する",
+      "距離を縮める"
+    ],
+    "mechanism": "感情の理解と言語化による心理的距離の縮小",
+    "how_to": ["感情観察→適切言語化→距離縮小"],
+    "templates": {
+      "meeting": "相手の感情{{emotions}}を理解し言語化{{verbalization}}して心理的距離{{psychological_distance}}を縮める",
+      "sales": "戦術的共感{{tactical_empathy}}により対立{{conflict}}を解消し、合意形成{{agreement_formation}}を促進",
+      "presentation": "感情理解{{emotional_understanding}}の重要性{{importance}}と実践方法{{practical_methods}}を説明"
+    },
+    "tags": ["交渉", "共感", "感情", "心理的距離"],
+    "related_theories": ["rollover_tactic", "foot_in_door"]
+  },
+  {
+    "id": "foot_in_door",
+    "name_ja": "フット・イン・ザ・ドア",
+    "name_en": "Foot-in-the-Door",
+    "domain": "negotiation",
+    "academic_field": "交渉学",
+    "one_liner": "小さな依頼から大きな依頼に移行",
+    "definition": "小さな依頼から大きな依頼に移行",
+    "content": "段階的承諾を引き出す",
+    "applicable_scenarios": "営業アプローチ、契約拡大",
+    "key_concepts": ["小さな依頼", "大きな依頼", "段階的承諾", "移行"],
+    "examples": [
+      "最初に小さな依頼をする",
+      "承諾を得てから大きな依頼に移行する",
+      "段階的に要求を高める"
+    ],
+    "practical_tips": [
+      "小さな依頼から始める",
+      "承諾を得てから移行する",
+      "段階的に要求を高める"
+    ],
+    "mechanism": "小さな承諾による大きな要求への受容性向上",
+    "how_to": ["小さな依頼→承諾獲得→大きな依頼移行"],
+    "templates": {
+      "meeting": "小さな依頼{{small_request}}から始めて段階的承諾{{gradual_consent}}を引き出す",
+      "sales": "フット・イン・ザ・ドア{{foot_in_door}}により契約拡大{{contract_expansion}}を促進",
+      "presentation": "段階的アプローチ{{gradual_approach}}の効果{{effectiveness}}と実践方法{{practical_methods}}を説明"
+    },
+    "tags": ["交渉", "段階的", "承諾", "アプローチ"],
+    "related_theories": ["tactical_empathy", "door_in_face"]
+  },
+  {
+    "id": "door_in_face",
+    "name_ja": "ドア・イン・ザ・フェイス",
+    "name_en": "Door-in-the-Face",
+    "domain": "negotiation",
+    "academic_field": "交渉学",
+    "one_liner": "大きな依頼の後に小さな依頼を提示",
+    "definition": "大きな依頼の後に小さな依頼を提示",
+    "content": "比較効果で受け入れやすくする",
+    "applicable_scenarios": "値引き交渉、条件緩和",
+    "key_concepts": ["大きな依頼", "小さな依頼", "比較効果", "受け入れやすさ"],
+    "examples": [
+      "最初に大きな依頼をする",
+      "拒否された後に小さな依頼を提示する",
+      "比較効果を活用する"
+    ],
+    "practical_tips": [
+      "大きな依頼から始める",
+      "拒否後に小さな依頼を提示する",
+      "比較効果を活用する"
+    ],
+    "mechanism": "大きな要求との比較による小さな要求の受容性向上",
+    "how_to": ["大きな依頼→拒否→小さな依頼提示"],
+    "templates": {
+      "meeting": "大きな依頼{{large_request}}の後に小さな依頼{{small_request}}を提示し、比較効果{{contrast_effect}}を活用",
+      "sales": "ドア・イン・ザ・フェイス{{door_in_face}}により値引き{{discount}}や条件緩和{{condition_relaxation}}を実現",
+      "presentation": "比較効果{{contrast_effect}}の心理的メカニズム{{psychological_mechanism}}と実践方法{{practical_methods}}を説明"
+    },
+    "tags": ["交渉", "比較効果", "戦術", "心理的効果"],
+    "related_theories": ["foot_in_door", "negotiation_anchoring"]
+  },
+  {
+    "id": "negotiation_anchoring",
+    "name_ja": "交渉アンカリング",
+    "name_en": "Negotiation Anchoring",
+    "domain": "negotiation",
+    "academic_field": "交渉学",
+    "one_liner": "交渉の初期提示が基準となる",
+    "definition": "交渉の初期提示が基準となる",
+    "content": "高めの初期提示で交渉範囲を有利に設定",
+    "applicable_scenarios": "価格設定、条件交渉",
+    "key_concepts": ["初期提示", "基準", "交渉範囲", "有利設定"],
+    "examples": [
+      "最初に高めの条件を提示する",
+      "交渉の基準を有利に設定する",
+      "アンカリング効果を活用する"
+    ],
+    "practical_tips": [
+      "高めの初期提示をする",
+      "基準を有利に設定する",
+      "アンカリング効果を活用する"
+    ],
+    "mechanism": "初期提示による交渉基準の設定",
+    "how_to": ["高め初期提示→基準設定→アンカリング効果活用"],
+    "templates": {
+      "meeting": "高めの初期提示{{high_initial_offer}}により交渉範囲{{negotiation_range}}を有利に設定",
+      "sales": "交渉アンカリング{{negotiation_anchoring}}により価格{{price}}や条件{{conditions}}の基準を設定",
+      "presentation": "アンカリング効果{{anchoring_effect}}のメカニズム{{mechanism}}と戦略的活用{{strategic_utilization}}を説明"
+    },
+    "tags": ["交渉", "アンカリング", "基準設定", "戦略"],
+    "related_theories": ["meso", "door_in_face"]
+  }
+]

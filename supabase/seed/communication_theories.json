@@ -1,0 +1,316 @@
+[
+  {
+    "id": "pyramid_principle",
+    "name_ja": "ピラミッド原則",
+    "name_en": "Pyramid Principle",
+    "domain": "communication",
+    "academic_field": "コミュニケーション理論",
+    "one_liner": "結論→根拠→詳細の順で伝える構造",
+    "definition": "結論→根拠→詳細の順で伝える構造",
+    "content": "論理的で分かりやすい説明が可能",
+    "applicable_scenarios": "提案資料、報告",
+    "key_concepts": ["結論", "根拠", "詳細", "論理構造", "説明"],
+    "examples": [
+      "最初に結論を明確に示す",
+      "結論を支える根拠を提示する",
+      "必要に応じて詳細を説明する"
+    ],
+    "practical_tips": [
+      "結論から始める",
+      "根拠を明確にする",
+      "詳細は必要最小限にする"
+    ],
+    "mechanism": "結論優先の構造化による理解しやすい説明の実現",
+    "how_to": ["結論提示→根拠説明→詳細補足"],
+    "templates": {
+      "meeting": "ピラミッド原則{{pyramid_principle}}により結論{{conclusion}}→根拠{{evidence}}→詳細{{details}}の順で説明",
+      "presentation": "論理的{{logical}}で分かりやすい{{understandable}}説明{{explanation}}の構造{{structure}}を構築",
+      "sales": "結論優先{{conclusion_first}}の提案資料{{proposal_material}}により理解{{understanding}}を促進"
+    },
+    "tags": ["コミュニケーション", "ピラミッド原則", "論理構造", "説明"],
+    "related_theories": ["scqa", "story_arc"]
+  },
+  {
+    "id": "scqa",
+    "name_ja": "SCQA",
+    "name_en": "Situation, Complication, Question, Answer",
+    "domain": "communication",
+    "academic_field": "コミュニケーション理論",
+    "one_liner": "物語構造で課題解決を提示",
+    "definition": "物語構造で課題解決を提示",
+    "content": "状況→複雑化→問い→答え",
+    "applicable_scenarios": "プレゼン構成",
+    "key_concepts": ["状況", "複雑化", "問い", "答え", "物語構造"],
+    "examples": [
+      "現在の状況を説明する",
+      "問題や課題を明示する",
+      "解決策を提示する"
+    ],
+    "practical_tips": [
+      "状況を客観的に説明する",
+      "問題を明確に示す",
+      "解決策を具体的に提示する"
+    ],
+    "mechanism": "物語構造による課題解決の論理的提示",
+    "how_to": ["状況説明→問題明示→解決策提示"],
+    "templates": {
+      "meeting": "SCQA{{scqa}}により状況{{situation}}→複雑化{{complication}}→問い{{question}}→答え{{answer}}の構造{{structure}}で説明",
+      "presentation": "物語構造{{story_structure}}による課題解決{{problem_solving}}の提示{{presentation}}を実現",
+      "sales": "SCQA{{scqa}}に基づく論理的{{logical}}な提案{{proposal}}により理解{{understanding}}を促進"
+    },
+    "tags": ["コミュニケーション", "SCQA", "物語構造", "課題解決"],
+    "related_theories": ["pyramid_principle", "story_arc"]
+  },
+  {
+    "id": "story_arc",
+    "name_ja": "ストーリーアーク",
+    "name_en": "Story Arc",
+    "domain": "communication",
+    "academic_field": "コミュニケーション理論",
+    "one_liner": "起承転結または山型の物語構造",
+    "definition": "起承転結または山型の物語構造",
+    "content": "感情移入を促す",
+    "applicable_scenarios": "商品説明、講演",
+    "key_concepts": ["起承転結", "山型構造", "感情移入", "物語", "構成"],
+    "examples": [
+      "起：背景や状況を説明する",
+      "承：問題や課題を提示する",
+      "転：解決策や転機を示す",
+      "結：結果や結論を述べる"
+    ],
+    "practical_tips": [
+      "物語の流れを自然にする",
+      "感情的な起伏を作る",
+      "結論で締めくくる"
+    ],
+    "mechanism": "物語構造による感情移入と理解の促進",
+    "how_to": ["背景説明→問題提示→解決策提示→結論提示"],
+    "templates": {
+      "meeting": "ストーリーアーク{{story_arc}}により起承転結{{beginning_development_turning_conclusion}}の物語構造{{story_structure}}で説明",
+      "presentation": "山型構造{{mountain_structure}}による感情移入{{emotional_immersion}}を促進{{promotion}}",
+      "sales": "物語構造{{story_structure}}による商品説明{{product_explanation}}で理解{{understanding}}を深める"
+    },
+    "tags": ["コミュニケーション", "ストーリーアーク", "物語構造", "感情移入"],
+    "related_theories": ["scqa", "nvc"]
+  },
+  {
+    "id": "nvc",
+    "name_ja": "NVC",
+    "name_en": "Nonviolent Communication",
+    "domain": "communication",
+    "academic_field": "コミュニケーション理論",
+    "one_liner": "非暴力的対話法",
+    "definition": "非暴力的対話法",
+    "content": "観察→感情→ニーズ→リクエストの順",
+    "applicable_scenarios": "対立解消、部下指導",
+    "key_concepts": ["観察", "感情", "ニーズ", "リクエスト", "非暴力"],
+    "examples": [
+      "事実を客観的に観察する",
+      "自分の感情を表現する",
+      "根本的なニーズを伝える",
+      "具体的なリクエストをする"
+    ],
+    "practical_tips": [
+      "事実と解釈を分ける",
+      "感情を適切に表現する",
+      "ニーズを明確にする"
+    ],
+    "mechanism": "4つのステップによる建設的な対話の実現",
+    "how_to": ["観察→感情表現→ニーズ伝達→リクエスト提示"],
+    "templates": {
+      "meeting": "NVC{{nvc}}により観察{{observation}}→感情{{feeling}}→ニーズ{{need}}→リクエスト{{request}}の順で対話",
+      "presentation": "非暴力的対話法{{nonviolent_communication}}による建設的{{constructive}}なコミュニケーション{{communication}}を実現",
+      "team_building": "NVC{{nvc}}による対立解消{{conflict_resolution}}と部下指導{{subordinate_guidance}}を促進"
+    },
+    "tags": ["コミュニケーション", "NVC", "非暴力", "対話法"],
+    "related_theories": ["story_arc", "active_listening"]
+  },
+  {
+    "id": "active_listening",
+    "name_ja": "アクティブリスニング",
+    "name_en": "Active Listening",
+    "domain": "communication",
+    "academic_field": "コミュニケーション理論",
+    "one_liner": "相手の話を積極的に聴き理解を示す",
+    "definition": "相手の話を積極的に聴き理解を示す",
+    "content": "復唱、要約、共感を行う",
+    "applicable_scenarios": "面談、営業",
+    "key_concepts": ["積極的", "理解", "復唱", "要約", "共感"],
+    "examples": [
+      "相手の話を最後まで聴く",
+      "内容を復唱して確認する",
+      "要約して理解を示す",
+      "共感の言葉をかける"
+    ],
+    "practical_tips": [
+      "相手の話を遮らない",
+      "適切な相槌を打つ",
+      "理解を示す言葉をかける"
+    ],
+    "mechanism": "積極的な聴取による相互理解の促進",
+    "how_to": ["最後まで聴く→復唱確認→要約理解→共感表現"],
+    "templates": {
+      "meeting": "アクティブリスニング{{active_listening}}により相手の話{{speaker_content}}を積極的{{actively}}に聴き理解{{understanding}}を示す",
+      "presentation": "復唱{{repetition}}、要約{{summary}}、共感{{empathy}}による効果的{{effective}}なコミュニケーション{{communication}}を実現",
+      "sales": "積極的聴取{{active_listening}}による顧客理解{{customer_understanding}}と信頼構築{{trust_building}}を促進"
+    },
+    "tags": ["コミュニケーション", "アクティブリスニング", "聴取", "相互理解"],
+    "related_theories": ["nvc", "spin_selling"]
+  },
+  {
+    "id": "spin_selling",
+    "name_ja": "SPINセリング",
+    "name_en": "SPIN Selling",
+    "domain": "communication",
+    "academic_field": "営業理論",
+    "one_liner": "Situation, Problem, Implication, Need-payoffの質問法",
+    "definition": "Situation, Problem, Implication, Need-payoffの質問法",
+    "content": "顧客課題を深堀り",
+    "applicable_scenarios": "BtoB営業",
+    "key_concepts": ["Situation", "Problem", "Implication", "Need-payoff", "質問法"],
+    "examples": [
+      "Situation：現在の状況を把握する",
+      "Problem：問題や課題を特定する",
+      "Implication：問題の影響を理解する",
+      "Need-payoff：解決策の価値を確認する"
+    ],
+    "practical_tips": [
+      "4つの段階を順序通りに進める",
+      "適切な質問を準備する",
+      "顧客の回答を深掘りする"
+    ],
+    "mechanism": "4段階の質問による顧客課題の体系的把握",
+    "how_to": ["状況把握→問題特定→影響理解→価値確認"],
+    "templates": {
+      "meeting": "SPINセリング{{spin_selling}}によりSituation{{situation}}→Problem{{problem}}→Implication{{implication}}→Need-payoff{{need_payoff}}の質問{{questions}}を実施",
+      "presentation": "4段階の質問法{{four_stage_questioning}}による顧客課題{{customer_challenges}}の深掘り{{deep_diving}}を実現",
+      "sales": "SPIN{{spin}}に基づく体系的{{systematic}}な営業アプローチ{{sales_approach}}により顧客理解{{customer_understanding}}を促進"
+    },
+    "tags": ["コミュニケーション", "SPINセリング", "営業", "質問法"],
+    "related_theories": ["active_listening", "challenger_sale"]
+  },
+  {
+    "id": "challenger_sale",
+    "name_ja": "チャレンジャー・セールス",
+    "name_en": "Challenger Sale",
+    "domain": "communication",
+    "academic_field": "営業理論",
+    "one_liner": "顧客に新しい視点を提供して行動変容を促す営業",
+    "definition": "顧客に新しい視点を提供して行動変容を促す営業",
+    "content": "洞察・適応・支配の3要素",
+    "applicable_scenarios": "競争市場営業",
+    "key_concepts": ["新しい視点", "行動変容", "洞察", "適応", "支配"],
+    "examples": [
+      "顧客に気づいていない課題を提示する",
+      "新しい解決策の価値を説明する",
+      "顧客の行動変容を促す"
+    ],
+    "practical_tips": [
+      "顧客の課題を深く理解する",
+      "新しい視点を提供する",
+      "行動変容を促す"
+    ],
+    "mechanism": "新しい視点提供による顧客の行動変容促進",
+    "how_to": ["課題理解→新視点提供→価値説明→行動変容促進"],
+    "templates": {
+      "meeting": "チャレンジャー・セールス{{challenger_sale}}により顧客に新しい視点{{new_perspective}}を提供",
+      "presentation": "洞察{{insight}}・適応{{adaptation}}・支配{{control}}の3要素{{three_elements}}による営業アプローチ{{sales_approach}}を説明",
+      "sales": "新しい視点{{new_perspective}}による顧客の行動変容{{behavioral_change}}を促進{{promotion}}"
+    },
+    "tags": ["コミュニケーション", "チャレンジャー・セールス", "営業", "行動変容"],
+    "related_theories": ["spin_selling", "meddicc"]
+  },
+  {
+    "id": "meddicc",
+    "name_ja": "MEDDICC",
+    "name_en": "MEDDICC",
+    "domain": "communication",
+    "academic_field": "営業理論",
+    "one_liner": "営業案件評価フレーム",
+    "definition": "営業案件評価フレーム",
+    "content": "Metrics, Economic buyer, Decision criteria, Decision process, Identify pain, Champion, Competition",
+    "applicable_scenarios": "営業パイプライン管理",
+    "key_concepts": ["Metrics", "Economic buyer", "Decision criteria", "Decision process", "Identify pain", "Champion", "Competition"],
+    "examples": [
+      "Metrics：定量的な成果指標を確認する",
+      "Economic buyer：最終決定者を特定する",
+      "Champion：内部推進者を確保する"
+    ],
+    "practical_tips": [
+      "7つの要素を体系的に評価する",
+      "各要素の重要度を理解する",
+      "定期的に見直し・更新する"
+    ],
+    "mechanism": "7要素の体系的評価による営業案件の成功可能性向上",
+    "how_to": ["7要素評価→重要度分析→改善施策→継続監視"],
+    "templates": {
+      "meeting": "MEDDICC{{meddicc}}により営業案件{{sales_opportunity}}の7要素{{seven_elements}}を体系的{{systematic}}に評価",
+      "presentation": "Metrics{{metrics}}・Economic buyer{{economic_buyer}}・Decision criteria{{decision_criteria}}等の評価結果{{evaluation_results}}を報告",
+      "sales": "MEDDICC{{meddicc}}に基づく営業パイプライン管理{{sales_pipeline_management}}により成功率{{success_rate}}を向上"
+    },
+    "tags": ["コミュニケーション", "MEDDICC", "営業", "案件評価"],
+    "related_theories": ["challenger_sale", "fab"]
+  },
+  {
+    "id": "fab",
+    "name_ja": "FAB",
+    "name_en": "Feature, Advantage, Benefit",
+    "domain": "communication",
+    "academic_field": "営業理論",
+    "one_liner": "特徴→利点→利益の順で説明",
+    "definition": "特徴→利点→利益の順で説明",
+    "content": "価値訴求を明確化",
+    "applicable_scenarios": "商品説明、営業",
+    "key_concepts": ["特徴", "利点", "利益", "価値訴求", "説明"],
+    "examples": [
+      "Feature：商品の特徴を説明する",
+      "Advantage：競合との違いを説明する",
+      "Benefit：顧客に与える利益を説明する"
+    ],
+    "practical_tips": [
+      "3つの要素を順序通りに説明する",
+      "顧客視点で利益を説明する",
+      "具体的な例を挙げる"
+    ],
+    "mechanism": "3段階の説明による価値訴求の明確化",
+    "how_to": ["特徴説明→利点説明→利益説明"],
+    "templates": {
+      "meeting": "FAB{{fab}}により特徴{{feature}}→利点{{advantage}}→利益{{benefit}}の順で商品説明{{product_explanation}}",
+      "presentation": "3段階の説明{{three_stage_explanation}}による価値訴求{{value_proposition}}の明確化{{clarification}}を実現",
+      "sales": "FAB{{fab}}に基づく体系的{{systematic}}な商品説明{{product_explanation}}で顧客理解{{customer_understanding}}を促進"
+    },
+    "tags": ["コミュニケーション", "FAB", "商品説明", "価値訴求"],
+    "related_theories": ["meddicc", "elevator_pitch"]
+  },
+  {
+    "id": "elevator_pitch",
+    "name_ja": "エレベーターピッチ",
+    "name_en": "Elevator Pitch",
+    "domain": "communication",
+    "academic_field": "コミュニケーション理論",
+    "one_liner": "短時間で核心を伝える自己・事業説明",
+    "definition": "短時間で核心を伝える自己・事業説明",
+    "content": "30秒以内に価値提案を届ける",
+    "applicable_scenarios": "投資家面談、初対面営業",
+    "key_concepts": ["短時間", "核心", "価値提案", "自己説明", "事業説明"],
+    "examples": [
+      "30秒以内に自己紹介をする",
+      "事業の核心的な価値を説明する",
+      "相手の興味を引く"
+    ],
+    "practical_tips": [
+      "30秒以内に収める",
+      "核心的な価値を伝える",
+      "相手の興味を引く"
+    ],
+    "mechanism": "短時間での核心的価値提案による印象的な説明",
+    "how_to": ["価値特定→核心抽出→30秒構成→印象的説明"],
+    "templates": {
+      "meeting": "エレベーターピッチ{{elevator_pitch}}により30秒以内{{within_30_seconds}}で核心{{core}}を伝える",
+      "presentation": "短時間{{short_time}}での価値提案{{value_proposition}}により印象的{{impressive}}な説明{{explanation}}を実現",
+      "sales": "エレベーターピッチ{{elevator_pitch}}による自己説明{{self_introduction}}と事業説明{{business_explanation}}で興味{{interest}}を引く"
+    },
+    "tags": ["コミュニケーション", "エレベーターピッチ", "短時間説明", "価値提案"],
+    "related_theories": ["fab", "pyramid_principle"]
+  }
+]

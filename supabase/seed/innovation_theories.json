@@ -1,0 +1,312 @@
+[
+  {
+    "id": "design_thinking",
+    "name_ja": "デザイン思考",
+    "name_en": "Design Thinking",
+    "domain": "innovation",
+    "academic_field": "イノベーション理論",
+    "one_liner": "人間中心設計の発想法",
+    "definition": "人間中心設計の発想法",
+    "content": "共感→問題定義→発想→試作→テストの反復で革新を生む",
+    "applicable_scenarios": "新製品開発、サービス改善",
+    "key_concepts": ["共感", "問題定義", "発想", "試作", "テスト"],
+    "examples": [
+      "ユーザーの行動を観察して潜在ニーズを発見する",
+      "問題の本質を深く理解して解決策を発想する",
+      "プロトタイプを作成してユーザーテストを実施する"
+    ],
+    "practical_tips": [
+      "ユーザー視点で問題を理解する",
+      "アイデアを素早く形にする",
+      "テスト結果を基に改善を繰り返す"
+    ],
+    "mechanism": "人間中心の反復的プロセスによる革新的解決策の創出",
+    "how_to": ["共感→問題定義→発想→試作→テスト→改善"],
+    "templates": {
+      "meeting": "デザイン思考{{design_thinking}}によりユーザー視点{{user_perspective}}で問題{{problem}}を理解",
+      "presentation": "共感{{empathy}}→問題定義{{problem_definition}}→発想{{ideation}}のプロセス{{process}}を説明",
+      "team_building": "試作{{prototyping}}→テスト{{testing}}→改善{{improvement}}のサイクル{{cycle}}を構築"
+    },
+    "tags": ["イノベーション", "デザイン思考", "新製品開発", "サービス改善"],
+    "related_theories": ["lean_startup", "jobs_to_be_done"]
+  },
+  {
+    "id": "lean_startup",
+    "name_ja": "リーンスタートアップ",
+    "name_en": "Lean Startup",
+    "domain": "innovation",
+    "academic_field": "イノベーション理論",
+    "one_liner": "最小限の製品で市場検証を行い改善を繰り返す方法論",
+    "definition": "最小限の製品で市場検証を行い改善を繰り返す方法論",
+    "content": "MVP→測定→学習サイクルを高速で回す",
+    "applicable_scenarios": "新規事業立ち上げ",
+    "key_concepts": ["MVP", "測定", "学習", "高速サイクル", "市場検証"],
+    "examples": [
+      "最小限の機能でMVPを作成して市場に投入する",
+      "ユーザーの行動データを測定して仮説を検証する",
+      "学習結果を基に製品を改善して次のサイクルを回す"
+    ],
+    "practical_tips": [
+      "MVPは必要最小限の機能に絞る",
+      "測定可能な仮説を立てる",
+      "学習を高速で繰り返す"
+    ],
+    "mechanism": "MVPによる市場検証と高速学習サイクルによるリスク最小化",
+    "how_to": ["仮説設定→MVP作成→市場投入→測定→学習→改善"],
+    "templates": {
+      "meeting": "リーンスタートアップ{{lean_startup}}によりMVP{{mvp}}で市場検証{{market_validation}}を実施",
+      "presentation": "仮説{{hypothesis}}→MVP{{mvp}}→測定{{measurement}}→学習{{learning}}のサイクル{{cycle}}を説明",
+      "team_building": "高速学習{{fast_learning}}による製品改善{{product_improvement}}の体制{{system}}を構築"
+    },
+    "tags": ["イノベーション", "リーンスタートアップ", "MVP", "新規事業"],
+    "related_theories": ["design_thinking", "kano_model"]
+  },
+  {
+    "id": "jobs_to_be_done",
+    "name_ja": "ジョブ理論",
+    "name_en": "Jobs to Be Done",
+    "domain": "innovation",
+    "academic_field": "イノベーション理論",
+    "one_liner": "顧客が製品に「雇う」目的（ジョブ）を理解する",
+    "definition": "顧客が製品に「雇う」目的（ジョブ）を理解する",
+    "content": "顧客課題の本質を捉え、解決策を設計",
+    "applicable_scenarios": "マーケティング戦略、商品開発",
+    "key_concepts": ["ジョブ", "顧客課題", "本質理解", "解決策設計"],
+    "examples": [
+      "顧客が「時間を節約したい」というジョブを理解する",
+      "ジョブの文脈や状況を深く分析する",
+      "ジョブに最適化された解決策を設計する"
+    ],
+    "practical_tips": [
+      "顧客の行動の「なぜ」を深掘りする",
+      "ジョブの文脈を理解する",
+      "ジョブに最適化された価値を提供する"
+    ],
+    "mechanism": "顧客のジョブ理解による本質的な価値提案の創出",
+    "how_to": ["ジョブ発見→文脈分析→解決策設計→価値提供"],
+    "templates": {
+      "meeting": "ジョブ理論{{jobs_theory}}により顧客の本質的課題{{fundamental_challenge}}を理解",
+      "presentation": "顧客が製品に「雇う」目的{{purpose}}とジョブ{{job}}の文脈{{context}}を分析",
+      "sales": "ジョブに最適化された解決策{{optimized_solution}}と価値提案{{value_proposition}}を提示"
+    },
+    "tags": ["イノベーション", "ジョブ理論", "顧客理解", "価値提案"],
+    "related_theories": ["design_thinking", "kano_model"]
+  },
+  {
+    "id": "kano_model",
+    "name_ja": "KANOモデル",
+    "name_en": "Kano Model",
+    "domain": "innovation",
+    "academic_field": "イノベーション理論",
+    "one_liner": "顧客満足に与える要素を分類",
+    "definition": "顧客満足に与える要素を分類",
+    "content": "魅力品質・当たり前品質・一元品質に分ける",
+    "applicable_scenarios": "機能優先順位付け",
+    "key_concepts": ["魅力品質", "当たり前品質", "一元品質", "顧客満足"],
+    "examples": [
+      "魅力品質：予想を超える機能で顧客を驚かせる",
+      "当たり前品質：基本的な機能を確実に提供する",
+      "一元品質：提供度と満足度が比例する機能を改善する"
+    ],
+    "practical_tips": [
+      "3つの品質を適切に分類する",
+      "当たり前品質を確実に提供する",
+      "魅力品質で差別化を図る"
+    ],
+    "mechanism": "品質要素の分類による顧客満足の最適化",
+    "how_to": ["品質要素分類→優先順位設定→戦略的改善"],
+    "templates": {
+      "meeting": "KANOモデル{{kano_model}}により機能の品質分類{{quality_classification}}を実施",
+      "presentation": "魅力品質{{attractive_quality}}・当たり前品質{{must_be_quality}}・一元品質{{one_dimensional_quality}}の特徴{{characteristics}}を説明",
+      "team_building": "品質分類{{quality_classification}}に基づく機能優先順位{{feature_priorities}}を設定"
+    },
+    "tags": ["イノベーション", "KANOモデル", "品質管理", "顧客満足"],
+    "related_theories": ["jobs_to_be_done", "diffusion_of_innovations"]
+  },
+  {
+    "id": "diffusion_of_innovations",
+    "name_ja": "イノベーション普及理論",
+    "name_en": "Diffusion of Innovations",
+    "domain": "innovation",
+    "academic_field": "イノベーション理論",
+    "one_liner": "革新の市場浸透を5層に分類",
+    "definition": "革新の市場浸透を5層に分類",
+    "content": "イノベーター〜ラガードへの拡散戦略設計",
+    "applicable_scenarios": "製品ローンチ計画",
+    "key_concepts": ["イノベーター", "アーリーアダプター", "アーリーマジョリティ", "レイトマジョリティ", "ラガード"],
+    "examples": [
+      "イノベーター層に最初に導入してもらう戦略を立てる",
+      "アーリーアダプターの影響力を活用して拡散を促進する",
+      "各層の特性に合わせたマーケティング戦略を設計する"
+    ],
+    "practical_tips": [
+      "各層の特性を理解する",
+      "段階的な拡散戦略を設計する",
+      "アーリーアダプターを重視する"
+    ],
+    "mechanism": "5層の特性理解による段階的市場浸透戦略の実現",
+    "how_to": ["5層特性理解→段階的戦略設計→拡散促進"],
+    "templates": {
+      "meeting": "イノベーション普及理論{{diffusion_theory}}により市場浸透戦略{{market_penetration_strategy}}を設計",
+      "presentation": "イノベーター{{innovators}}〜ラガード{{laggards}}の5層{{five_layers}}の特性{{characteristics}}と戦略{{strategy}}を説明",
+      "sales": "各層{{each_layer}}に適したマーケティングアプローチ{{marketing_approach}}を提案"
+    },
+    "tags": ["イノベーション", "普及理論", "市場浸透", "マーケティング戦略"],
+    "related_theories": ["kano_model", "aarrr_funnel"]
+  },
+  {
+    "id": "aarrr_funnel",
+    "name_ja": "AARRRファネル",
+    "name_en": "AARRR Funnel",
+    "domain": "innovation",
+    "academic_field": "イノベーション理論",
+    "one_liner": "獲得・活性化・定着・収益化・紹介の5指標",
+    "definition": "獲得・活性化・定着・収益化・紹介の5指標",
+    "content": "プロダクトの成長指標を一貫管理",
+    "applicable_scenarios": "SaaS分析、グロース施策",
+    "key_concepts": ["獲得", "活性化", "定着", "収益化", "紹介"],
+    "examples": [
+      "獲得：新規ユーザーの獲得効率を測定する",
+      "活性化：初期体験を最適化してユーザーを定着させる",
+      "収益化：ユーザー価値を最大化して収益を向上させる"
+    ],
+    "practical_tips": [
+      "5つの指標を体系的に管理する",
+      "各段階の改善点を特定する",
+      "全体のファネル効率を最適化する"
+    ],
+    "mechanism": "5段階の成長指標による体系的成長管理",
+    "how_to": ["5指標設定→段階的改善→ファネル最適化"],
+    "templates": {
+      "meeting": "AARRRファネル{{aarrr_funnel}}により成長指標{{growth_metrics}}を体系的に管理",
+      "presentation": "獲得{{acquisition}}・活性化{{activation}}・定着{{retention}}・収益化{{revenue}}・紹介{{referral}}の分析結果{{analysis_results}}を報告",
+      "team_building": "各段階{{each_stage}}の改善施策{{improvement_measures}}を策定し、ファネル効率{{funnel_efficiency}}を最適化"
+    },
+    "tags": ["イノベーション", "AARRRファネル", "成長指標", "SaaS"],
+    "related_theories": ["diffusion_of_innovations", "north_star_metric"]
+  },
+  {
+    "id": "north_star_metric",
+    "name_ja": "ノーススターメトリクス",
+    "name_en": "North Star Metric",
+    "domain": "innovation",
+    "academic_field": "イノベーション理論",
+    "one_liner": "事業の根幹価値を示す単一指標",
+    "definition": "事業の根幹価値を示す単一指標",
+    "content": "全社が向かう方向性の統一",
+    "applicable_scenarios": "成長戦略策定",
+    "key_concepts": ["根幹価値", "単一指標", "方向性統一", "戦略的整合性"],
+    "examples": [
+      "Uberの「月間乗車回数」で移動の価値を測定する",
+      "Netflixの「月間視聴時間」でエンターテイメント価値を測定する",
+      "全社の意思決定をこの指標に基づいて統一する"
+    ],
+    "practical_tips": [
+      "事業の本質的価値を表現する指標を選ぶ",
+      "全社で共有して方向性を統一する",
+      "定期的に指標の妥当性を検証する"
+    ],
+    "mechanism": "単一指標による全社の戦略的方向性の統一",
+    "how_to": ["本質的価値特定→単一指標設定→全社統一"],
+    "templates": {
+      "meeting": "ノーススターメトリクス{{north_star_metric}}により事業の根幹価値{{core_value}}を統一",
+      "presentation": "事業の本質的価値{{essential_value}}を表現する単一指標{{single_metric}}の設定{{setting}}と活用{{utilization}}を説明",
+      "team_building": "全社の方向性{{company_direction}}を統一する戦略的指標{{strategic_metric}}を共有"
+    },
+    "tags": ["イノベーション", "ノーススターメトリクス", "戦略的指標", "方向性統一"],
+    "related_theories": ["aarrr_funnel", "rice_scoring"]
+  },
+  {
+    "id": "rice_scoring",
+    "name_ja": "RICEスコアリング",
+    "name_en": "RICE Scoring",
+    "domain": "innovation",
+    "academic_field": "イノベーション理論",
+    "one_liner": "Reach, Impact, Confidence, Effortで優先度評価",
+    "definition": "Reach, Impact, Confidence, Effortで優先度評価",
+    "content": "施策の選定とリソース配分を合理化",
+    "applicable_scenarios": "プロジェクト優先順位付け",
+    "key_concepts": ["Reach", "Impact", "Confidence", "Effort", "優先度評価"],
+    "examples": [
+      "Reach：影響を受けるユーザー数を推定する",
+      "Impact：各ユーザーへの影響度を評価する",
+      "Effort：実装に必要な工数を見積もる"
+    ],
+    "practical_tips": [
+      "4つの要素を定量的に評価する",
+      "スコアの計算式を統一する",
+      "定期的に評価を見直す"
+    ],
+    "mechanism": "4要素の定量的評価による客観的優先度決定",
+    "how_to": ["4要素評価→スコア計算→優先度決定"],
+    "templates": {
+      "meeting": "RICEスコアリング{{rice_scoring}}により施策の優先度{{priority}}を定量的に評価",
+      "presentation": "Reach{{reach}}・Impact{{impact}}・Confidence{{confidence}}・Effort{{effort}}の4要素{{four_elements}}による評価結果{{evaluation_results}}を報告",
+      "team_building": "RICEスコア{{rice_score}}に基づく施策選定{{initiative_selection}}とリソース配分{{resource_allocation}}を最適化"
+    },
+    "tags": ["イノベーション", "RICEスコアリング", "優先度評価", "リソース配分"],
+    "related_theories": ["north_star_metric", "moscow_method"]
+  },
+  {
+    "id": "moscow_method",
+    "name_ja": "MoSCoW法",
+    "name_en": "MoSCoW Method",
+    "domain": "innovation",
+    "academic_field": "イノベーション理論",
+    "one_liner": "Must, Should, Could, Won'tで要求を分類",
+    "definition": "Must, Should, Could, Won'tで要求を分類",
+    "content": "リリース計画の合意形成を容易に",
+    "applicable_scenarios": "要件定義、開発計画",
+    "key_concepts": ["Must", "Should", "Could", "Won't", "要求分類"],
+    "examples": [
+      "Must：リリースに必須の機能を明確にする",
+      "Should：重要だが必須ではない機能を特定する",
+      "Could：実装可能であれば含めたい機能を整理する"
+    ],
+    "practical_tips": [
+      "4つのカテゴリーを明確に定義する",
+      "ステークホルダーと合意を形成する",
+      "リリース計画に反映する"
+    ],
+    "mechanism": "要求の優先度分類による効率的なリリース計画策定",
+    "how_to": ["要求収集→優先度分類→合意形成→計画策定"],
+    "templates": {
+      "meeting": "MoSCoW法{{moscow_method}}により機能要求{{functional_requirements}}を優先度別に分類",
+      "presentation": "Must{{must}}・Should{{should}}・Could{{could}}・Won't{{wont}}の4カテゴリー{{four_categories}}による分類結果{{classification_results}}を説明",
+      "team_building": "優先度分類{{priority_classification}}に基づくリリース計画{{release_plan}}の合意形成{{consensus_building}}を促進"
+    },
+    "tags": ["イノベーション", "MoSCoW法", "要求分類", "リリース計画"],
+    "related_theories": ["rice_scoring", "opportunity_solution_tree"]
+  },
+  {
+    "id": "opportunity_solution_tree",
+    "name_ja": "オポチュニティ・ソリューション・ツリー",
+    "name_en": "Opportunity Solution Tree",
+    "domain": "innovation",
+    "academic_field": "イノベーション理論",
+    "one_liner": "機会と解決策をツリー構造で整理",
+    "definition": "機会と解決策をツリー構造で整理",
+    "content": "探索と選択の全体像を可視化",
+    "applicable_scenarios": "製品戦略策定",
+    "key_concepts": ["機会", "解決策", "ツリー構造", "可視化", "戦略策定"],
+    "examples": [
+      "顧客の機会を特定してツリーの根に配置する",
+      "各機会に対する複数の解決策を枝に展開する",
+      "解決策の実現可能性と効果を評価して選択する"
+    ],
+    "practical_tips": [
+      "機会を体系的に整理する",
+      "解決策の選択肢を広く検討する",
+      "評価基準を明確にする"
+    ],
+    "mechanism": "ツリー構造による機会と解決策の体系的整理と戦略的選択",
+    "how_to": ["機会特定→解決策展開→評価選択→戦略策定"],
+    "templates": {
+      "meeting": "オポチュニティ・ソリューション・ツリー{{opportunity_solution_tree}}により製品戦略{{product_strategy}}を策定",
+      "presentation": "顧客機会{{customer_opportunities}}と解決策{{solutions}}のツリー構造{{tree_structure}}を可視化{{visualization}}",
+      "team_building": "機会{{opportunities}}と解決策{{solutions}}の体系的整理{{systematic_organization}}により戦略的選択{{strategic_selection}}を促進"
+    },
+    "tags": ["イノベーション", "オポチュニティ・ソリューション・ツリー", "戦略策定", "可視化"],
+    "related_theories": ["moscow_method", "design_thinking"]
+  }
+]

@@ -131,6 +131,7 @@ export async function getRelatedTheories(adviceContext: {
   goal: string;
   shortAdvice: string;
   additionalContext?: string;
+  adviceId?: string; // アドバイスIDを追加
 }) {
   try {
     console.log('getRelatedTheories API call with context:', adviceContext);
@@ -139,7 +140,8 @@ export async function getRelatedTheories(adviceContext: {
       scene: adviceContext.scene,
       goal: adviceContext.goal,
       short_advice: adviceContext.shortAdvice,
-      ...(adviceContext.additionalContext && { advice_context: adviceContext.additionalContext })
+      ...(adviceContext.additionalContext && { advice_context: adviceContext.additionalContext }),
+      ...(adviceContext.adviceId && { advice_id: adviceContext.adviceId }) // アドバイスIDを追加
     };
     
     console.log('Request body:', requestBody);

@@ -1,0 +1,313 @@
+[
+  {
+    "id": "scrum",
+    "name_ja": "スクラム",
+    "name_en": "Scrum",
+    "domain": "operations",
+    "academic_field": "プロジェクト管理",
+    "one_liner": "短期間の反復で製品を改善するアジャイル手法",
+    "definition": "短期間の反復で製品を改善するアジャイル手法",
+    "content": "スプリント、デイリースクラム、レビューを通じ透明性を高める",
+    "applicable_scenarios": "ソフトウェア開発、製品改善",
+    "key_concepts": ["スプリント", "デイリースクラム", "レビュー", "透明性", "反復改善"],
+    "examples": [
+      "2週間のスプリントで機能を開発・改善する",
+      "毎日のデイリースクラムで進捗と課題を共有する",
+      "スプリントレビューで成果を確認し、次期計画を立てる"
+    ],
+    "practical_tips": [
+      "スプリントの期間を適切に設定する",
+      "デイリースクラムを短時間で効率的に行う",
+      "透明性を保って進捗を可視化する"
+    ],
+    "mechanism": "短期反復による継続的改善と透明性の確保",
+    "how_to": ["スプリント計画→実行→レビュー→改善→次期計画"],
+    "templates": {
+      "meeting": "スクラム{{scrum}}によりスプリント{{sprint}}での開発計画{{development_plan}}を策定",
+      "presentation": "デイリースクラム{{daily_scrum}}とスプリントレビュー{{sprint_review}}による透明性{{transparency}}を確保",
+      "team_building": "短期反復{{short_iteration}}による継続的改善{{continuous_improvement}}の体制{{system}}を構築"
+    },
+    "tags": ["オペレーション", "スクラム", "アジャイル", "プロジェクト管理"],
+    "related_theories": ["kanban", "pdca_cycle"]
+  },
+  {
+    "id": "kanban",
+    "name_ja": "カンバン",
+    "name_en": "Kanban",
+    "domain": "operations",
+    "academic_field": "プロジェクト管理",
+    "one_liner": "作業を可視化し流れを最適化する方法",
+    "definition": "作業を可視化し流れを最適化する方法",
+    "content": "WIP制限と継続的改善",
+    "applicable_scenarios": "業務効率化、フロー管理",
+    "key_concepts": ["可視化", "フロー最適化", "WIP制限", "継続的改善"],
+    "examples": [
+      "作業の流れをボードで可視化する",
+      "WIP制限を設定してボトルネックを防ぐ",
+      "フローの改善点を継続的に特定・改善する"
+    ],
+    "practical_tips": [
+      "作業の流れを明確に可視化する",
+      "適切なWIP制限を設定する",
+      "継続的に改善点を特定する"
+    ],
+    "mechanism": "可視化とWIP制限によるフロー最適化",
+    "how_to": ["フロー可視化→WIP制限設定→継続的改善"],
+    "templates": {
+      "meeting": "カンバン{{kanban}}により作業フロー{{work_flow}}を可視化し、WIP制限{{wip_limit}}を設定",
+      "presentation": "作業の可視化{{work_visualization}}とフロー最適化{{flow_optimization}}の効果{{effectiveness}}を説明",
+      "team_building": "継続的改善{{continuous_improvement}}による業務効率化{{work_efficiency}}を推進"
+    },
+    "tags": ["オペレーション", "カンバン", "フロー管理", "業務効率化"],
+    "related_theories": ["scrum", "theory_of_constraints"]
+  },
+  {
+    "id": "theory_of_constraints",
+    "name_ja": "制約理論",
+    "name_en": "Theory of Constraints (TOC)",
+    "domain": "operations",
+    "academic_field": "オペレーション管理",
+    "one_liner": "全体の制約要因を特定・改善して最大効率化",
+    "definition": "全体の制約要因を特定・改善して最大効率化",
+    "content": "制約の特定→活用→従属→強化",
+    "applicable_scenarios": "生産管理、業務改善",
+    "key_concepts": ["制約要因", "特定", "活用", "従属", "強化"],
+    "examples": [
+      "システム全体の制約要因を特定する",
+      "制約要因を最大限活用する",
+      "他の要素を制約に従属させる"
+    ],
+    "practical_tips": [
+      "制約要因を正確に特定する",
+      "制約要因を最大限活用する",
+      "継続的に制約を改善する"
+    ],
+    "mechanism": "制約要因の最適化による全体システムの効率最大化",
+    "how_to": ["制約特定→制約活用→他要素従属→制約強化"],
+    "templates": {
+      "meeting": "制約理論{{toc}}によりシステム全体{{entire_system}}の制約要因{{constraint_factors}}を特定",
+      "presentation": "制約の特定{{identification}}→活用{{utilization}}→従属{{subordination}}→強化{{strengthening}}のプロセス{{process}}を説明",
+      "team_building": "制約要因{{constraint_factors}}の最適化{{optimization}}による全体効率{{overall_efficiency}}の最大化{{maximization}}を実現"
+    },
+    "tags": ["オペレーション", "制約理論", "効率化", "システム最適化"],
+    "related_theories": ["kanban", "critical_path_method"]
+  },
+  {
+    "id": "critical_path_method",
+    "name_ja": "クリティカルパス法",
+    "name_en": "Critical Path Method (CPM)",
+    "domain": "operations",
+    "academic_field": "プロジェクト管理",
+    "one_liner": "プロジェクトの最短完了経路を特定する",
+    "definition": "プロジェクトの最短完了経路を特定する",
+    "content": "依存関係と所要時間からスケジュール管理",
+    "applicable_scenarios": "大規模プロジェクト計画",
+    "key_concepts": ["最短完了経路", "依存関係", "所要時間", "スケジュール管理"],
+    "examples": [
+      "タスク間の依存関係を整理する",
+      "各タスクの所要時間を見積もる",
+      "クリティカルパスを特定してスケジュールを最適化する"
+    ],
+    "practical_tips": [
+      "依存関係を正確に把握する",
+      "所要時間を適切に見積もる",
+      "クリティカルパスを継続的に監視する"
+    ],
+    "mechanism": "依存関係と所要時間の分析による最短完了経路の特定",
+    "how_to": ["依存関係整理→所要時間見積→クリティカルパス特定→スケジュール最適化"],
+    "templates": {
+      "meeting": "クリティカルパス法{{cpm}}によりプロジェクトの最短完了経路{{shortest_completion_path}}を特定",
+      "presentation": "タスク間の依存関係{{task_dependencies}}と所要時間{{required_time}}からスケジュール{{schedule}}を最適化",
+      "team_building": "クリティカルパス{{critical_path}}の監視{{monitoring}}によるプロジェクト管理{{project_management}}を強化"
+    },
+    "tags": ["オペレーション", "クリティカルパス法", "プロジェクト管理", "スケジュール最適化"],
+    "related_theories": ["theory_of_constraints", "pert"]
+  },
+  {
+    "id": "pert",
+    "name_ja": "PERT",
+    "name_en": "Program Evaluation and Review Technique",
+    "domain": "operations",
+    "academic_field": "プロジェクト管理",
+    "one_liner": "楽観・悲観・最頻の3見積で期間予測",
+    "definition": "楽観・悲観・最頻の3見積で期間予測",
+    "content": "不確実性の高いプロジェクト管理",
+    "applicable_scenarios": "新技術導入計画",
+    "key_concepts": ["楽観見積", "悲観見積", "最頻見積", "期間予測", "不確実性"],
+    "examples": [
+      "楽観的、悲観的、最頻の3つの見積もりを立てる",
+      "3つの見積もりから期待値を計算する",
+      "不確実性を考慮したスケジュールを立てる"
+    ],
+    "practical_tips": [
+      "3つの見積もりを適切に設定する",
+      "期待値の計算式を理解する",
+      "不確実性を考慮した計画を立てる"
+    ],
+    "mechanism": "3つの見積もりによる不確実性を考慮した期間予測",
+    "how_to": ["3見積設定→期待値計算→不確実性考慮→期間予測"],
+    "templates": {
+      "meeting": "PERT{{pert}}により楽観・悲観・最頻の3見積{{three_estimates}}で期間予測{{duration_forecast}}を実施",
+      "presentation": "3つの見積もり{{three_estimates}}から期待値{{expected_value}}を計算し、不確実性{{uncertainty}}を考慮した計画{{plan}}を策定",
+      "team_building": "不確実性{{uncertainty}}を考慮したプロジェクト管理{{project_management}}の体制{{system}}を構築"
+    },
+    "tags": ["オペレーション", "PERT", "期間予測", "不確実性管理"],
+    "related_theories": ["critical_path_method", "raci_chart"]
+  },
+  {
+    "id": "raci_chart",
+    "name_ja": "RACIチャート",
+    "name_en": "RACI Chart",
+    "domain": "operations",
+    "academic_field": "プロジェクト管理",
+    "one_liner": "役割と責任を4区分で明確化",
+    "definition": "役割と責任を4区分（Responsible, Accountable, Consulted, Informed）で明確化",
+    "content": "混乱防止と責任所在の明確化",
+    "applicable_scenarios": "組織横断プロジェクト",
+    "key_concepts": ["Responsible", "Accountable", "Consulted", "Informed", "責任明確化"],
+    "examples": [
+      "Responsible：実際に作業を実行する担当者を明確にする",
+      "Accountable：最終責任を持つ担当者を特定する",
+      "Consulted：相談・承認が必要な関係者を明示する"
+    ],
+    "practical_tips": [
+      "4つの役割を明確に定義する",
+      "責任の重複や空白を避ける",
+      "定期的に見直し・更新する"
+    ],
+    "mechanism": "4つの役割分類による責任と権限の明確化",
+    "how_to": ["役割定義→責任割り当て→重複・空白チェック→見直し・更新"],
+    "templates": {
+      "meeting": "RACIチャート{{raci_chart}}により役割{{roles}}と責任{{responsibilities}}を4区分{{four_categories}}で明確化",
+      "presentation": "Responsible{{responsible}}・Accountable{{accountable}}・Consulted{{consulted}}・Informed{{informed}}の役割分担{{role_allocation}}を説明",
+      "team_building": "責任所在{{responsibility_location}}の明確化{{clarification}}による混乱防止{{confusion_prevention}}を実現"
+    },
+    "tags": ["オペレーション", "RACIチャート", "役割分担", "責任明確化"],
+    "related_theories": ["pert", "rapid_framework"]
+  },
+  {
+    "id": "rapid_framework",
+    "name_ja": "RAPIDフレームワーク",
+    "name_en": "RAPID Framework",
+    "domain": "operations",
+    "academic_field": "意思決定論",
+    "one_liner": "Recommend, Agree, Perform, Input, Decideの5役割で意思決定を整理",
+    "definition": "Recommend, Agree, Perform, Input, Decideの5役割で意思決定を整理",
+    "content": "意思決定の迅速化",
+    "applicable_scenarios": "経営判断、承認プロセス",
+    "key_concepts": ["Recommend", "Agree", "Perform", "Input", "Decide"],
+    "examples": [
+      "Recommend：提案・推奨を行う担当者を明確にする",
+      "Decide：最終決定を行う担当者を特定する",
+      "Perform：決定に基づいて実行する担当者を明示する"
+    ],
+    "practical_tips": [
+      "5つの役割を明確に定義する",
+      "意思決定の流れを整理する",
+      "役割の重複を避ける"
+    ],
+    "mechanism": "5つの役割による意思決定プロセスの効率化",
+    "how_to": ["役割定義→意思決定フロー整理→重複回避→効率化"],
+    "templates": {
+      "meeting": "RAPIDフレームワーク{{rapid_framework}}により意思決定プロセス{{decision_process}}を5役割{{five_roles}}で整理",
+      "presentation": "Recommend{{recommend}}・Agree{{agree}}・Perform{{perform}}・Input{{input}}・Decide{{decide}}の役割分担{{role_allocation}}を説明",
+      "team_building": "意思決定の迅速化{{acceleration}}による業務効率{{business_efficiency}}の向上{{improvement}}を実現"
+    },
+    "tags": ["オペレーション", "RAPIDフレームワーク", "意思決定", "業務効率化"],
+    "related_theories": ["raci_chart", "ooda_loop"]
+  },
+  {
+    "id": "ooda_loop",
+    "name_ja": "OODAループ",
+    "name_en": "Observe, Orient, Decide, Act",
+    "domain": "operations",
+    "academic_field": "意思決定論",
+    "one_liner": "観察→状況判断→意思決定→行動の高速循環",
+    "definition": "観察→状況判断→意思決定→行動の高速循環",
+    "content": "変化対応力向上",
+    "applicable_scenarios": "市場変化対応、危機管理",
+    "key_concepts": ["観察", "状況判断", "意思決定", "行動", "高速循環"],
+    "examples": [
+      "Observe：環境の変化を継続的に観察する",
+      "Orient：観察結果を基に状況を判断する",
+      "Decide：状況に応じた意思決定を行う"
+    ],
+    "practical_tips": [
+      "4つのステップを高速で回す",
+      "環境変化を継続的に監視する",
+      "意思決定の質と速度を両立する"
+    ],
+    "mechanism": "4ステップの高速循環による変化対応力の向上",
+    "how_to": ["継続観察→状況判断→意思決定→行動実行→高速循環"],
+    "templates": {
+      "meeting": "OODAループ{{ooda_loop}}により観察{{observe}}→状況判断{{orient}}→意思決定{{decide}}→行動{{act}}の高速循環{{high_speed_cycle}}を実現",
+      "presentation": "環境変化{{environmental_changes}}への対応力{{response_capability}}を向上させるOODAループ{{ooda_loop}}の活用{{utilization}}を説明",
+      "team_building": "高速意思決定{{fast_decision_making}}による変化対応力{{change_response_capability}}の向上{{improvement}}を促進"
+    },
+    "tags": ["オペレーション", "OODAループ", "意思決定", "変化対応"],
+    "related_theories": ["rapid_framework", "pdca_cycle"]
+  },
+  {
+    "id": "pdca_cycle",
+    "name_ja": "PDCAサイクル",
+    "name_en": "Plan, Do, Check, Act",
+    "domain": "operations",
+    "academic_field": "品質管理",
+    "one_liner": "計画→実行→評価→改善の反復",
+    "definition": "計画→実行→評価→改善の反復",
+    "content": "継続的改善の基礎",
+    "applicable_scenarios": "品質管理、業務改善",
+    "key_concepts": ["計画", "実行", "評価", "改善", "反復"],
+    "examples": [
+      "Plan：改善計画を立てる",
+      "Do：計画を実行する",
+      "Check：結果を評価する",
+      "Act：改善点を特定して次期計画に反映する"
+    ],
+    "practical_tips": [
+      "4つのステップを順序通りに実行する",
+      "評価結果を次期計画に反映する",
+      "継続的にサイクルを回す"
+    ],
+    "mechanism": "4ステップの反復による継続的改善の実現",
+    "how_to": ["計画策定→実行→評価→改善→次期計画"],
+    "templates": {
+      "meeting": "PDCAサイクル{{pdca_cycle}}により計画{{plan}}→実行{{do}}→評価{{check}}→改善{{act}}の反復{{iteration}}を実施",
+      "presentation": "継続的改善{{continuous_improvement}}の基礎となるPDCAサイクル{{pdca_cycle}}の活用{{utilization}}を説明",
+      "team_building": "PDCAサイクル{{pdca_cycle}}による品質管理{{quality_management}}と業務改善{{business_improvement}}の体制{{system}}を構築"
+    },
+    "tags": ["オペレーション", "PDCAサイクル", "継続的改善", "品質管理"],
+    "related_theories": ["ooda_loop", "premortem_analysis"]
+  },
+  {
+    "id": "premortem_analysis",
+    "name_ja": "プレモーテム分析",
+    "name_en": "Premortem Analysis",
+    "domain": "operations",
+    "academic_field": "リスク管理",
+    "one_liner": "失敗した前提で原因を想定する",
+    "definition": "失敗した前提で原因を想定する",
+    "content": "潜在的リスクの事前特定",
+    "applicable_scenarios": "新規プロジェクト計画",
+    "key_concepts": ["失敗前提", "原因想定", "リスク特定", "事前対策"],
+    "examples": [
+      "プロジェクトが失敗したと仮定して原因を考える",
+      "失敗の可能性を事前に特定する",
+      "特定したリスクへの対策を講じる"
+    ],
+    "practical_tips": [
+      "失敗を前提とした思考を行う",
+      "失敗の原因を多角的に分析する",
+      "事前対策を講じる"
+    ],
+    "mechanism": "失敗前提による潜在的リスクの事前特定と対策",
+    "how_to": ["失敗前提設定→原因分析→リスク特定→事前対策"],
+    "templates": {
+      "meeting": "プレモーテム分析{{premortem_analysis}}によりプロジェクト失敗{{project_failure}}の原因{{causes}}を事前に想定",
+      "presentation": "失敗前提{{failure_assumption}}による潜在的リスク{{potential_risks}}の特定{{identification}}と事前対策{{preventive_measures}}を説明",
+      "team_building": "リスク管理{{risk_management}}によるプロジェクト成功率{{project_success_rate}}の向上{{improvement}}を促進"
+    },
+    "tags": ["オペレーション", "プレモーテム分析", "リスク管理", "プロジェクト管理"],
+    "related_theories": ["pdca_cycle", "scrum"]
+  }
+]

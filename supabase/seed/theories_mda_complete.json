@@ -1,0 +1,158 @@
+[
+  {
+    "id": "anchoring_effect",
+    "name_ja": "アンカリング効果",
+    "name_en": "Anchoring Effect",
+    "domain": "behavioral_econ",
+    "academic_field": "行動経済学",
+    "one_liner": "冒頭の基準提示で判断の軸を作る",
+    "definition": "最初に提示された基準がその後の判断を左右する心理効果",
+    "content": "価格や条件の初提示は、その後の交渉や評価の基準点として強く影響を与える",
+    "applicable_scenarios": "価格交渉、予算策定、KPI設定",
+    "key_concepts": ["初期情報", "参照点", "判断の軸", "基準設定"],
+    "examples": [
+      "営業で最初に高額プランを提示して価格感度を下げる",
+      "会議で目標値を最初に示して議論の方向性を定める",
+      "評価面談で基準を明確にして公平性を保つ"
+    ],
+    "practical_tips": [
+      "最初に提示する基準は慎重に選ぶ",
+      "基準の根拠も同時に説明する",
+      "複数の基準を提示して比較させる"
+    ],
+    "mechanism": "初期情報が参照点として作用",
+    "how_to": ["基準→理由→比較の順で短く提示"],
+    "templates": {
+      "meeting": "基準値: {{anchor_value}}（理由: {{reason}}）を冒頭に提示して軸を固定",
+      "sales": "参考価格: {{price}}を最初に提示して価格感度を調整",
+      "presentation": "目標値: {{target}}を冒頭に示して議論の方向性を定める"
+    },
+    "tags": ["会議", "交渉", "営業", "評価"],
+    "related_theories": ["framing_effect", "loss_aversion"]
+  },
+  {
+    "id": "framing_effect",
+    "name_ja": "フレーミング効果",
+    "name_en": "Framing Effect",
+    "domain": "behavioral_econ",
+    "academic_field": "行動経済学",
+    "one_liner": "同じ情報でも提示の仕方によって受け取られ方や選好が変わる",
+    "definition": "同じ情報でも提示の仕方によって受け取られ方や選好が変わる",
+    "content": "利得枠と損失枠の両面から事実を提示することで意思決定をコントロールする",
+    "applicable_scenarios": "企画提案、稟議承認、営業トーク",
+    "key_concepts": ["利得枠", "損失枠", "提示方法", "意思決定"],
+    "examples": [
+      "利得枠：「導入により20%の効率向上」",
+      "損失枠：「未導入だと20%の機会損失」",
+      "両面提示：「導入で20%向上、未導入で20%損失」"
+    ],
+    "practical_tips": [
+      "相手の関心事に合わせて枠組みを選択する",
+      "両面提示でバランスの取れた印象を与える",
+      "具体的な数値で効果を表現する"
+    ],
+    "mechanism": "提示方法による認知バイアスの活用",
+    "how_to": ["相手視点→枠組み選択→効果提示"],
+    "templates": {
+      "meeting": "『得: {{gain1}}, {{gain2}} / 避ける損: {{loss1}}』の両面で提示",
+      "sales": "顧客のKPI文脈で利得/損失を両面提示",
+      "presentation": "現状維持のリスクと改善のメリットを対比"
+    },
+    "tags": ["会議", "営業", "プレゼン", "意思決定"],
+    "related_theories": ["anchoring_effect", "prospect_theory"]
+  },
+  {
+    "id": "loss_aversion",
+    "name_ja": "損失回避",
+    "name_en": "Loss Aversion",
+    "domain": "behavioral_econ",
+    "academic_field": "行動経済学",
+    "one_liner": "人は利益を得るより損失を避けることを優先する傾向がある",
+    "definition": "人は利益を得るより損失を避けることを優先する傾向がある",
+    "content": "未導入時の損失額を明示することで行動を促す",
+    "applicable_scenarios": "導入提案、解約抑止、業務改善",
+    "key_concepts": ["損失回避", "心理的重み", "行動促進", "リスク提示"],
+    "examples": [
+      "システム未導入による機会損失を数値化",
+      "現状維持のコストを明示",
+      "改善しない場合の競合優位性喪失を説明"
+    ],
+    "practical_tips": [
+      "損失を具体的な数値で表現する",
+      "現状維持のコストを可視化する",
+      "改善のメリットと比較して提示する"
+    ],
+    "mechanism": "損失の心理的重みが利得より大きい",
+    "how_to": ["現状分析→損失可視化→改善提案"],
+    "templates": {
+      "meeting": "未導入だと{{loss_metric}}で{{loss_value}}の損失見込みと提示",
+      "sales": "現状維持の機会損失を数値化して改善の緊急性を訴求",
+      "presentation": "現状の課題と改善しない場合のリスクを明確化"
+    },
+    "tags": ["会議", "交渉", "営業", "改善提案"],
+    "related_theories": ["anchoring_effect", "prospect_theory"]
+  },
+  {
+    "id": "social_proof",
+    "name_ja": "社会的証明",
+    "name_en": "Social Proof",
+    "domain": "behavioral_econ",
+    "academic_field": "行動経済学",
+    "one_liner": "他者の行動や事例が意思決定を後押しする",
+    "definition": "他者の行動や事例が意思決定を後押しする",
+    "content": "類似条件の成功事例と定量結果を提示する",
+    "applicable_scenarios": "新規提案、導入推進",
+    "key_concepts": ["他者行動", "類似事例", "成功事例", "意思決定支援"],
+    "examples": [
+      "同業他社の導入事例を紹介",
+      "類似規模企業の成果を提示",
+      "先行導入者の声を活用"
+    ],
+    "practical_tips": [
+      "類似条件の事例を選ぶ",
+      "具体的な数値で効果を表現する",
+      "信頼性の高い情報源を使用する"
+    ],
+    "mechanism": "他者の行動を参照することで不確実性を低減",
+    "how_to": ["類似事例収集→効果定量化→事例提示"],
+    "templates": {
+      "sales": "同業の{{peer}}で{{metric}}が{{delta}}改善と提示",
+      "meeting": "類似企業の{{company}}で{{result}}を達成",
+      "presentation": "先行事例として{{case}}での{{outcome}}を紹介"
+    },
+    "tags": ["営業", "会議", "新規提案", "導入推進"],
+    "related_theories": ["anchoring_effect", "framing_effect"]
+  },
+  {
+    "id": "active_listening",
+    "name_ja": "アクティブリスニング",
+    "name_en": "Active Listening",
+    "domain": "communication",
+    "academic_field": "コミュニケーション理論",
+    "one_liner": "相手の話を積極的に聴き理解を示す",
+    "definition": "相手の話を積極的に聴き理解を示す",
+    "content": "復唱、要約、共感を行う",
+    "applicable_scenarios": "面談、営業",
+    "key_concepts": ["積極的", "理解", "復唱", "要約", "共感"],
+    "examples": [
+      "相手の話を最後まで聴く",
+      "内容を復唱して確認する",
+      "要約して理解を示す",
+      "共感の言葉をかける"
+    ],
+    "practical_tips": [
+      "相手の話を遮らない",
+      "適切な相槌を打つ",
+      "理解を示す言葉をかける"
+    ],
+    "mechanism": "積極的な聴取による相互理解の促進",
+    "how_to": ["最後まで聴く→復唱確認→要約理解→共感表現"],
+    "templates": {
+      "meeting": "アクティブリスニング{{active_listening}}により相手の話{{speaker_content}}を積極的{{actively}}に聴き理解{{understanding}}を示す",
+      "presentation": "復唱{{repetition}}、要約{{summary}}、共感{{empathy}}による効果的{{effective}}なコミュニケーション{{communication}}を実現",
+      "sales": "積極的聴取{{active_listening}}による顧客理解{{customer_understanding}}と信頼構築{{trust_building}}を促進"
+    },
+    "tags": ["コミュニケーション", "アクティブリスニング", "聴取", "相互理解"],
+    "related_theories": ["nvc", "spin_selling"]
+  }
+]

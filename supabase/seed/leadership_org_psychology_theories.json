@@ -1,0 +1,622 @@
+[
+  {
+    "id": "servant_leadership",
+    "name_ja": "サーバント・リーダーシップ",
+    "name_en": "Servant Leadership",
+    "domain": "leadership",
+    "academic_field": "リーダーシップ論",
+    "one_liner": "メンバーの成長と幸福を第一に考え、支援するリーダー像",
+    "definition": "メンバーの成長と幸福を第一に考え、支援するリーダー像",
+    "content": "支援型で信頼を築き、自己発揮を促す",
+    "applicable_scenarios": "チーム立ち上げ、部下育成",
+    "key_concepts": ["支援型", "信頼構築", "自己発揮", "メンバー成長"],
+    "examples": [
+      "部下の課題解決を支援し、成長機会を創出する",
+      "チームメンバーの強みを活かす環境を整える",
+      "メンバーの声に耳を傾け、必要な支援を提供する"
+    ],
+    "practical_tips": [
+      "メンバーの成長を第一に考える",
+      "支援的な姿勢を保つ",
+      "信頼関係を築く"
+    ],
+    "mechanism": "支援による信頼構築と自己発揮促進",
+    "how_to": ["メンバー理解→支援提供→成長促進"],
+    "templates": {
+      "meeting": "メンバーの課題{{challenge}}を理解し、支援策{{support}}を提案",
+      "team_building": "各メンバーの強み{{strength}}を活かす役割分担を設計",
+      "interview": "成長目標{{growth_goal}}を確認し、支援計画{{support_plan}}を策定"
+    },
+    "tags": ["リーダーシップ", "部下育成", "チーム構築", "支援"],
+    "related_theories": ["authentic_leadership", "emotional_intelligence"]
+  },
+  {
+    "id": "transformational_leadership",
+    "name_ja": "トランスフォーメーショナル・リーダーシップ",
+    "name_en": "Transformational Leadership",
+    "domain": "leadership",
+    "academic_field": "リーダーシップ論",
+    "one_liner": "ビジョンを示し、価値観や意識の変革を促す",
+    "definition": "ビジョンを示し、価値観や意識の変革を促す",
+    "content": "鼓舞と模範行動で高いモチベーションを引き出す",
+    "applicable_scenarios": "大規模変革、文化改革",
+    "key_concepts": ["ビジョン", "価値観変革", "鼓舞", "模範行動"],
+    "examples": [
+      "組織の未来像を明確に示し、メンバーを鼓舞する",
+      "変革の必要性を説き、新しい価値観を共有する",
+      "自らが模範となり、期待される行動を示す"
+    ],
+    "practical_tips": [
+      "明確なビジョンを提示する",
+      "変革の必要性を説く",
+      "自らが模範となる"
+    ],
+    "mechanism": "ビジョンによる鼓舞と模範行動による変革促進",
+    "how_to": ["ビジョン提示→変革必要性説明→模範行動実践"],
+    "templates": {
+      "meeting": "組織ビジョン{{vision}}を提示し、変革の必要性{{necessity}}を説明",
+      "presentation": "未来像{{future}}を描き、メンバーの意識変革{{mindset_change}}を促進",
+      "team_building": "新しい価値観{{new_values}}を共有し、行動変革{{behavior_change}}を促す"
+    },
+    "tags": ["リーダーシップ", "組織変革", "ビジョン", "文化改革"],
+    "related_theories": ["authentic_leadership", "servant_leadership"]
+  },
+  {
+    "id": "situational_leadership",
+    "name_ja": "シチュエーショナル・リーダーシップ",
+    "name_en": "Situational Leadership",
+    "domain": "leadership",
+    "academic_field": "リーダーシップ論",
+    "one_liner": "部下の成熟度に応じて指導スタイルを変える理論",
+    "definition": "部下の成熟度に応じて指導スタイルを変える理論",
+    "content": "指示型〜委任型を状況に応じて切替",
+    "applicable_scenarios": "新人育成、マネジメント層指導",
+    "key_concepts": ["成熟度", "指導スタイル", "指示型", "委任型"],
+    "examples": [
+      "新人には具体的な指示を与える",
+      "中堅には相談しながら進める",
+      "ベテランには委任して任せる"
+    ],
+    "practical_tips": [
+      "部下の成熟度を正確に把握する",
+      "状況に応じてスタイルを変える",
+      "成長に合わせて段階的に委任する"
+    ],
+    "mechanism": "成熟度に応じた適切な指導スタイルの選択",
+    "how_to": ["成熟度把握→スタイル選択→段階的委任"],
+    "templates": {
+      "meeting": "部下の成熟度{{maturity}}を確認し、適切な指導スタイル{{style}}を選択",
+      "interview": "成長段階{{growth_stage}}に応じた指導方法{{guidance_method}}を提案",
+      "team_building": "各メンバーの成熟度{{maturity}}に応じた役割分担{{role_assignment}}を設計"
+    },
+    "tags": ["リーダーシップ", "部下育成", "指導", "成熟度"],
+    "related_theories": ["servant_leadership", "grow_model"]
+  },
+  {
+    "id": "level5_leadership",
+    "name_ja": "レベル5リーダーシップ",
+    "name_en": "Level 5 Leadership",
+    "domain": "leadership",
+    "academic_field": "リーダーシップ論",
+    "one_liner": "謙虚さと強い意志を併せ持つ最高レベルのリーダー像",
+    "definition": "謙虚さと強い意志を併せ持つ最高レベルのリーダー像",
+    "content": "成果に焦点を当てつつ、功績を他者に帰す",
+    "applicable_scenarios": "組織変革、事業継承",
+    "key_concepts": ["謙虚さ", "強い意志", "成果焦点", "功績帰属"],
+    "examples": [
+      "成功時は他者の功績を称え、失敗時は責任を取る",
+      "組織の成果に焦点を当て、個人の名声を求めない",
+      "強い意志で変革を推進し、謙虚に学び続ける"
+    ],
+    "practical_tips": [
+      "成功時は他者の功績を称える",
+      "失敗時は責任を取る",
+      "組織の成果に焦点を当てる"
+    ],
+    "mechanism": "謙虚さと強い意志の両立による持続的成果",
+    "how_to": ["成果焦点→功績帰属→謙虚な学習"],
+    "templates": {
+      "meeting": "成功の要因{{success_factor}}を分析し、関係者の功績{{contribution}}を称える",
+      "presentation": "組織の成果{{achievement}}を強調し、個人の名声{{personal_fame}}は求めない",
+      "team_building": "変革の意志{{change_will}}を示し、謙虚な学習姿勢{{learning_attitude}}を共有"
+    },
+    "tags": ["リーダーシップ", "組織変革", "謙虚さ", "成果"],
+    "related_theories": ["authentic_leadership", "transformational_leadership"]
+  },
+  {
+    "id": "emotional_intelligence",
+    "name_ja": "エモーショナルインテリジェンス",
+    "name_en": "Emotional Intelligence",
+    "domain": "leadership",
+    "academic_field": "組織心理学",
+    "one_liner": "感情を理解し適切に管理する能力",
+    "definition": "感情を理解し適切に管理する能力",
+    "content": "自己認識・自己制御・共感・対人スキルを発揮",
+    "applicable_scenarios": "対人交渉、衝突解消",
+    "key_concepts": ["自己認識", "自己制御", "共感", "対人スキル"],
+    "examples": [
+      "自分の感情を認識し、適切に制御する",
+      "相手の感情を理解し、共感を示す",
+      "感情的な状況でも冷静に対処する"
+    ],
+    "practical_tips": [
+      "自分の感情を認識する",
+      "感情を適切に制御する",
+      "相手の感情に共感する"
+    ],
+    "mechanism": "感情の理解と適切な管理による対人関係の改善",
+    "how_to": ["自己認識→自己制御→共感→対人スキル発揮"],
+    "templates": {
+      "meeting": "自分の感情{{emotion}}を認識し、適切な対応{{appropriate_response}}を選択",
+      "interview": "相手の感情{{feeling}}を理解し、共感{{empathy}}を示す",
+      "team_building": "感情的な状況{{emotional_situation}}でも冷静{{calm}}に対処"
+    },
+    "tags": ["リーダーシップ", "対人関係", "感情管理", "共感"],
+    "related_theories": ["servant_leadership", "authentic_leadership"]
+  },
+  {
+    "id": "lmx_theory",
+    "name_ja": "LMX理論",
+    "name_en": "Leader–Member Exchange",
+    "domain": "leadership",
+    "academic_field": "組織心理学",
+    "one_liner": "リーダーと部下一人ひとりの関係質が成果に影響する理論",
+    "definition": "リーダーと部下一人ひとりの関係質が成果に影響する理論",
+    "content": "高品質な関係構築がエンゲージメントを高める",
+    "applicable_scenarios": "チーム編成、評価面談",
+    "key_concepts": ["関係質", "エンゲージメント", "個別関係", "成果影響"],
+    "examples": [
+      "各メンバーとの個別の関係を深める",
+      "信頼関係を築き、エンゲージメントを高める",
+      "関係の質を向上させる努力を継続する"
+    ],
+    "practical_tips": [
+      "各メンバーとの個別の関係を深める",
+      "信頼関係を築く",
+      "関係の質を向上させる"
+    ],
+    "mechanism": "個別関係の質によるエンゲージメントと成果の向上",
+    "how_to": ["個別関係構築→信頼醸成→エンゲージメント向上"],
+    "templates": {
+      "meeting": "各メンバーとの関係{{relationship}}を確認し、改善点{{improvement}}を特定",
+      "interview": "信頼関係{{trust}}を築き、エンゲージメント{{engagement}}を高める",
+      "team_building": "関係の質{{relationship_quality}}を向上させる活動{{activity}}を実施"
+    },
+    "tags": ["リーダーシップ", "チーム編成", "関係構築", "エンゲージメント"],
+    "related_theories": ["servant_leadership", "emotional_intelligence"]
+  },
+  {
+    "id": "authentic_leadership",
+    "name_ja": "オーセンティック・リーダーシップ",
+    "name_en": "Authentic Leadership",
+    "domain": "leadership",
+    "academic_field": "リーダーシップ論",
+    "one_liner": "自己の価値観や信念に忠実で透明性のあるリーダー",
+    "definition": "自己の価値観や信念に忠実で透明性のあるリーダー",
+    "content": "誠実な姿勢で信頼を醸成",
+    "applicable_scenarios": "危機対応、価値観共有",
+    "key_concepts": ["価値観", "信念", "透明性", "誠実性"],
+    "examples": [
+      "自分の価値観を明確に示す",
+      "透明性を保って意思決定を説明する",
+      "誠実な姿勢で信頼を醸成する"
+    ],
+    "practical_tips": [
+      "自分の価値観を明確にする",
+      "透明性を保つ",
+      "誠実な姿勢を保つ"
+    ],
+    "mechanism": "価値観の一貫性と透明性による信頼醸成",
+    "how_to": ["価値観明確化→透明性確保→誠実性維持"],
+    "templates": {
+      "meeting": "自分の価値観{{values}}を明確に示し、意思決定{{decision}}を透明に説明",
+      "presentation": "信念{{beliefs}}に基づく方針{{policy}}を説明し、透明性{{transparency}}を確保",
+      "team_building": "価値観{{values}}を共有し、誠実な姿勢{{authentic_attitude}}で信頼を醸成"
+    },
+    "tags": ["リーダーシップ", "価値観", "透明性", "信頼"],
+    "related_theories": ["servant_leadership", "transformational_leadership"]
+  },
+  {
+    "id": "grow_model",
+    "name_ja": "GROWモデル",
+    "name_en": "Goal, Reality, Options, Will",
+    "domain": "leadership",
+    "academic_field": "コーチング理論",
+    "one_liner": "コーチングの基本フレームワーク",
+    "definition": "コーチングの基本フレームワーク",
+    "content": "目標→現状→選択肢→意志の順で導く",
+    "applicable_scenarios": "目標設定、問題解決支援",
+    "key_concepts": ["目標", "現状", "選択肢", "意志"],
+    "examples": [
+      "具体的な目標を設定する",
+      "現状を正確に把握する",
+      "選択肢を検討し、意志を確認する"
+    ],
+    "practical_tips": [
+      "具体的な目標を設定する",
+      "現状を正確に把握する",
+      "選択肢を検討する"
+    ],
+    "mechanism": "構造化された質問による自己気づき促進",
+    "how_to": ["目標設定→現状把握→選択肢検討→意志確認"],
+    "templates": {
+      "meeting": "目標{{goal}}を設定し、現状{{reality}}を把握して選択肢{{options}}を検討",
+      "interview": "GROWモデルに沿って問題解決{{problem_solving}}を支援",
+      "team_building": "チーム目標{{team_goal}}を設定し、現状{{current_state}}と選択肢{{alternatives}}を検討"
+    },
+    "tags": ["コーチング", "目標設定", "問題解決", "自己気づき"],
+    "related_theories": ["situational_leadership", "servant_leadership"]
+  },
+  {
+    "id": "psychological_safety",
+    "name_ja": "心理的安全性",
+    "name_en": "Psychological Safety",
+    "domain": "organizational_psych",
+    "academic_field": "組織心理学",
+    "one_liner": "意見や質問をしても罰せられない状態",
+    "definition": "意見や質問をしても罰せられない状態",
+    "content": "発言の自由が学習とイノベーションを促す",
+    "applicable_scenarios": "会議、ブレインストーミング",
+    "key_concepts": ["発言の自由", "学習促進", "イノベーション", "罰のない環境"],
+    "examples": [
+      "全ての意見を歓迎する雰囲気を作る",
+      "質問や異論を積極的に求める",
+      "失敗を学習機会として扱う"
+    ],
+    "practical_tips": [
+      "全ての意見を歓迎する",
+      "質問や異論を求める",
+      "失敗を学習機会として扱う"
+    ],
+    "mechanism": "罰のない環境による自由な発言と学習促進",
+    "how_to": ["歓迎的雰囲気→積極的意見収集→学習機会創出"],
+    "templates": {
+      "meeting": "全ての意見{{opinions}}を歓迎し、心理的安全性{{safety}}を確保",
+      "team_building": "質問{{questions}}や異論{{different_views}}を積極的に求める環境{{environment}}を作る",
+      "presentation": "失敗{{failure}}を学習機会{{learning_opportunity}}として扱う姿勢{{attitude}}を示す"
+    },
+    "tags": ["組織心理学", "会議", "ブレインストーミング", "学習"],
+    "related_theories": ["authentic_leadership", "groupthink_prevention"]
+  },
+  {
+    "id": "groupthink_prevention",
+    "name_ja": "集団浅慮防止",
+    "name_en": "Groupthink Prevention",
+    "domain": "organizational_psych",
+    "academic_field": "組織心理学",
+    "one_liner": "同調圧力で批判的思考が失われる現象を防ぐ",
+    "definition": "同調圧力で批判的思考が失われる現象を防ぐ",
+    "content": "異論を歓迎し、外部意見を取り入れる",
+    "applicable_scenarios": "意思決定会議、新規プロジェクト",
+    "key_concepts": ["同調圧力", "批判的思考", "異論歓迎", "外部意見"],
+    "examples": [
+      "異論を積極的に求める",
+      "外部の専門家の意見を取り入れる",
+      "批判的思考を奨励する"
+    ],
+    "practical_tips": [
+      "異論を積極的に求める",
+      "外部意見を取り入れる",
+      "批判的思考を奨励する"
+    ],
+    "mechanism": "多様な視点による批判的思考の促進",
+    "how_to": ["異論収集→外部意見導入→批判的思考奨励"],
+    "templates": {
+      "meeting": "異論{{different_opinions}}を積極的に求め、集団浅慮{{groupthink}}を防止",
+      "presentation": "外部専門家{{external_expert}}の意見{{opinion}}を取り入れて多様な視点{{diverse_perspectives}}を確保",
+      "team_building": "批判的思考{{critical_thinking}}を奨励し、同調圧力{{conformity_pressure}}を軽減"
+    },
+    "tags": ["組織心理学", "意思決定", "批判的思考", "多様性"],
+    "related_theories": ["psychological_safety", "authentic_leadership"]
+  },
+  {
+    "id": "social_loafing_prevention",
+    "name_ja": "社会的手抜き防止",
+    "name_en": "Social Loafing Prevention",
+    "domain": "organizational_psych",
+    "academic_field": "組織心理学",
+    "one_liner": "集団になると個人努力が減る現象を防ぐ",
+    "definition": "集団になると個人努力が減る現象を防ぐ",
+    "content": "役割明確化と成果の可視化で防止",
+    "applicable_scenarios": "チームタスク、共同作業",
+    "key_concepts": ["個人努力", "役割明確化", "成果可視化", "責任分担"],
+    "examples": [
+      "各メンバーの役割を明確にする",
+      "個人の成果を可視化する",
+      "責任分担を明確にする"
+    ],
+    "practical_tips": [
+      "役割を明確にする",
+      "成果を可視化する",
+      "責任分担を明確にする"
+    ],
+    "mechanism": "役割と責任の明確化による個人努力の促進",
+    "how_to": ["役割明確化→成果可視化→責任分担明確化"],
+    "templates": {
+      "meeting": "各メンバーの役割{{role}}を明確にし、社会的手抜き{{social_loafing}}を防止",
+      "team_building": "個人の成果{{individual_achievement}}を可視化し、責任分担{{responsibility}}を明確化",
+      "presentation": "チームタスク{{team_task}}での個人貢献{{individual_contribution}}を明確化"
+    },
+    "tags": ["組織心理学", "チームタスク", "共同作業", "責任分担"],
+    "related_theories": ["tuckman_model", "goal_setting_theory"]
+  },
+  {
+    "id": "tuckman_model",
+    "name_ja": "タックマンモデル",
+    "name_en": "Tuckman's Stages",
+    "domain": "organizational_psych",
+    "academic_field": "組織心理学",
+    "one_liner": "形成期→混乱期→統一期→遂行期のチーム発達段階",
+    "definition": "形成期→混乱期→統一期→遂行期のチーム発達段階",
+    "content": "段階ごとの適切な関与が重要",
+    "applicable_scenarios": "新チーム立ち上げ",
+    "key_concepts": ["形成期", "混乱期", "統一期", "遂行期"],
+    "examples": [
+      "形成期には明確な指示とガイダンスを提供する",
+      "混乱期には対立を建設的に扱い、調整を促進する",
+      "統一期には規範を確立し、協力を強化する"
+    ],
+    "practical_tips": [
+      "段階を理解する",
+      "適切な関与を行う",
+      "次の段階への移行を促進する"
+    ],
+    "mechanism": "段階的発達によるチーム成熟度の向上",
+    "how_to": ["段階理解→適切関与→移行促進"],
+    "templates": {
+      "meeting": "チームの現在の段階{{current_stage}}を確認し、適切な関与{{appropriate_intervention}}を選択",
+      "team_building": "形成期{{forming}}から遂行期{{performing}}への段階的発達{{staged_development}}を促進",
+      "presentation": "各段階{{stages}}の特徴{{characteristics}}と適切な対応{{appropriate_response}}を説明"
+    },
+    "tags": ["組織心理学", "チーム発達", "段階的発達", "チーム構築"],
+    "related_theories": ["social_loafing_prevention", "psychological_safety"]
+  },
+  {
+    "id": "pygmalion_effect",
+    "name_ja": "ピグマリオン効果",
+    "name_en": "Pygmalion Effect",
+    "domain": "organizational_psych",
+    "academic_field": "組織心理学",
+    "one_liner": "期待が高いほど成果も高まる現象",
+    "definition": "期待が高いほど成果も高まる現象",
+    "content": "高い期待を明確に伝える",
+    "applicable_scenarios": "部下育成、教育",
+    "key_concepts": ["期待", "成果向上", "自己実現予言", "信頼"],
+    "examples": [
+      "部下に高い期待を明確に伝える",
+      "能力を信じていることを示す",
+      "成長の可能性を強調する"
+    ],
+    "practical_tips": [
+      "高い期待を明確に伝える",
+      "能力を信じていることを示す",
+      "成長の可能性を強調する"
+    ],
+    "mechanism": "期待による自己実現予言の実現",
+    "how_to": ["期待明確化→能力信頼→成長可能性強調"],
+    "templates": {
+      "meeting": "部下に高い期待{{high_expectation}}を明確に伝え、ピグマリオン効果{{pygmalion_effect}}を活用",
+      "interview": "能力{{capability}}を信じていることを示し、成長の可能性{{growth_potential}}を強調",
+      "team_building": "チーム全体に高い期待{{team_expectation}}を設定し、成果向上{{performance_improvement}}を促進"
+    },
+    "tags": ["組織心理学", "部下育成", "教育", "期待"],
+    "related_theories": ["goal_setting_theory", "expectancy_theory"]
+  },
+  {
+    "id": "equity_theory",
+    "name_ja": "公平理論",
+    "name_en": "Equity Theory",
+    "domain": "organizational_psych",
+    "academic_field": "組織心理学",
+    "one_liner": "報酬と努力の公平感が動機付けに影響する",
+    "definition": "報酬と努力の公平感が動機付けに影響する",
+    "content": "公平な評価制度設計が必要",
+    "applicable_scenarios": "人事評価、報酬制度",
+    "key_concepts": ["公平感", "報酬", "努力", "動機付け"],
+    "examples": [
+      "公平な評価基準を設定する",
+      "報酬と努力のバランスを保つ",
+      "透明性のある評価プロセスを構築する"
+    ],
+    "practical_tips": [
+      "公平な評価基準を設定する",
+      "報酬と努力のバランスを保つ",
+      "透明性を確保する"
+    ],
+    "mechanism": "公平感による動機付けの向上",
+    "how_to": ["公平基準設定→バランス確保→透明性確保"],
+    "templates": {
+      "meeting": "公平な評価基準{{fair_criteria}}を設定し、報酬と努力{{reward_effort}}のバランスを確保",
+      "interview": "評価プロセス{{evaluation_process}}の透明性{{transparency}}を確保し、公平感{{fairness}}を醸成",
+      "presentation": "公平な報酬制度{{fair_compensation}}の設計{{design}}と運用{{operation}}を説明"
+    },
+    "tags": ["組織心理学", "人事評価", "報酬制度", "公平性"],
+    "related_theories": ["expectancy_theory", "goal_setting_theory"]
+  },
+  {
+    "id": "expectancy_theory",
+    "name_ja": "期待理論",
+    "name_en": "Expectancy Theory",
+    "domain": "organizational_psych",
+    "academic_field": "組織心理学",
+    "one_liner": "努力→成果→報酬の連鎖が動機を生む",
+    "definition": "努力→成果→報酬の連鎖が動機を生む",
+    "content": "各リンクを強化する施策が必要",
+    "applicable_scenarios": "目標管理制度",
+    "key_concepts": ["努力", "成果", "報酬", "動機"],
+    "examples": [
+      "努力が成果につながることを明確にする",
+      "成果が報酬につながることを保証する",
+      "各段階の連鎖を強化する"
+    ],
+    "practical_tips": [
+      "努力と成果の関係を明確にする",
+      "成果と報酬の関係を保証する",
+      "連鎖を強化する"
+    ],
+    "mechanism": "努力→成果→報酬の連鎖による動機形成",
+    "how_to": ["努力成果関係明確化→成果報酬関係保証→連鎖強化"],
+    "templates": {
+      "meeting": "努力{{effort}}→成果{{performance}}→報酬{{reward}}の連鎖{{chain}}を強化",
+      "interview": "各段階{{stages}}の関係{{relationship}}を明確化し、動機{{motivation}}を高める",
+      "presentation": "期待理論{{expectancy_theory}}に基づく目標管理制度{{goal_management}}の設計を説明"
+    },
+    "tags": ["組織心理学", "目標管理", "動機付け", "連鎖"],
+    "related_theories": ["equity_theory", "goal_setting_theory"]
+  },
+  {
+    "id": "herzberg_two_factor",
+    "name_ja": "二要因理論",
+    "name_en": "Herzberg Two-Factor",
+    "domain": "organizational_psych",
+    "academic_field": "組織心理学",
+    "one_liner": "満足要因と不満要因が別物であるという理論",
+    "definition": "満足要因と不満要因が別物であるという理論",
+    "content": "動機付け要因を増やし、衛生要因を整える",
+    "applicable_scenarios": "職場環境改善",
+    "key_concepts": ["満足要因", "不満要因", "動機付け", "衛生要因"],
+    "examples": [
+      "動機付け要因（達成感、承認）を増やす",
+      "衛生要因（給与、労働条件）を整える",
+      "両方を適切にバランスする"
+    ],
+    "practical_tips": [
+      "動機付け要因を増やす",
+      "衛生要因を整える",
+      "バランスを取る"
+    ],
+    "mechanism": "満足要因と衛生要因の適切なバランスによる動機付け",
+    "how_to": ["動機付け要因増加→衛生要因整備→バランス確保"],
+    "templates": {
+      "meeting": "動機付け要因{{motivators}}を増やし、衛生要因{{hygiene_factors}}を整備",
+      "team_building": "満足要因{{satisfaction_factors}}と不満要因{{dissatisfaction_factors}}のバランス{{balance}}を確保",
+      "presentation": "二要因理論{{two_factor_theory}}に基づく職場環境改善{{workplace_improvement}}を説明"
+    },
+    "tags": ["組織心理学", "職場環境", "動機付け", "満足度"],
+    "related_theories": ["expectancy_theory", "self_determination_theory"]
+  },
+  {
+    "id": "job_characteristics_model",
+    "name_ja": "職務特性モデル",
+    "name_en": "Job Characteristics Model",
+    "domain": "organizational_psych",
+    "academic_field": "組織心理学",
+    "one_liner": "仕事の特性が動機と満足度に影響",
+    "definition": "仕事の特性が動機と満足度に影響",
+    "content": "多様性・重要性・自律性を高める",
+    "applicable_scenarios": "職務設計、人材配置",
+    "key_concepts": ["多様性", "重要性", "自律性", "職務特性"],
+    "examples": [
+      "仕事の多様性を高める",
+      "重要性を明確にする",
+      "自律性を確保する"
+    ],
+    "practical_tips": [
+      "多様性を高める",
+      "重要性を明確にする",
+      "自律性を確保する"
+    ],
+    "mechanism": "職務特性の向上による動機と満足度の向上",
+    "how_to": ["多様性向上→重要性明確化→自律性確保"],
+    "templates": {
+      "meeting": "職務の多様性{{variety}}、重要性{{significance}}、自律性{{autonomy}}を高める",
+      "interview": "職務特性{{job_characteristics}}の改善{{improvement}}により動機{{motivation}}を向上",
+      "team_building": "職務設計{{job_design}}と人材配置{{personnel_assignment}}を最適化"
+    },
+    "tags": ["組織心理学", "職務設計", "人材配置", "動機付け"],
+    "related_theories": ["herzberg_two_factor", "self_determination_theory"]
+  },
+  {
+    "id": "self_determination_theory",
+    "name_ja": "自己決定理論",
+    "name_en": "Self-Determination Theory",
+    "domain": "organizational_psych",
+    "academic_field": "組織心理学",
+    "one_liner": "自律性・有能感・関係性が動機を高める",
+    "definition": "自律性・有能感・関係性が動機を高める",
+    "content": "内発的動機を支援する環境設計",
+    "applicable_scenarios": "教育研修、組織開発",
+    "key_concepts": ["自律性", "有能感", "関係性", "内発的動機"],
+    "examples": [
+      "自律性を尊重する環境を作る",
+      "有能感を高める機会を提供する",
+      "関係性を構築する場を作る"
+    ],
+    "practical_tips": [
+      "自律性を尊重する",
+      "有能感を高める",
+      "関係性を構築する"
+    ],
+    "mechanism": "3つの基本欲求の充足による内発的動機の促進",
+    "how_to": ["自律性尊重→有能感向上→関係性構築"],
+    "templates": {
+      "meeting": "自律性{{autonomy}}、有能感{{competence}}、関係性{{relatedness}}を高める環境{{environment}}を設計",
+      "team_building": "内発的動機{{intrinsic_motivation}}を支援する組織開発{{organization_development}}を推進",
+      "presentation": "自己決定理論{{self_determination_theory}}に基づく教育研修{{education_training}}を説明"
+    },
+    "tags": ["組織心理学", "教育研修", "組織開発", "内発的動機"],
+    "related_theories": ["job_characteristics_model", "goal_setting_theory"]
+  },
+  {
+    "id": "goal_setting_theory",
+    "name_ja": "目標設定理論",
+    "name_en": "Goal-Setting Theory",
+    "domain": "organizational_psych",
+    "academic_field": "組織心理学",
+    "one_liner": "明確で適度に難しい目標が成果を高める",
+    "definition": "明確で適度に難しい目標が成果を高める",
+    "content": "SMART目標の設定",
+    "applicable_scenarios": "KPI設計、個人面談",
+    "key_concepts": ["明確性", "難易度", "SMART", "成果向上"],
+    "examples": [
+      "具体的で測定可能な目標を設定する",
+      "達成可能で関連性のある目標にする",
+      "期限を明確にする"
+    ],
+    "practical_tips": [
+      "SMART目標を設定する",
+      "難易度を適切にする",
+      "フィードバックを提供する"
+    ],
+    "mechanism": "明確で適切な難易度の目標による成果向上",
+    "how_to": ["SMART目標設定→適切難易度→フィードバック提供"],
+    "templates": {
+      "meeting": "SMART目標{{smart_goals}}を設定し、成果向上{{performance_improvement}}を促進",
+      "interview": "具体的{{specific}}で測定可能{{measurable}}な目標{{goals}}を設定",
+      "presentation": "目標設定理論{{goal_setting_theory}}に基づくKPI設計{{kpi_design}}を説明"
+    },
+    "tags": ["組織心理学", "KPI設計", "目標設定", "成果向上"],
+    "related_theories": ["expectancy_theory", "pygmalion_effect"]
+  },
+  {
+    "id": "procedural_justice",
+    "name_ja": "手続き的公正",
+    "name_en": "Procedural Justice / Fair Process",
+    "domain": "organizational_psych",
+    "academic_field": "組織心理学",
+    "one_liner": "プロセスの公平感が受容と信頼を生む",
+    "definition": "プロセスの公平感が受容と信頼を生む",
+    "content": "透明性と説明責任の確保",
+    "applicable_scenarios": "評価制度、異動人事",
+    "key_concepts": ["プロセス", "公平感", "受容", "信頼"],
+    "examples": [
+      "透明性のあるプロセスを構築する",
+      "説明責任を果たす",
+      "公平性を確保する"
+    ],
+    "practical_tips": [
+      "透明性を確保する",
+      "説明責任を果たす",
+      "公平性を確保する"
+    ],
+    "mechanism": "プロセスの公平性による受容と信頼の醸成",
+    "how_to": ["透明性確保→説明責任履行→公平性確保"],
+    "templates": {
+      "meeting": "透明性{{transparency}}と説明責任{{accountability}}を確保し、手続き的公正{{procedural_justice}}を実現",
+      "interview": "評価プロセス{{evaluation_process}}の公平性{{fairness}}を説明し、受容{{acceptance}}を促進",
+      "presentation": "手続き的公正{{procedural_justice}}に基づく評価制度{{evaluation_system}}の設計を説明"
+    },
+    "tags": ["組織心理学", "評価制度", "異動人事", "公平性"],
+    "related_theories": ["equity_theory", "authentic_leadership"]
+  }
+]

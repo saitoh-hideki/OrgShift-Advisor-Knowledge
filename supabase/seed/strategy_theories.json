@@ -1,0 +1,312 @@
+[
+  {
+    "id": "porters_five_forces",
+    "name_ja": "ファイブフォース分析",
+    "name_en": "Porter's Five Forces",
+    "domain": "strategy",
+    "academic_field": "経営戦略論",
+    "one_liner": "業界構造を5つの競争要因で分析",
+    "definition": "業界構造を5つの競争要因で分析",
+    "content": "参入障壁・代替品・買い手・売り手・競合",
+    "applicable_scenarios": "市場分析、新規事業",
+    "key_concepts": ["参入障壁", "代替品", "買い手", "売り手", "競合"],
+    "examples": [
+      "新規参入の障壁を分析して参入戦略を策定する",
+      "代替品の脅威を評価して差別化戦略を強化する",
+      "買い手・売り手の交渉力を分析して戦略を調整する"
+    ],
+    "practical_tips": [
+      "5つの要因を体系的に分析する",
+      "各要因の強度を定量的に評価する",
+      "分析結果を戦略立案に活用する"
+    ],
+    "mechanism": "業界構造分析による競争環境の理解と戦略立案",
+    "how_to": ["5要因分析→強度評価→戦略立案"],
+    "templates": {
+      "meeting": "ファイブフォース分析{{five_forces}}により業界構造{{industry_structure}}を理解し、戦略{{strategy}}を策定",
+      "presentation": "参入障壁{{entry_barriers}}、代替品{{substitutes}}、競合{{competition}}の分析結果{{analysis_results}}を報告",
+      "sales": "業界分析{{industry_analysis}}に基づく競争優位{{competitive_advantage}}を説明"
+    },
+    "tags": ["経営戦略", "業界分析", "競争環境", "戦略立案"],
+    "related_theories": ["value_chain_analysis", "generic_strategies"]
+  },
+  {
+    "id": "value_chain_analysis",
+    "name_ja": "バリューチェーン分析",
+    "name_en": "Value Chain Analysis",
+    "domain": "strategy",
+    "academic_field": "経営戦略論",
+    "one_liner": "企業活動を主活動と支援活動に分け価値創出を分析",
+    "definition": "企業活動を主活動と支援活動に分け価値創出を分析",
+    "content": "強みと弱みを特定し競争優位を構築",
+    "applicable_scenarios": "業務改善、差別化戦略",
+    "key_concepts": ["主活動", "支援活動", "価値創出", "競争優位"],
+    "examples": [
+      "各活動の価値創出度を分析して強みを特定する",
+      "弱みを改善して競争優位を強化する",
+      "価値連鎖の最適化を図る"
+    ],
+    "practical_tips": [
+      "主活動と支援活動を分類する",
+      "各活動の価値創出度を評価する",
+      "改善点を特定して戦略を策定する"
+    ],
+    "mechanism": "価値創出活動の分析による競争優位の特定と強化",
+    "how_to": ["活動分類→価値評価→改善戦略策定"],
+    "templates": {
+      "meeting": "バリューチェーン分析{{value_chain_analysis}}により強み{{strengths}}と弱み{{weaknesses}}を特定",
+      "presentation": "主活動{{primary_activities}}と支援活動{{support_activities}}の価値創出度{{value_creation}}を分析",
+      "team_building": "価値連鎖{{value_linkage}}の最適化{{optimization}}により競争優位{{competitive_advantage}}を構築"
+    },
+    "tags": ["経営戦略", "価値創出", "競争優位", "業務改善"],
+    "related_theories": ["porters_five_forces", "core_competence"]
+  },
+  {
+    "id": "generic_strategies",
+    "name_ja": "基本戦略",
+    "name_en": "Generic Strategies",
+    "domain": "strategy",
+    "academic_field": "経営戦略論",
+    "one_liner": "コストリーダー・差別化・集中戦略の3つ",
+    "definition": "コストリーダー・差別化・集中戦略の3つ",
+    "content": "競争優位を明確化する",
+    "applicable_scenarios": "事業計画立案",
+    "key_concepts": ["コストリーダー", "差別化", "集中戦略", "競争優位"],
+    "examples": [
+      "コスト優位を活かした価格競争戦略を展開する",
+      "独自性を活かした差別化戦略を推進する",
+      "特定市場に集中した専門化戦略を実行する"
+    ],
+    "practical_tips": [
+      "3つの戦略の特徴を理解する",
+      "自社の強みに合った戦略を選択する",
+      "戦略の一貫性を保つ"
+    ],
+    "mechanism": "明確な戦略ポジショニングによる競争優位の確立",
+    "how_to": ["戦略特徴理解→強み適合性評価→戦略選択"],
+    "templates": {
+      "meeting": "基本戦略{{generic_strategies}}を選択し、競争優位{{competitive_advantage}}を明確化",
+      "presentation": "コストリーダー{{cost_leadership}}、差別化{{differentiation}}、集中{{focus}}の戦略特徴{{strategic_features}}を説明",
+      "sales": "選択した基本戦略{{chosen_strategy}}に基づく価値提案{{value_proposition}}を提示"
+    },
+    "tags": ["経営戦略", "戦略ポジショニング", "競争優位", "事業計画"],
+    "related_theories": ["porters_five_forces", "blue_ocean_strategy"]
+  },
+  {
+    "id": "blue_ocean_strategy",
+    "name_ja": "ブルーオーシャン戦略",
+    "name_en": "Blue Ocean Strategy",
+    "domain": "strategy",
+    "academic_field": "経営戦略論",
+    "one_liner": "競争のない市場空間を創出",
+    "definition": "競争のない市場空間を創出",
+    "content": "差別化と低コストの同時実現",
+    "applicable_scenarios": "新規市場開拓",
+    "key_concepts": ["新市場創出", "差別化", "低コスト", "競争回避"],
+    "examples": [
+      "既存の競争要因を削除・削減して新市場を創出する",
+      "新しい価値要素を創出して差別化を図る",
+      "コスト構造を最適化して低価格を実現する"
+    ],
+    "practical_tips": [
+      "既存の競争要因を分析する",
+      "新しい価値要素を創出する",
+      "コスト構造を最適化する"
+    ],
+    "mechanism": "競争要因の削除・削減・創出による新市場の創出",
+    "how_to": ["競争要因分析→価値要素創出→コスト最適化"],
+    "templates": {
+      "meeting": "ブルーオーシャン戦略{{blue_ocean_strategy}}により新市場{{new_market}}を創出",
+      "presentation": "競争要因の削除{{elimination}}・削減{{reduction}}・創出{{creation}}により差別化{{differentiation}}を実現",
+      "sales": "新市場創出{{market_creation}}による競争回避{{competition_avoidance}}の価値{{value}}を提案"
+    },
+    "tags": ["経営戦略", "新市場創出", "差別化", "イノベーション"],
+    "related_theories": ["generic_strategies", "rbv_theory"]
+  },
+  {
+    "id": "rbv_theory",
+    "name_ja": "資源ベース理論",
+    "name_en": "Resource-Based View (RBV)",
+    "domain": "strategy",
+    "academic_field": "経営戦略論",
+    "one_liner": "価値・希少性・模倣困難・組織化の4条件で資源分析",
+    "definition": "価値・希少性・模倣困難・組織化の4条件で資源分析",
+    "content": "持続的競争優位の源泉特定",
+    "applicable_scenarios": "競争戦略構築",
+    "key_concepts": ["価値", "希少性", "模倣困難性", "組織化"],
+    "examples": [
+      "VRIOフレームワークで資源の競争優位性を評価する",
+      "希少で模倣困難な資源を特定して戦略を構築する",
+      "組織能力を活用して競争優位を確立する"
+    ],
+    "practical_tips": [
+      "VRIOフレームワークを活用する",
+      "4条件を体系的に評価する",
+      "戦略的資源を特定する"
+    ],
+    "mechanism": "VRIO条件を満たす資源による持続的競争優位の構築",
+    "how_to": ["VRIO評価→戦略的資源特定→競争優位構築"],
+    "templates": {
+      "meeting": "VRIOフレームワーク{{vrio_framework}}により戦略的資源{{strategic_resources}}を特定",
+      "presentation": "価値{{value}}・希少性{{rarity}}・模倣困難性{{inimitability}}・組織化{{organization}}の4条件{{four_conditions}}を評価",
+      "team_building": "戦略的資源{{strategic_resources}}を活用して持続的競争優位{{sustainable_advantage}}を構築"
+    },
+    "tags": ["経営戦略", "資源分析", "競争優位", "VRIO"],
+    "related_theories": ["blue_ocean_strategy", "core_competence"]
+  },
+  {
+    "id": "core_competence",
+    "name_ja": "コア・コンピタンス",
+    "name_en": "Core Competence",
+    "domain": "strategy",
+    "academic_field": "経営戦略論",
+    "one_liner": "競争優位をもたらす中核能力",
+    "definition": "競争優位をもたらす中核能力",
+    "content": "顧客価値・模倣困難性・幅広い市場展開性",
+    "applicable_scenarios": "新規事業選定",
+    "key_concepts": ["中核能力", "顧客価値", "模倣困難性", "市場展開性"],
+    "examples": [
+      "顧客に価値を提供する中核能力を特定する",
+      "模倣困難な独自能力を強化する",
+      "複数市場での活用可能性を評価する"
+    ],
+    "practical_tips": [
+      "顧客価値を生み出す能力を特定する",
+      "模倣困難性を高める",
+      "市場展開性を評価する"
+    ],
+    "mechanism": "中核能力による複数市場での競争優位の実現",
+    "how_to": ["顧客価値分析→模倣困難性強化→市場展開性評価"],
+    "templates": {
+      "meeting": "コア・コンピタンス{{core_competence}}を特定し、新規事業{{new_business}}の選定に活用",
+      "presentation": "顧客価値{{customer_value}}・模倣困難性{{inimitability}}・市場展開性{{market_expansion}}の3要素{{three_elements}}を分析",
+      "sales": "中核能力{{core_capability}}を活用した新規市場{{new_market}}での競争優位{{competitive_advantage}}を提案"
+    },
+    "tags": ["経営戦略", "中核能力", "新規事業", "競争優位"],
+    "related_theories": ["rbv_theory", "swot_analysis"]
+  },
+  {
+    "id": "swot_analysis",
+    "name_ja": "SWOT分析",
+    "name_en": "SWOT Analysis",
+    "domain": "strategy",
+    "academic_field": "経営戦略論",
+    "one_liner": "強み・弱み・機会・脅威を整理",
+    "definition": "強み・弱み・機会・脅威を整理",
+    "content": "内部・外部環境を俯瞰し戦略立案",
+    "applicable_scenarios": "事業診断",
+    "key_concepts": ["強み", "弱み", "機会", "脅威"],
+    "examples": [
+      "内部環境（強み・弱み）と外部環境（機会・脅威）を分析する",
+      "強みと機会を組み合わせた戦略を策定する",
+      "弱みと脅威への対応策を検討する"
+    ],
+    "practical_tips": [
+      "4つの要素を体系的に分析する",
+      "内部・外部環境を明確に分ける",
+      "戦略的含意を導き出す"
+    ],
+    "mechanism": "内部・外部環境の体系的分析による戦略立案",
+    "how_to": ["4要素分析→戦略的含意導出→戦略立案"],
+    "templates": {
+      "meeting": "SWOT分析{{swot_analysis}}により内部・外部環境{{internal_external_environment}}を分析",
+      "presentation": "強み{{strengths}}・弱み{{weaknesses}}・機会{{opportunities}}・脅威{{threats}}の分析結果{{analysis_results}}を報告",
+      "team_building": "強みと機会{{strength_opportunity}}の組み合わせによる戦略{{strategy}}を策定"
+    },
+    "tags": ["経営戦略", "環境分析", "戦略立案", "事業診断"],
+    "related_theories": ["core_competence", "pestel_analysis"]
+  },
+  {
+    "id": "pestel_analysis",
+    "name_ja": "PESTEL分析",
+    "name_en": "PESTEL Analysis",
+    "domain": "strategy",
+    "academic_field": "経営戦略論",
+    "one_liner": "政治・経済・社会・技術・環境・法的要因分析",
+    "definition": "政治・経済・社会・技術・環境・法的要因分析",
+    "content": "マクロ環境の変化把握",
+    "applicable_scenarios": "長期戦略策定",
+    "key_concepts": ["政治", "経済", "社会", "技術", "環境", "法的"],
+    "examples": [
+      "政治・経済情勢の変化を分析して事業リスクを評価する",
+      "社会・技術トレンドを把握して新機会を発見する",
+      "環境・法的規制の変化に対応した戦略を策定する"
+    ],
+    "practical_tips": [
+      "6つの要因を体系的に分析する",
+      "変化の方向性と速度を評価する",
+      "戦略的影響を分析する"
+    ],
+    "mechanism": "マクロ環境要因の分析による戦略的機会・脅威の特定",
+    "how_to": ["6要因分析→変化評価→戦略的影響分析"],
+    "templates": {
+      "meeting": "PESTEL分析{{pestel_analysis}}によりマクロ環境{{macro_environment}}の変化を把握",
+      "presentation": "政治{{political}}・経済{{economic}}・社会{{social}}・技術{{technological}}・環境{{environmental}}・法的{{legal}}要因{{factors}}を分析",
+      "sales": "環境変化{{environmental_changes}}に対応した戦略{{adaptive_strategy}}を提案"
+    },
+    "tags": ["経営戦略", "環境分析", "長期戦略", "リスク管理"],
+    "related_theories": ["swot_analysis", "balanced_scorecard"]
+  },
+  {
+    "id": "balanced_scorecard",
+    "name_ja": "バランススコアカード",
+    "name_en": "Balanced Scorecard (BSC)",
+    "domain": "strategy",
+    "academic_field": "経営戦略論",
+    "one_liner": "財務・顧客・業務プロセス・学習成長の4視点で評価",
+    "definition": "財務・顧客・業務プロセス・学習成長の4視点で評価",
+    "content": "戦略と業務をリンクさせる",
+    "applicable_scenarios": "経営管理",
+    "key_concepts": ["財務", "顧客", "業務プロセス", "学習成長"],
+    "examples": [
+      "4つの視点で戦略目標を設定する",
+      "各視点のKPIを設定して進捗を管理する",
+      "戦略と日常業務の連携を図る"
+    ],
+    "practical_tips": [
+      "4つの視点をバランスよく設定する",
+      "因果関係を明確にする",
+      "定期的に進捗を評価する"
+    ],
+    "mechanism": "4視点のバランスの取れた評価による戦略実行の促進",
+    "how_to": ["4視点設定→因果関係明確化→進捗評価"],
+    "templates": {
+      "meeting": "バランススコアカード{{balanced_scorecard}}により4視点{{four_perspectives}}で戦略目標{{strategic_goals}}を設定",
+      "presentation": "財務{{financial}}・顧客{{customer}}・業務プロセス{{business_process}}・学習成長{{learning_growth}}のKPI{{kpi}}を設定",
+      "team_building": "戦略{{strategy}}と日常業務{{daily_operations}}の連携{{linkage}}を強化"
+    },
+    "tags": ["経営戦略", "戦略実行", "KPI", "経営管理"],
+    "related_theories": ["pestel_analysis", "okr"]
+  },
+  {
+    "id": "okr",
+    "name_ja": "OKR",
+    "name_en": "Objectives and Key Results",
+    "domain": "strategy",
+    "academic_field": "経営戦略論",
+    "one_liner": "野心的目標と測定可能な成果指標",
+    "definition": "野心的目標と測定可能な成果指標",
+    "content": "全社の方向性と優先順位を統一",
+    "applicable_scenarios": "組織目標管理",
+    "key_concepts": ["野心的目標", "測定可能", "成果指標", "優先順位"],
+    "examples": [
+      "野心的だが達成可能な目標を設定する",
+      "定量的な成果指標で進捗を測定する",
+      "全社の方向性と優先順位を統一する"
+    ],
+    "practical_tips": [
+      "野心的だが現実的な目標を設定する",
+      "測定可能な成果指標を設定する",
+      "定期的に進捗を評価する"
+    ],
+    "mechanism": "野心的目標と測定可能な成果指標による組織の方向性統一",
+    "how_to": ["野心的目標設定→成果指標設定→進捗評価"],
+    "templates": {
+      "meeting": "OKR{{okr}}により野心的目標{{ambitious_objectives}}と測定可能な成果指標{{measurable_results}}を設定",
+      "presentation": "全社の方向性{{company_direction}}と優先順位{{priorities}}を統一した目標管理{{goal_management}}を実施",
+      "team_building": "野心的目標{{ambitious_goals}}の達成に向けた組織の方向性{{organizational_direction}}を統一"
+    },
+    "tags": ["経営戦略", "目標管理", "成果指標", "組織統一"],
+    "related_theories": ["balanced_scorecard", "goal_setting_theory"]
+  }
+]

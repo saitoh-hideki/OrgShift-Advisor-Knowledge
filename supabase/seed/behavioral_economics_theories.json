@@ -1,0 +1,622 @@
+[
+  {
+    "id": "anchoring_effect",
+    "name_ja": "アンカリング効果",
+    "name_en": "Anchoring Effect",
+    "domain": "behavioral_econ",
+    "academic_field": "行動経済学",
+    "one_liner": "冒頭の基準提示で判断の軸を作る",
+    "definition": "最初に提示された基準がその後の判断を左右する心理効果",
+    "content": "価格や条件の初提示は、その後の交渉や評価の基準点として強く影響を与える",
+    "applicable_scenarios": "価格交渉、予算策定、KPI設定",
+    "key_concepts": ["初期情報", "参照点", "判断の軸", "基準設定"],
+    "examples": [
+      "営業で最初に高額プランを提示して価格感度を下げる",
+      "会議で目標値を最初に示して議論の方向性を定める",
+      "評価面談で基準を明確にして公平性を保つ"
+    ],
+    "practical_tips": [
+      "最初に提示する基準は慎重に選ぶ",
+      "基準の根拠も同時に説明する",
+      "複数の基準を提示して比較させる"
+    ],
+    "mechanism": "初期情報が参照点として作用",
+    "how_to": ["基準→理由→比較の順で短く提示"],
+    "templates": {
+      "meeting": "基準値: {{anchor_value}}（理由: {{reason}}）を冒頭に提示して軸を固定",
+      "sales": "参考価格: {{price}}を最初に提示して価格感度を調整",
+      "presentation": "目標値: {{target}}を冒頭に示して議論の方向性を定める"
+    },
+    "tags": ["会議", "交渉", "営業", "評価"],
+    "related_theories": ["framing_effect", "loss_aversion"]
+  },
+  {
+    "id": "framing_effect",
+    "name_ja": "フレーミング効果",
+    "name_en": "Framing Effect",
+    "domain": "behavioral_econ",
+    "academic_field": "行動経済学",
+    "one_liner": "同じ事実でも見せ方で選好が変わる",
+    "definition": "同じ情報でも提示の仕方によって受け取られ方や選好が変わる",
+    "content": "利得枠と損失枠の両面から事実を提示することで意思決定をコントロールする",
+    "applicable_scenarios": "企画提案、稟議承認、営業トーク",
+    "key_concepts": ["利得枠", "損失枠", "提示方法", "意思決定コントロール"],
+    "examples": [
+      "「成功率80%」vs「失敗率20%」で印象が変わる",
+      "「コスト削減」vs「投資効果」で受け取られ方が変わる",
+      "「リスク」vs「機会」で判断が変わる"
+    ],
+    "practical_tips": [
+      "相手の関心事に合わせて枠組みを選ぶ",
+      "両面の視点を提供して公平性を示す",
+      "数値とストーリーを組み合わせる"
+    ],
+    "mechanism": "利得/損失の枠組みで判断が変化",
+    "how_to": ["相手KPI文脈で利得/損失を両面提示"],
+    "templates": {
+      "meeting": "『得: {{gain1}}, {{gain2}} / 避ける損: {{loss1}}』の両面で提示",
+      "sales": "「{{benefit}}の効果」と「{{risk}}の回避」を並列で説明",
+      "presentation": "「{{opportunity}}の機会」と「{{threat}}の脅威」を対比"
+    },
+    "tags": ["会議", "営業", "プレゼン", "提案"],
+    "related_theories": ["anchoring_effect", "prospect_theory"]
+  },
+  {
+    "id": "loss_aversion",
+    "name_ja": "損失回避",
+    "name_en": "Loss Aversion",
+    "domain": "behavioral_econ",
+    "academic_field": "行動経済学",
+    "one_liner": "導入しない損失を可視化して行動を促す",
+    "definition": "人は利益を得るより損失を避けることを優先する傾向がある",
+    "content": "未導入時の損失額を明示することで行動を促す",
+    "applicable_scenarios": "導入提案、解約抑止、業務改善",
+    "key_concepts": ["損失回避", "現状維持", "リスク回避", "行動促進"],
+    "examples": [
+      "「現状維持で年間100万円の損失」を明示",
+      "「導入しないリスク」を具体的に数値化",
+      "「機会損失」を可視化して行動を促す"
+    ],
+    "practical_tips": [
+      "損失を具体的な数値で示す",
+      "現状維持のコストを明示する",
+      "機会損失を可視化する"
+    ],
+    "mechanism": "損失の心理的重みが利得より大",
+    "how_to": ["回避できる損失→得られる利得の順で提示"],
+    "templates": {
+      "meeting": "未導入だと{{loss_metric}}で{{loss_value}}の損失見込みと提示",
+      "sales": "現状維持の年間コスト{{cost}}を明示して導入効果を強調",
+      "presentation": "「{{risk}}のリスク」と「{{solution}}の解決策」を対比"
+    },
+    "tags": ["会議", "交渉", "営業", "提案"],
+    "related_theories": ["framing_effect", "status_quo_bias"]
+  },
+  {
+    "id": "endowment_effect",
+    "name_ja": "保有効果",
+    "name_en": "Endowment Effect",
+    "domain": "behavioral_econ",
+    "academic_field": "行動経済学",
+    "one_liner": "所有しているものを過大評価し、手放しにくくなる",
+    "definition": "所有しているものを過大評価し、手放しにくくなる",
+    "content": "現状の維持コストや機会損失を数値化し、新しい選択肢の価値を比較する",
+    "applicable_scenarios": "システム刷新、契約更新交渉",
+    "key_concepts": ["所有価値", "過大評価", "手放しにくさ", "現状維持"],
+    "examples": [
+      "既存システムの維持コストを可視化",
+      "現状の機会損失を数値化",
+      "新システムの相対的価値を強調"
+    ],
+    "practical_tips": [
+      "現状のコストを具体的に示す",
+      "新選択肢の相対的価値を強調する",
+      "段階的移行のメリットを説明する"
+    ],
+    "mechanism": "所有物への心理的愛着",
+    "how_to": ["現状コスト→新選択肢価値の順で比較"],
+    "templates": {
+      "meeting": "現状維持コスト{{cost}} vs 新システム導入効果{{benefit}}",
+      "sales": "既存契約の機会損失{{loss}}を明示",
+      "presentation": "「現状の課題」と「新提案の解決策」を対比"
+    },
+    "tags": ["会議", "交渉", "システム", "契約"],
+    "related_theories": ["loss_aversion", "status_quo_bias"]
+  },
+  {
+    "id": "status_quo_bias",
+    "name_ja": "現状維持バイアス",
+    "name_en": "Status Quo Bias",
+    "domain": "behavioral_econ",
+    "academic_field": "行動経済学",
+    "one_liner": "変化より現状を選びたがる心理傾向",
+    "definition": "変化より現状を選びたがる心理傾向",
+    "content": "小さなパイロットや安全策を示すことで変化への抵抗を減らす",
+    "applicable_scenarios": "組織変革、業務プロセス改善",
+    "key_concepts": ["現状維持", "変化への抵抗", "段階的移行", "リスク軽減"],
+    "examples": [
+      "小規模パイロットから始める",
+      "段階的な移行計画を示す",
+      "安全策とロールバック案を提示"
+    ],
+    "practical_tips": [
+      "小さな変化から始める",
+      "段階的な移行計画を示す",
+      "リスク軽減策を明示する"
+    ],
+    "mechanism": "変化への不安と現状への愛着",
+    "how_to": ["小さなパイロット→段階的移行→本格導入"],
+    "templates": {
+      "meeting": "段階的移行: パイロット{{pilot}}→拡大{{expansion}}→本格導入{{full}}",
+      "sales": "リスク軽減策{{safety}}と段階的導入{{phases}}を提案",
+      "presentation": "「現状の課題」→「段階的解決策」→「最終目標」の流れ"
+    },
+    "tags": ["組織変革", "業務改善", "プロジェクト", "導入"],
+    "related_theories": ["endowment_effect", "loss_aversion"]
+  },
+  {
+    "id": "availability_heuristic",
+    "name_ja": "利用可能性ヒューリスティック",
+    "name_en": "Availability Heuristic",
+    "domain": "behavioral_econ",
+    "academic_field": "行動経済学",
+    "one_liner": "思い出しやすい情報に基づいて確率や重要度を判断する",
+    "definition": "思い出しやすい情報に基づいて確率や重要度を判断する",
+    "content": "直近の事例に偏らず、全期間のデータで判断する必要がある",
+    "applicable_scenarios": "リスク評価、事故後の対応方針",
+    "key_concepts": ["記憶の偏り", "直近事例", "統計的基準", "判断の偏り"],
+    "examples": [
+      "直近の事故データだけでなく、過去10年の統計を見る",
+      "印象的な事例だけでなく、全体の傾向を分析する",
+      "記憶に残りやすい情報の偏りを認識する"
+    ],
+    "practical_tips": [
+      "全期間のデータを収集する",
+      "統計的基準を確認する",
+      "第三者の視点を入れる"
+    ],
+    "mechanism": "記憶しやすい情報への過度な依存",
+    "how_to": ["全期間データ→統計的基準→第三者の視点"],
+    "templates": {
+      "meeting": "過去{{period}}の統計データ{{data}}で判断基準を設定",
+      "sales": "業界全体の統計{{industry_stats}}と比較して提案",
+      "presentation": "「直近の事例」と「長期的な傾向」を両方提示"
+    },
+    "tags": ["リスク評価", "意思決定", "データ分析", "判断"],
+    "related_theories": ["confirmation_bias", "representativeness_heuristic"]
+  },
+  {
+    "id": "representativeness_heuristic",
+    "name_ja": "代表性ヒューリスティック",
+    "name_en": "Representativeness Heuristic",
+    "domain": "behavioral_econ",
+    "academic_field": "行動経済学",
+    "one_liner": "外見的特徴や一部情報から全体を推測して誤る",
+    "definition": "外見的特徴や一部情報から全体を推測して誤る",
+    "content": "統計的基準（ベースレート）を確認して判断の偏りを防ぐ",
+    "applicable_scenarios": "採用面接、顧客評価",
+    "key_concepts": ["外見的特徴", "一部情報", "統計的基準", "ベースレート"],
+    "examples": [
+      "学歴だけでなく、実績やスキルを総合的に評価する",
+      "第一印象だけでなく、複数回の接触で判断する",
+      "業界の統計データと比較して評価する"
+    ],
+    "practical_tips": [
+      "複数の評価軸を設定する",
+      "統計的基準を確認する",
+      "時間をかけて総合的に判断する"
+    ],
+    "mechanism": "表面的な類似性への過度な依存",
+    "how_to": ["複数軸評価→統計的基準→総合判断"],
+    "templates": {
+      "meeting": "評価軸{{criteria}}で{{candidate}}を総合的に判断",
+      "sales": "業界統計{{stats}}と比較して顧客の特徴を分析",
+      "presentation": "「表面的な特徴」と「本質的な能力」を区別して説明"
+    },
+    "tags": ["採用", "評価", "判断", "分析"],
+    "related_theories": ["availability_heuristic", "confirmation_bias"]
+  },
+  {
+    "id": "confirmation_bias",
+    "name_ja": "確証バイアス",
+    "name_en": "Confirmation Bias",
+    "domain": "behavioral_econ",
+    "academic_field": "行動経済学",
+    "one_liner": "自分の仮説を支持する情報だけを集めやすい傾向",
+    "definition": "自分の仮説を支持する情報だけを集めやすい傾向",
+    "content": "反証情報を意図的に探し、第三者の視点を入れる",
+    "applicable_scenarios": "市場調査、企画検証",
+    "key_concepts": ["仮説支持", "情報収集の偏り", "反証情報", "第三者視点"],
+    "examples": [
+      "反対意見も積極的に収集する",
+      "第三者の視点を入れて検証する",
+      "複数の情報源から確認する"
+    ],
+    "practical_tips": [
+      "反証情報を意図的に探す",
+      "第三者の視点を入れる",
+      "複数の情報源を活用する"
+    ],
+    "mechanism": "既存の信念を強化したい心理",
+    "how_to": ["反証情報収集→第三者視点→複数情報源確認"],
+    "templates": {
+      "meeting": "反対意見{{opposition}}も含めて総合的に検討",
+      "sales": "第三者の視点{{third_party}}で提案内容を検証",
+      "presentation": "「賛成意見」と「反対意見」を両方提示"
+    },
+    "tags": ["調査", "検証", "意思決定", "分析"],
+    "related_theories": ["availability_heuristic", "representativeness_heuristic"]
+  },
+  {
+    "id": "sunk_cost_fallacy",
+    "name_ja": "サンクコスト効果",
+    "name_en": "Sunk Cost Fallacy",
+    "domain": "behavioral_econ",
+    "academic_field": "行動経済学",
+    "one_liner": "回収不能な過去投資を理由に意思決定を変えられない",
+    "definition": "回収不能な過去投資を理由に意思決定を変えられない",
+    "content": "未来の価値だけで判断し、撤退基準を事前に設定する",
+    "applicable_scenarios": "不採算事業の撤退判断",
+    "key_concepts": ["過去投資", "回収不能", "未来価値", "撤退基準"],
+    "examples": [
+      "過去の投資額は考慮せず、将来の収益性で判断する",
+      "撤退基準を事前に設定する",
+      "機会コストを考慮する"
+    ],
+    "practical_tips": [
+      "過去投資は考慮しない",
+      "撤退基準を事前に設定する",
+      "機会コストを計算する"
+    ],
+    "mechanism": "過去投資への心理的執着",
+    "how_to": ["未来価値評価→撤退基準確認→機会コスト計算"],
+    "templates": {
+      "meeting": "将来の収益性{{future_profit}}で判断、過去投資は除外",
+      "sales": "撤退基準{{exit_criteria}}を事前に設定",
+      "presentation": "「過去の投資」と「将来の価値」を分けて説明"
+    },
+    "tags": ["投資判断", "撤退判断", "意思決定", "プロジェクト"],
+    "related_theories": ["loss_aversion", "status_quo_bias"]
+  },
+  {
+    "id": "prospect_theory",
+    "name_ja": "プロスペクト理論",
+    "name_en": "Prospect Theory",
+    "domain": "behavioral_econ",
+    "academic_field": "行動経済学",
+    "one_liner": "価値評価は参照点に依存し、損失は利得より重く感じられる",
+    "definition": "価値評価は参照点に依存し、損失は利得より重く感じられる",
+    "content": "参照点を明示し、損失と利得を別枠で設計する",
+    "applicable_scenarios": "価格戦略、インセンティブ設計",
+    "key_concepts": ["参照点", "価値評価", "損失回避", "利得追求"],
+    "examples": [
+      "参照点を明確にして価値評価の基準を示す",
+      "損失と利得を別枠で提示する",
+      "リスクの異なる選択肢を比較する"
+    ],
+    "practical_tips": [
+      "参照点を明確にする",
+      "損失と利得を分けて提示する",
+      "リスクの異なる選択肢を提供する"
+    ],
+    "mechanism": "参照点依存の価値評価",
+    "how_to": ["参照点設定→損失利得分離→リスク選択肢提供"],
+    "templates": {
+      "meeting": "参照点{{reference}}を設定して価値評価の基準を明確化",
+      "sales": "損失{{loss}}と利得{{gain}}を別枠で提示",
+      "presentation": "「安全な選択」と「リスクのある選択」を比較"
+    },
+    "tags": ["価格戦略", "インセンティブ", "意思決定", "リスク"],
+    "related_theories": ["framing_effect", "loss_aversion"]
+  },
+  {
+    "id": "probability_weighting",
+    "name_ja": "確率加重",
+    "name_en": "Probability Weighting",
+    "domain": "behavioral_econ",
+    "academic_field": "行動経済学",
+    "one_liner": "低確率や高確率の事象を実際以上に評価してしまう傾向",
+    "definition": "低確率や高確率の事象を実際以上に評価してしまう傾向",
+    "content": "発生頻度を視覚化して直感的に理解させる",
+    "applicable_scenarios": "保証サービス設計、リスク説明",
+    "key_concepts": ["確率評価", "低確率", "高確率", "視覚化"],
+    "examples": [
+      "確率を視覚的に表現する",
+      "実際の発生頻度を比較する",
+      "直感的に理解しやすい形で説明する"
+    ],
+    "practical_tips": [
+      "確率を視覚化する",
+      "実際の発生頻度と比較する",
+      "直感的に理解しやすくする"
+    ],
+    "mechanism": "確率の直感的理解の困難さ",
+    "how_to": ["確率視覚化→発生頻度比較→直感的理解促進"],
+    "templates": {
+      "meeting": "確率{{probability}}を視覚的に表現して理解を促進",
+      "sales": "実際の発生頻度{{frequency}}と比較して説明",
+      "presentation": "「理論的な確率」と「実際の発生頻度」を対比"
+    },
+    "tags": ["確率", "リスク", "説明", "理解"],
+    "related_theories": ["prospect_theory", "availability_heuristic"]
+  },
+  {
+    "id": "mental_accounting",
+    "name_ja": "メンタルアカウンティング",
+    "name_en": "Mental Accounting",
+    "domain": "behavioral_econ",
+    "academic_field": "行動経済学",
+    "one_liner": "お金を用途別に心の中で分けて管理する傾向",
+    "definition": "お金を用途別に心の中で分けて管理する傾向",
+    "content": "費目別の価値訴求や分割払いで心理的負担を軽減する",
+    "applicable_scenarios": "価格パッケージ設計、販売促進",
+    "key_concepts": ["用途別管理", "費目分け", "心理的負担", "価値訴求"],
+    "examples": [
+      "用途別に価格を分けて提示する",
+      "分割払いで心理的負担を軽減する",
+      "費目別の価値を強調する"
+    ],
+    "practical_tips": [
+      "用途別に価格を分ける",
+      "分割払いを提案する",
+      "費目別の価値を強調する"
+    ],
+    "mechanism": "心理的な費目分けによる負担軽減",
+    "how_to": ["用途別価格設定→分割払い提案→費目別価値強調"],
+    "templates": {
+      "meeting": "用途別価格{{usage_price}}で心理的負担を軽減",
+      "sales": "分割払い{{installment}}で購入しやすくする",
+      "presentation": "「初期費用」と「運用費用」を分けて説明"
+    },
+    "tags": ["価格設定", "販売促進", "心理的負担", "価値訴求"],
+    "related_theories": ["framing_effect", "loss_aversion"]
+  },
+  {
+    "id": "hyperbolic_discounting",
+    "name_ja": "双曲割引",
+    "name_en": "Hyperbolic Discounting",
+    "domain": "behavioral_econ",
+    "academic_field": "行動経済学",
+    "one_liner": "将来の利益より目先の利益を過大評価する",
+    "definition": "将来の利益より目先の利益を過大評価する",
+    "content": "短期の中間報酬やマイルストーンで長期施策を維持させる",
+    "applicable_scenarios": "長期契約継続、学習プログラム",
+    "key_concepts": ["時間割引", "短期利益", "長期利益", "中間報酬"],
+    "examples": [
+      "短期の中間報酬を設定する",
+      "マイルストーンで進捗を可視化する",
+      "長期の価値を段階的に示す"
+    ],
+    "practical_tips": [
+      "短期の中間報酬を設定する",
+      "マイルストーンで進捗を可視化する",
+      "長期の価値を段階的に示す"
+    ],
+    "mechanism": "時間による価値評価の非線形性",
+    "how_to": ["短期報酬設定→マイルストーン可視化→長期価値段階提示"],
+    "templates": {
+      "meeting": "短期目標{{short_goal}}と長期目標{{long_goal}}を段階的に設定",
+      "sales": "中間報酬{{intermediate_reward}}で長期契約を維持",
+      "presentation": "「短期の成果」と「長期の価値」を段階的に説明"
+    },
+    "tags": ["長期計画", "継続", "動機付け", "目標設定"],
+    "related_theories": ["loss_aversion", "status_quo_bias"]
+  },
+  {
+    "id": "paradox_of_choice",
+    "name_ja": "選択肢過多",
+    "name_en": "Paradox of Choice",
+    "domain": "behavioral_econ",
+    "academic_field": "行動経済学",
+    "one_liner": "選択肢が多いと意思決定が遅れ、満足度も下がる",
+    "definition": "選択肢が多いと意思決定が遅れ、満足度も下がる",
+    "content": "推奨案を明示し、選択肢を3つ程度に絞る",
+    "applicable_scenarios": "商品ラインナップ、料金プラン設計",
+    "key_concepts": ["選択肢数", "意思決定遅延", "満足度", "推奨案"],
+    "examples": [
+      "選択肢を3つ程度に絞る",
+      "推奨案を明示する",
+      "比較しやすい形で提示する"
+    ],
+    "practical_tips": [
+      "選択肢を3つ程度に絞る",
+      "推奨案を明示する",
+      "比較しやすい形で提示する"
+    ],
+    "mechanism": "選択肢過多による認知負荷の増大",
+    "how_to": ["選択肢絞り込み→推奨案明示→比較しやすく提示"],
+    "templates": {
+      "meeting": "選択肢を3つ{{option1}}, {{option2}}, {{option3}}に絞って検討",
+      "sales": "推奨プラン{{recommended}}を明示して選択を促進",
+      "presentation": "「基本プラン」「標準プラン」「プレミアムプラン」で比較"
+    },
+    "tags": ["選択", "意思決定", "商品設計", "プラン設計"],
+    "related_theories": ["framing_effect", "anchoring_effect"]
+  },
+  {
+    "id": "decoy_effect",
+    "name_ja": "デコイ効果",
+    "name_en": "Decoy Effect",
+    "domain": "behavioral_econ",
+    "academic_field": "行動経済学",
+    "one_liner": "劣る第三案が特定案の魅力を引き立てる",
+    "definition": "劣る第三案が特定案の魅力を引き立てる",
+    "content": "中間プランや狙いのプランを選ばせやすくする価格設計",
+    "applicable_scenarios": "価格戦略、販売促進",
+    "key_concepts": ["第三案", "比較優位", "価格設計", "選択誘導"],
+    "examples": [
+      "中間プランを狙いの選択肢にする",
+      "比較優位を明確にする",
+      "価格差を適切に設定する"
+    ],
+    "practical_tips": [
+      "中間プランを狙いの選択肢にする",
+      "比較優位を明確にする",
+      "価格差を適切に設定する"
+    ],
+    "mechanism": "比較による相対的価値評価",
+    "how_to": ["中間プラン設定→比較優位明確化→価格差適正化"],
+    "templates": {
+      "meeting": "3つの選択肢{{option1}}, {{option2}}, {{option3}}で中間案を推奨",
+      "sales": "中間プラン{{middle_plan}}の比較優位を強調",
+      "presentation": "「基本」「標準」「プレミアム」で標準プランを推奨"
+    },
+    "tags": ["価格戦略", "販売促進", "選択誘導", "比較"],
+    "related_theories": ["paradox_of_choice", "framing_effect"]
+  },
+  {
+    "id": "scarcity_effect",
+    "name_ja": "希少性効果",
+    "name_en": "Scarcity Effect",
+    "domain": "behavioral_econ",
+    "academic_field": "行動経済学",
+    "one_liner": "限定や希少性が価値認知を高める",
+    "definition": "限定や希少性が価値認知を高める",
+    "content": "本当の限定条件を明示し、期限や数量を明確化する",
+    "applicable_scenarios": "キャンペーン、先着特典",
+    "key_concepts": ["希少性", "限定", "価値認知", "緊急性"],
+    "examples": [
+      "本当の限定条件を明示する",
+      "期限や数量を明確化する",
+      "緊急性を強調する"
+    ],
+    "practical_tips": [
+      "本当の限定条件を明示する",
+      "期限や数量を明確化する",
+      "緊急性を強調する"
+    ],
+    "mechanism": "希少性による価値の過大評価",
+    "how_to": ["限定条件明示→期限数量明確化→緊急性強調"],
+    "templates": {
+      "meeting": "限定期間{{limited_period}}で緊急性を強調",
+      "sales": "先着{{limited_number}}名様限定で希少性を訴求",
+      "presentation": "「期間限定」「数量限定」で価値を強調"
+    },
+    "tags": ["キャンペーン", "限定", "希少性", "緊急性"],
+    "related_theories": ["loss_aversion", "framing_effect"]
+  },
+  {
+    "id": "social_proof",
+    "name_ja": "社会的証明",
+    "name_en": "Social Proof",
+    "domain": "behavioral_econ",
+    "academic_field": "行動経済学",
+    "one_liner": "類似事例の提示で不確実性を下げる",
+    "definition": "他者の行動や事例が意思決定を後押しする",
+    "content": "類似条件の成功事例と定量結果を提示する",
+    "applicable_scenarios": "新規提案、導入推進",
+    "key_concepts": ["他者行動", "事例", "不確実性", "信頼性"],
+    "examples": [
+      "類似条件の成功事例を提示する",
+      "定量結果を示す",
+      "信頼性の高い情報源を使う"
+    ],
+    "practical_tips": [
+      "類似条件の事例を選ぶ",
+      "定量結果を示す",
+      "信頼性の高い情報源を使う"
+    ],
+    "mechanism": "他者の行動を参照",
+    "how_to": ["類似事例収集→定量結果確認→信頼性高い情報源選択"],
+    "templates": {
+      "meeting": "同業の{{peer}}で{{metric}}が{{delta}}改善と提示",
+      "sales": "類似企業{{similar_company}}の成功事例{{success_case}}を紹介",
+      "presentation": "「業界事例」と「定量効果」を並列で説明"
+    },
+    "tags": ["営業", "会議", "事例", "信頼性"],
+    "related_theories": ["framing_effect", "anchoring_effect"]
+  },
+  {
+    "id": "reciprocity",
+    "name_ja": "返報性の原理",
+    "name_en": "Reciprocity",
+    "domain": "behavioral_econ",
+    "academic_field": "行動経済学",
+    "one_liner": "先に価値提供を受けると返そうとする心理",
+    "definition": "先に価値提供を受けると返そうとする心理",
+    "content": "相手固有の価値提供を先に行う",
+    "applicable_scenarios": "初回接触、関係構築",
+    "key_concepts": ["価値提供", "返報", "関係構築", "信頼"],
+    "examples": [
+      "相手固有の価値を先に提供する",
+      "無償のサービスを提供する",
+      "長期的な関係を重視する"
+    ],
+    "practical_tips": [
+      "相手固有の価値を先に提供する",
+      "無償のサービスを提供する",
+      "長期的な関係を重視する"
+    ],
+    "mechanism": "受けた恩への返報心理",
+    "how_to": ["相手固有価値先提供→無償サービス提供→長期的関係重視"],
+    "templates": {
+      "meeting": "相手の課題{{challenge}}に対する無償アドバイス{{free_advice}}を提供",
+      "sales": "業界レポート{{industry_report}}を無償で提供",
+      "presentation": "「無償の価値提供」と「長期的な関係構築」を説明"
+    },
+    "tags": ["関係構築", "信頼", "価値提供", "長期的関係"],
+    "related_theories": ["social_proof", "commitment_consistency"]
+  },
+  {
+    "id": "commitment_consistency",
+    "name_ja": "一貫性の原理",
+    "name_en": "Commitment & Consistency",
+    "domain": "behavioral_econ",
+    "academic_field": "行動経済学",
+    "one_liner": "過去の言動と整合的に行動したくなる傾向",
+    "definition": "過去の言動と整合的に行動したくなる傾向",
+    "content": "小さな合意から積み重ね、次の行動に接続する",
+    "applicable_scenarios": "契約プロセス、教育研修",
+    "key_concepts": ["一貫性", "合意", "積み重ね", "行動接続"],
+    "examples": [
+      "小さな合意から始める",
+      "段階的に合意を積み重ねる",
+      "次の行動に自然に接続する"
+    ],
+    "practical_tips": [
+      "小さな合意から始める",
+      "段階的に合意を積み重ねる",
+      "次の行動に自然に接続する"
+    ],
+    "mechanism": "自己イメージの一貫性維持",
+    "how_to": ["小さな合意→段階的積み重ね→次の行動接続"],
+    "templates": {
+      "meeting": "小さな合意{{small_agreement}}から始めて段階的に積み重ね",
+      "sales": "段階的な合意{{step_agreement}}で契約プロセスを進める",
+      "presentation": "「小さな合意」→「段階的積み重ね」→「最終目標」の流れ"
+    },
+    "tags": ["契約", "教育", "合意", "段階的進行"],
+    "related_theories": ["reciprocity", "social_proof"]
+  },
+  {
+    "id": "peak_end_rule",
+    "name_ja": "ピーク・エンドの法則",
+    "name_en": "Peak–End Rule",
+    "domain": "behavioral_econ",
+    "academic_field": "行動経済学",
+    "one_liner": "体験はピークと終わりで評価されやすい",
+    "definition": "体験はピークと終わりで評価されやすい",
+    "content": "最も印象的な瞬間と終了時を設計する",
+    "applicable_scenarios": "顧客体験設計、会議・プレゼンの締め",
+    "key_concepts": ["ピーク体験", "終了時", "印象", "評価"],
+    "examples": [
+      "最も印象的な瞬間を設計する",
+      "終了時を印象的に締めくくる",
+      "全体の流れを考慮する"
+    ],
+    "practical_tips": [
+      "最も印象的な瞬間を設計する",
+      "終了時を印象的に締めくくる",
+      "全体の流れを考慮する"
+    ],
+    "mechanism": "ピークと終了時の記憶への偏重",
+    "how_to": ["ピーク体験設計→終了時印象化→全体流れ考慮"],
+    "templates": {
+      "meeting": "最も印象的な瞬間{{peak_moment}}と印象的な締め{{ending}}を設計",
+      "sales": "デモンストレーション{{demo}}のピークと締めを重視",
+      "presentation": "「最も印象的なポイント」と「印象的な締め」を設計"
+    },
+    "tags": ["体験設計", "印象", "評価", "記憶"],
+    "related_theories": ["framing_effect", "anchoring_effect"]
+  }
+]
