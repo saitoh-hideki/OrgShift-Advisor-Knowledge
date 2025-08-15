@@ -1,6 +1,6 @@
 // 認証なしで理論詳細を取得するエッジファンクション
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { adminClient } from "../_shared/client.ts"
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -35,11 +35,21 @@ serve(async (req) => {
       })
     }
 
-    // Supabaseクライアントを作成（認証なし）
-    const supabaseUrl = Deno.env.get('SUPABASE_URL') || 'https://eqiqthlfjcbyqfudziar.supabase.co'
-    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVxaXF0aGxmamNieXFmdWR6aWFyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ5NzI5NzQsImV4cCI6MjA1MDU0ODk3NH0.Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8'
-    
-    const supabase = createClient(supabaseUrl, supabaseAnonKey)
+    // Supabaseクライアントを作成
+    let supabase;
+    try {
+      supabase = adminClient();
+      console.log('Supabase client created successfully');
+    } catch (clientError) {
+      console.error('Failed to create Supabase client:', clientError);
+      return new Response(JSON.stringify({ 
+        error: 'Failed to initialize database connection',
+        details: clientError.message 
+      }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
     
     // データベースから理論を検索
     const { data: theory, error } = await supabase

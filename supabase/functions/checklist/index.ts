@@ -1,6 +1,7 @@
 // 状況に応じた最適なチェックリストを生成するEdge Function（ルーター）
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { generateAIAdvice, type AIContext } from "../_shared/ai-utils.ts"
+import { adminClient, diagnoseEnvironment } from "../_shared/client.ts"
 
 interface ChecklistRequest {
   scene: string;
@@ -33,6 +34,17 @@ serve(async (req) => {
   if (req.method !== "POST") return new Response("Method Not Allowed", { status: 405 })
   
   try {
+    console.log('Checklist function called with method:', req.method);
+    console.log('Request URL:', req.url);
+    
+    // 環境変数の診断
+    const envDiagnosis = diagnoseEnvironment();
+    console.log('Environment diagnosis:', envDiagnosis);
+    
+    if (!envDiagnosis.OPENAI_API_KEY) {
+      console.warn('OpenAI API key not configured, using fallback checklist');
+    }
+    
     const body: ChecklistRequest = await req.json()
     console.log('Checklist request received:', body);
     
@@ -68,11 +80,12 @@ serve(async (req) => {
       });
     } catch (error) {
       console.error("Specialist checklist failed:", error);
-      // 専門関数が失敗した場合は汎用AIを使用
-      const genericChecklist = await generateGenericChecklist(context, body.additional_context);
-      console.log('Using generic checklist:', genericChecklist);
       
-      return new Response(JSON.stringify(genericChecklist), {
+      // 専門関数が失敗した場合は、直接フォールバックチェックリストを使用
+      console.log("Using fallback checklist due to specialist failure");
+      const fallbackChecklist = generateFallbackChecklist(context);
+      
+      return new Response(JSON.stringify(fallbackChecklist), {
         headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
       });
     }
@@ -100,9 +113,20 @@ async function routeToSpecialistChecklist(scene: string, context: AIContext, add
   if (specialistUrl) {
     try {
       console.log(`Routing to specialist checklist: ${scene}`);
+      // 環境変数から直接認証情報を取得
+      const supabaseUrl = Deno.env.get('SUPABASE_URL');
+      const supabaseServiceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+      
+      if (!supabaseServiceRoleKey) {
+        console.error('SUPABASE_SERVICE_ROLE_KEY not configured');
+        throw new Error('SUPABASE_SERVICE_ROLE_KEY not configured');
+      }
+      
       const response = await fetch(specialistUrl, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify({
           scene: context.scene,
           goal: context.goal,
@@ -110,7 +134,26 @@ async function routeToSpecialistChecklist(scene: string, context: AIContext, add
           stakes: context.stakes,
           participants: context.participants,
           relationship: context.relationship,
-          additional_context: additionalContext
+          additional_context: additionalContext,
+          // シーン別関数で必要な追加フィールド
+          meeting_type: "定例会議", // デフォルト値
+          participants_count: context.participants || 2,
+          participant_roles: context.relationship ? [context.relationship] : ["参加者"],
+          meeting_format: "対面", // デフォルト値
+          // 他のシーン用のフィールドも追加
+          customer_type: "既存顧客",
+          industry: "IT",
+          customer_position: "担当者",
+          company_size: "中小企業",
+          sales_stage: "提案",
+          presentation_purpose: "情報共有",
+          audience_type: "社内",
+          presentation_format: "対面",
+          interview_type: "1on1",
+          interview_purpose: "進捗確認",
+          team_building_type: "チーム強化",
+          team_maturity: "成長期",
+          team_context: "プロジェクト進行中"
         })
       });
       
@@ -119,6 +162,13 @@ async function routeToSpecialistChecklist(scene: string, context: AIContext, add
         return data;
       } else {
         console.error(`Specialist checklist ${scene} failed with status:`, response.status);
+        
+        // 認証エラー（401）の場合は、フォールバックチェックリストを使用
+        if (response.status === 401) {
+          console.log(`Authentication failed for ${scene}, using fallback checklist`);
+          throw new Error('Authentication failed, using fallback');
+        }
+        
         throw new Error(`Specialist checklist failed with status: ${response.status}`);
       }
     } catch (error) {

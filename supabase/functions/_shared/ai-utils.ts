@@ -29,10 +29,13 @@ export async function generateAIAdvice(
   const openaiApiKey = Deno.env.get("OPENAI_API_KEY")
   
   if (!openaiApiKey) {
+    console.error("OpenAI API key not configured");
     throw new Error("OpenAI API key not configured")
   }
 
   try {
+    console.log("Calling OpenAI API with prompt length:", prompt.length);
+    
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -57,19 +60,26 @@ export async function generateAIAdvice(
     })
 
     if (!response.ok) {
-      throw new Error(`OpenAI API error: ${response.status}`)
+      const errorText = await response.text();
+      console.error(`OpenAI API error: ${response.status} - ${errorText}`);
+      throw new Error(`OpenAI API error: ${response.status} - ${errorText}`)
     }
 
     const data = await response.json()
     const content = data.choices[0].message.content
     
+    console.log("OpenAI response received, content length:", content.length);
+    
     // JSONレスポンスを抽出
     const jsonMatch = content.match(/\{[\s\S]*\}/)
     if (!jsonMatch) {
+      console.error("Failed to parse AI response, content:", content.substring(0, 200));
       throw new Error("Failed to parse AI response")
     }
     
     const aiResponse = JSON.parse(jsonMatch[0])
+    console.log("Parsed AI response structure:", Object.keys(aiResponse));
+    
     return aiResponse.advices || []
   } catch (error) {
     console.error("AI generation error:", error)

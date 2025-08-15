@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { adminClient } from "../_shared/client.ts"
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -34,25 +34,17 @@ serve(async (req) => {
     console.log('Recent-advices function called with method:', req.method);
     
     // Supabaseクライアントの作成
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
-    
-    console.log('Environment variables check:', {
-      hasUrl: !!supabaseUrl,
-      hasKey: !!supabaseServiceKey,
-      urlLength: supabaseUrl?.length || 0,
-      keyLength: supabaseServiceKey?.length || 0
-    });
-    
-    if (!supabaseUrl || !supabaseServiceKey) {
-      console.error('Missing environment variables:', { supabaseUrl, supabaseServiceKey });
+    let supabase;
+    try {
+      supabase = adminClient();
+      console.log('Supabase client created successfully');
+    } catch (clientError) {
+      console.error('Failed to create Supabase client:', clientError);
       return new Response(
-        JSON.stringify({ error: 'Missing environment variables' }),
+        JSON.stringify({ error: 'Failed to initialize database connection', details: clientError.message }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
-    
-    const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
     // プロトタイプ版: 認証なしで固定ユーザーIDを使用
     const prototypeUserId = '00000000-0000-0000-0000-000000000000'
@@ -67,7 +59,7 @@ serve(async (req) => {
         const { error: deleteExistingError } = await supabase
           .from('recent_advices')
           .delete()
-          .eq('user_id', prototypeUserId)
+          .is('user_id', null)
           .eq('theory_id', payload.theory_id)
 
         if (deleteExistingError) {
@@ -78,8 +70,22 @@ serve(async (req) => {
         const { data: newAdvice, error: insertError } = await supabase
           .from('recent_advices')
           .insert({
-            user_id: prototypeUserId,
-            ...payload
+            user_id: null, // 外部キー制約を回避
+            scene_id: payload.scene_id,
+            goal: payload.goal,
+            time_limit: payload.time_limit,
+            stakes: payload.stakes,
+            participants: payload.participants,
+            relationship: payload.relationship,
+            theory_id: payload.theory_id,
+            short_advice: payload.short_advice,
+            expected_effect: payload.expected_effect,
+            caution: payload.caution,
+            tips: payload.tips,
+            related_theory: payload.related_theory,
+            implementation_steps: payload.implementation_steps,
+            success_indicators: payload.success_indicators,
+            common_mistakes: payload.common_mistakes
           })
           .select()
           .single()

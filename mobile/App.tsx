@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -38,6 +38,8 @@ interface Theory {
   key_concepts: string[];
   when_to_use: string[];
   examples: string[];
+  practical_tips?: string[];
+  academic_field?: string;
   related_theories?: Array<{
     id: string;
     name: string;
@@ -69,7 +71,7 @@ export default function App() {
   const [goal, setGoal] = useState<string>('');
   const [timeLimit, setTimeLimit] = useState<string>('');
   const [stakes, setStakes] = useState<string>('');
-  const [participants, setParticipants] = useState<number>(2);
+  const [participants, setParticipants] = useState<number>(0);
   const [relationship, setRelationship] = useState<string>('');
   // 理論詳細用の状態
   const [selectedTheoryId, setSelectedTheoryId] = useState<string>('');
@@ -123,11 +125,18 @@ export default function App() {
   const [recentAdvices, setRecentAdvices] = useState<RecentAdvice[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
+  // ScrollViewのref
+  const adviceScrollViewRef = useRef<ScrollView>(null);
+  const theoryScrollViewRef = useRef<ScrollView>(null);
+
   // 最近使用したアドバイスを保存
   const saveRecentAdvice = async (advice: Advice) => {
     try {
+      // 元のtheory_idを使用して一意性を保つ
+      const theoryId = advice.theory_id || `advice_${Date.now()}_${Math.random()}`;
+      
       const newRecentAdvice: RecentAdvice = {
-        id: Date.now().toString(),
+        id: theoryId,
         scene,
         goal,
         timeLimit,
@@ -138,9 +147,9 @@ export default function App() {
         timestamp: new Date()
       };
 
-      // ローカル状態を更新
+      // ローカル状態を更新（theory_idベースで重複チェック）
       setRecentAdvices(prev => {
-        const filtered = prev.filter(ra => ra.advice.theory_id !== advice.theory_id);
+        const filtered = prev.filter(ra => ra.advice.theory_id !== theoryId);
         return [newRecentAdvice, ...filtered].slice(0, 10); // 最新10件を保持
       });
 
@@ -152,7 +161,7 @@ export default function App() {
         stakes,
         participants,
         relationship,
-        theory_id: advice.theory_id,
+        theory_id: theoryId, // 元のtheory_idを使用
         short_advice: advice.short_advice,
         expected_effect: advice.expected_effect,
         caution: advice.caution,
@@ -212,32 +221,38 @@ export default function App() {
             },
             timestamp: new Date(dbAdvice.created_at)
           }));
-          
           setRecentAdvices(loadedAdvices);
-          console.log('Recent advices loaded from database:', loadedAdvices.length);
         }
       } catch (error) {
-        console.error('Failed to load recent advices from database:', error);
-        
-        // エラーの詳細をログに出力
-        if (error instanceof Error) {
-          console.error('Error details:', {
-            message: error.message,
-            stack: error.stack,
-            name: error.name
-          });
-        }
-        
-        // データベースからの読み込みに失敗してもアプリは動作する
-        // ただし、開発時には詳細なエラー情報を表示
-        if (__DEV__) {
-          console.warn('Development mode: Recent advices load failed, but app continues to work');
-        }
+        console.error('Failed to load recent advices:', error);
       }
     };
 
     loadRecentAdvices();
   }, []);
+
+  // AIアドバイザー画面に移動した時にスクロール位置をリセット
+  useEffect(() => {
+    if (currentView === 'advices') {
+      // 画面が表示された時に一番上から表示されるようにする
+      setTimeout(() => {
+        adviceScrollViewRef.current?.scrollTo({ y: 0, animated: true });
+      }, 100);
+    }
+  }, [currentView]);
+
+  // 理論表示画面に移動した時にスクロール位置をリセット
+  useEffect(() => {
+    if (currentView === 'theory') {
+      // 画面が表示された時に一番上から表示されるようにする
+      setTimeout(() => {
+        // 理論表示のScrollViewを一番上にスクロール
+        if (theoryScrollViewRef.current) {
+          theoryScrollViewRef.current.scrollTo({ y: 0, animated: true });
+        }
+      }, 100);
+    }
+  }, [currentView]);
 
   // アドバイスを取得
   const getAdvice = async () => {
@@ -290,7 +305,7 @@ export default function App() {
         if (interviewRelationship) payload.interview_relationship = interviewRelationship;
         if (interviewContext) payload.interview_context = interviewContext;
         if (interviewOutcomes) payload.interview_outcomes = interviewOutcomes;
-      } else if (scene === 'team_building') {
+      } else if (scene === 'team-building') {
         if (teamBuildingType) payload.team_building_type = teamBuildingType;
         if (teamMaturity) payload.team_maturity = teamMaturity;
         if (teamContext) payload.team_context = teamContext;
@@ -308,8 +323,18 @@ export default function App() {
       if (response.advices && response.advices.length > 0) {
         setAdvices(response.advices);
         setCurrentView('advices');
-        // 最初のアドバイスを最近使用に保存
-        saveRecentAdvice(response.advices[0]);
+        // 全てのアドバイスを最近使用に保存（重複を防ぎながら）
+        const savePromises = response.advices.map(async (advice: Advice) => {
+          try {
+            await saveRecentAdvice(advice);
+          } catch (error) {
+            console.error(`Failed to save advice ${advice.theory_id}:`, error);
+          }
+        });
+        
+        // 並行して保存を実行
+        await Promise.all(savePromises);
+        console.log(`Saved ${response.advices.length} advices to recent advices`);
       } else {
         console.warn('No advices in response:', response);
         Alert.alert('エラー', 'アドバイスが見つかりませんでした');
@@ -366,46 +391,93 @@ export default function App() {
       
       console.log('getRelatedTheories response:', response);
       
-      if (response.related_theories) {
+      if (response.related_theories && response.related_theories.length > 0) {
         console.log('Setting related theories:', response.related_theories);
+        
+        // 一番上の理論をメインとして表示し、関連理論も含める
+        const topTheory = response.related_theories[0];
+        console.log('Top theory to display:', topTheory);
+        
         setCurrentTheory({
           id: 'related_theories',
-          name: '関連理論',
-          description: response.summary || 'アドバイスに関連する理論を表示します',
-          key_concepts: [],
-          when_to_use: [],
-          examples: [],
-          related_theories: response.related_theories
+          name: topTheory.name || '関連理論',
+          description: topTheory.description || '理論の説明がありません',
+          key_concepts: topTheory.key_concepts || [],
+          when_to_use: topTheory.when_to_use || [],
+          examples: topTheory.examples || [],
+          practical_tips: topTheory.practical_tips || [],
+          academic_field: topTheory.academic_field || '理論',
+          related_theories: response.related_theories // 関連理論も含める
         });
         setCurrentView('theory');
       } else {
-        console.log('No related theories found, falling back to single theory');
-        // 従来の方法で理論を取得
-        const theoryResponse = await api.getTheory(advice.theory_id);
-        setCurrentTheory(theoryResponse);
-        setCurrentView('theory');
+        console.log('No related theories found, showing single theory');
+        // 単一の理論を表示
+        await showSingleTheory(advice);
       }
     } catch (error) {
       console.error('Error getting related theories:', error);
-      console.error('Error details:', {
-        message: error instanceof Error ? error.message : 'Unknown error',
-        stack: error instanceof Error ? error.stack : undefined,
-        name: error instanceof Error ? error.name : 'Unknown'
-      });
       
-      // フォールバック: 従来の方法で理論を取得
+      // エラーの詳細をログに出力
+      if (error instanceof Error) {
+        console.error('Error details:', {
+          message: error.message,
+          stack: error.stack,
+          name: error.name
+        });
+      }
+      
+      // フォールバック: 単一の理論を表示
       try {
-        console.log('Attempting fallback to single theory fetch');
-        const theoryResponse = await api.getTheory(advice.theory_id);
-        setCurrentTheory(theoryResponse);
-        setCurrentView('theory');
+        console.log('Attempting fallback to single theory display');
+        await showSingleTheory(advice);
       } catch (fallbackError) {
-        console.error('Fallback theory fetch also failed:', fallbackError);
-        Alert.alert('エラー', '理論の取得に失敗しました');
+        console.error('Fallback theory display also failed:', fallbackError);
+        Alert.alert('エラー', '理論の表示に失敗しました。しばらく時間をおいて再度お試しください。');
       }
     } finally {
       setIsLoadingTheory(false);
     }
+  };
+
+  // 単一の理論を表示する関数
+  const showSingleTheory = async (advice: Advice) => {
+    try {
+      if (advice.theory_id) {
+        // theory_idがある場合は、その理論の詳細を表示
+        const theoryResponse = await api.getTheory(advice.theory_id);
+        if (theoryResponse) {
+          setCurrentTheory(theoryResponse);
+          setCurrentView('theory');
+        } else {
+          // 理論が見つからない場合は、アドバイス内容を理論として表示
+          showAdviceAsTheory(advice);
+        }
+      } else {
+        // theory_idがない場合は、アドバイス内容を理論として表示
+        showAdviceAsTheory(advice);
+      }
+    } catch (error) {
+      console.error('Error showing single theory:', error);
+      // エラーが発生した場合は、アドバイス内容を理論として表示
+      showAdviceAsTheory(advice);
+    }
+  };
+
+  // アドバイス内容を理論として表示する関数
+  const showAdviceAsTheory = (advice: Advice) => {
+    const theoryData = {
+      id: 'advice_theory',
+      name: 'アドバイス理論',
+      description: advice.short_advice,
+      key_concepts: [advice.expected_effect],
+      when_to_use: [scene, goal],
+      examples: [advice.short_advice],
+      related_theories: []
+    };
+    
+    setCurrentTheory(theoryData);
+    setCurrentView('theory');
   };
 
   // アドバイス内容から一意のIDを生成する関数
@@ -435,7 +507,7 @@ export default function App() {
     setGoal(recentAdvice.goal);
     setTimeLimit(recentAdvice.timeLimit);
     setStakes(recentAdvice.stakes);
-    setParticipants(recentAdvice.participants || 2);
+    setParticipants(recentAdvice.participants || 0); // 0をデフォルト値に変更
     setRelationship(recentAdvice.relationship || '');
     setAdvices([recentAdvice.advice]);
     setCurrentView('advices');
@@ -443,6 +515,13 @@ export default function App() {
 
   // シーン固有の詳細設定をリセット
   const resetSceneDetails = () => {
+    // 基本設定をリセット
+    setGoal('');
+    setTimeLimit('');
+    setStakes('');
+    setParticipants(0); // 0に設定して選択状態を解除
+    setRelationship('');
+    
     // 会議・ミーティング用
     setMeetingType('');
     setMeetingFormat('');
@@ -488,8 +567,12 @@ export default function App() {
 
   // シーン変更時に詳細設定をリセット
   const handleSceneChange = (newScene: string) => {
-    setScene(newScene);
-    resetSceneDetails();
+    // 現在のシーンと異なる場合のみリセット
+    if (newScene !== scene) {
+      setScene(newScene);
+      resetSceneDetails();
+      console.log(`Scene changed to ${newScene}, all settings reset`);
+    }
     setCurrentView('input');
   };
 
@@ -801,10 +884,144 @@ export default function App() {
             <Text style={styles.inputHeaderTitle}>{sceneConfig.name}</Text>
           </View>
 
-          {/* シーン固有の詳細設定 */}
+          {/* 基本設定（上に配置） */}
+          <View style={styles.basicSection}>
+            <Text style={styles.basicSectionTitle}>基本設定</Text>
+            
+            <View style={styles.inputRow}>
+              <Text style={styles.inputLabel}>目標:</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                <View style={styles.optionsContainer}>
+                  {sceneConfig.goals.map((goalOption) => (
+                    <TouchableOpacity
+                      key={goalOption}
+                      style={[
+                        styles.optionButton,
+                        goal === goalOption && styles.selectedOption
+                      ]}
+                      onPress={() => setGoal(goalOption)}
+                    >
+                      <Text style={[
+                        styles.optionText,
+                        goal === goalOption && styles.selectedOptionText
+                      ]}>
+                        {goalOption}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </ScrollView>
+            </View>
+
+            <View style={styles.inputRow}>
+              <Text style={styles.inputLabel}>時間制限:</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                <View style={styles.optionsContainer}>
+                  {sceneConfig.timeLimits.map((timeOption) => (
+                    <TouchableOpacity
+                      key={timeOption}
+                      style={[
+                        styles.optionButton,
+                        timeLimit === timeOption && styles.selectedOption
+                      ]}
+                      onPress={() => setTimeLimit(timeOption)}
+                    >
+                      <Text style={[
+                        styles.optionText,
+                        timeLimit === timeOption && styles.selectedOptionText
+                      ]}>
+                        {timeOption}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </ScrollView>
+            </View>
+
+            <View style={styles.inputRow}>
+              <Text style={styles.inputLabel}>重要度:</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                <View style={styles.optionsContainer}>
+                  {sceneConfig.stakes.map((stakesOption) => (
+                    <TouchableOpacity
+                      key={stakesOption}
+                      style={[
+                        styles.optionButton,
+                        stakes === stakesOption && styles.selectedOption
+                      ]}
+                      onPress={() => setStakes(stakesOption)}
+                    >
+                      <Text style={[
+                        styles.optionText,
+                        stakes === stakesOption && styles.selectedOptionText
+                      ]}>
+                        {stakesOption}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </ScrollView>
+            </View>
+
+            {sceneConfig.participants && (
+              <View style={styles.inputRow}>
+                <Text style={styles.inputLabel}>参加者数:</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  <View style={styles.optionsContainer}>
+                    {sceneConfig.participants.map((participantOption) => (
+                      <TouchableOpacity
+                        key={participantOption}
+                        style={[
+                          styles.optionButton,
+                          participants === participantOption && participants !== 0 && styles.selectedOption
+                        ]}
+                        onPress={() => setParticipants(participantOption)}
+                      >
+                        <Text style={[
+                          styles.optionText,
+                          participants === participantOption && participants !== 0 && styles.selectedOptionText
+                        ]}>
+                          {participantOption}人
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </ScrollView>
+              </View>
+            )}
+
+            {sceneConfig.relationships && (
+              <View style={styles.inputRow}>
+                <Text style={styles.inputLabel}>関係性:</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  <View style={styles.optionsContainer}>
+                    {sceneConfig.relationships.map((relationshipOption) => (
+                      <TouchableOpacity
+                        key={relationshipOption}
+                        style={[
+                          styles.optionButton,
+                          relationship === relationshipOption && styles.selectedOption
+                        ]}
+                        onPress={() => setRelationship(relationshipOption)}
+                      >
+                        <Text style={[
+                          styles.optionText,
+                          relationship === relationshipOption && styles.selectedOptionText
+                        ]}>
+                          {relationshipOption}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </ScrollView>
+              </View>
+            )}
+          </View>
+
+          {/* シーン固有の詳細設定（下に配置） */}
           {scene === 'meeting' && (
             <View style={styles.detailSection}>
-              <Text style={styles.detailSectionTitle}>会議の詳細</Text>
+              <Text style={styles.detailSectionTitle}>会議の詳細設定</Text>
               
               {/* 会議の種類 */}
               <View style={styles.detailRow}>
@@ -992,7 +1209,7 @@ export default function App() {
 
           {scene === 'sales' && (
             <View style={styles.detailSection}>
-              <Text style={styles.detailSectionTitle}>営業の詳細</Text>
+              <Text style={styles.detailSectionTitle}>営業の詳細設定</Text>
               
               {/* 顧客タイプ */}
               <View style={styles.detailRow}>
@@ -1206,7 +1423,7 @@ export default function App() {
 
           {scene === 'presentation' && (
             <View style={styles.detailSection}>
-              <Text style={styles.detailSectionTitle}>プレゼンテーションの詳細</Text>
+              <Text style={styles.detailSectionTitle}>プレゼンテーションの詳細設定</Text>
               
               {/* プレゼンテーションの目的 */}
               <View style={styles.detailRow}>
@@ -1368,7 +1585,7 @@ export default function App() {
 
           {scene === 'interview' && (
             <View style={styles.detailSection}>
-              <Text style={styles.detailSectionTitle}>面談の詳細</Text>
+              <Text style={styles.detailSectionTitle}>面談の詳細設定</Text>
               
               {/* 面談の種類 */}
               <View style={styles.detailRow}>
@@ -1502,9 +1719,9 @@ export default function App() {
             </View>
           )}
 
-          {scene === 'team_building' && (
+          {scene === 'team-building' && (
             <View style={styles.detailSection}>
-              <Text style={styles.detailSectionTitle}>チーム構築の詳細</Text>
+              <Text style={styles.detailSectionTitle}>チーム構築の詳細設定</Text>
               
               {/* チーム構築の種類 */}
               <View style={styles.detailRow}>
@@ -1668,140 +1885,6 @@ export default function App() {
             </View>
           )}
 
-          {/* 基本設定 */}
-          <View style={styles.basicSection}>
-            <Text style={styles.basicSectionTitle}>基本設定</Text>
-            
-            <View style={styles.inputRow}>
-              <Text style={styles.inputLabel}>目標:</Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                <View style={styles.optionsContainer}>
-                  {sceneConfig.goals.map((goalOption) => (
-                    <TouchableOpacity
-                      key={goalOption}
-                      style={[
-                        styles.optionButton,
-                        goal === goalOption && styles.selectedOption
-                      ]}
-                      onPress={() => setGoal(goalOption)}
-                    >
-                      <Text style={[
-                        styles.optionText,
-                        goal === goalOption && styles.selectedOptionText
-                      ]}>
-                        {goalOption}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              </ScrollView>
-            </View>
-
-            <View style={styles.inputRow}>
-              <Text style={styles.inputLabel}>時間制限:</Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                <View style={styles.optionsContainer}>
-                  {sceneConfig.timeLimits.map((timeOption) => (
-                    <TouchableOpacity
-                      key={timeOption}
-                      style={[
-                        styles.optionButton,
-                        timeLimit === timeOption && styles.selectedOption
-                      ]}
-                      onPress={() => setTimeLimit(timeOption)}
-                    >
-                      <Text style={[
-                        styles.optionText,
-                        timeLimit === timeOption && styles.selectedOptionText
-                      ]}>
-                        {timeOption}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              </ScrollView>
-            </View>
-
-            <View style={styles.inputRow}>
-              <Text style={styles.inputLabel}>重要度:</Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                <View style={styles.optionsContainer}>
-                  {sceneConfig.stakes.map((stakesOption) => (
-                    <TouchableOpacity
-                      key={stakesOption}
-                      style={[
-                        styles.optionButton,
-                        stakes === stakesOption && styles.selectedOption
-                      ]}
-                      onPress={() => setStakes(stakesOption)}
-                    >
-                      <Text style={[
-                        styles.optionText,
-                        stakes === stakesOption && styles.selectedOptionText
-                      ]}>
-                        {stakesOption}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              </ScrollView>
-            </View>
-
-            {sceneConfig.participants && (
-              <View style={styles.inputRow}>
-                <Text style={styles.inputLabel}>参加者数:</Text>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                  <View style={styles.optionsContainer}>
-                    {sceneConfig.participants.map((participantOption) => (
-                      <TouchableOpacity
-                        key={participantOption}
-                        style={[
-                          styles.optionButton,
-                          participants === participantOption && styles.selectedOption
-                        ]}
-                        onPress={() => setParticipants(participantOption)}
-                      >
-                        <Text style={[
-                          styles.optionText,
-                          participants === participantOption && styles.selectedOptionText
-                        ]}>
-                          {participantOption}人
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-                </ScrollView>
-              </View>
-            )}
-
-            {sceneConfig.relationships && (
-              <View style={styles.inputRow}>
-                <Text style={styles.inputLabel}>関係性:</Text>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                  <View style={styles.optionsContainer}>
-                    {sceneConfig.relationships.map((relationshipOption) => (
-                      <TouchableOpacity
-                        key={relationshipOption}
-                        style={[
-                          styles.optionButton,
-                          relationship === relationshipOption && styles.selectedOption
-                        ]}
-                        onPress={() => setRelationship(relationshipOption)}
-                      >
-                        <Text style={[
-                          styles.optionText,
-                          relationship === relationshipOption && styles.selectedOptionText
-                        ]}>
-                          {relationshipOption}
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-                </ScrollView>
-              </View>
-            )}
-          </View>
-
           {/* アクションボタン */}
           <View style={styles.actionButtons}>
             <TouchableOpacity
@@ -1831,7 +1914,14 @@ export default function App() {
   // アドバイス表示画面
   const renderAdvices = () => (
     <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        style={styles.scrollView} 
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.adviceScrollContent}
+        automaticallyAdjustContentInsets={false}
+        contentInsetAdjustmentBehavior="never"
+        ref={adviceScrollViewRef}
+      >
         <View style={styles.adviceHeader}>
           <TouchableOpacity
             style={styles.backButton}
@@ -1847,8 +1937,12 @@ export default function App() {
             <Text style={styles.adviceTitle}>アドバイス {index + 1}</Text>
             <Text style={styles.adviceText}>{advice.short_advice}</Text>
             
-            <Text style={styles.adviceSubtitle}>期待される効果</Text>
-            <Text style={styles.adviceDescription}>{advice.expected_effect}</Text>
+            {advice.expected_effect && (
+              <>
+                <Text style={styles.adviceSubtitle}>期待される効果</Text>
+                <Text style={styles.adviceDescription}>{advice.expected_effect}</Text>
+              </>
+            )}
             
             {advice.implementation_steps && advice.implementation_steps.length > 0 && (
               <>
@@ -1918,25 +2012,81 @@ export default function App() {
             </View>
           </View>
         ))}
+
+        {/* エラーが発生した場合の表示 */}
+        {advices.length === 0 && (
+          <View style={styles.noAdviceContainer}>
+            <Text style={styles.noAdviceText}>アドバイスが表示されていません</Text>
+            <Text style={styles.noAdviceSubtext}>シーンと目標を選択して、再度アドバイスを取得してください</Text>
+            <TouchableOpacity
+              style={styles.retryButton}
+              onPress={() => setCurrentView('input')}
+            >
+              <Text style={styles.retryButtonText}>入力画面に戻る</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
 
   // 理論表示画面
   const renderTheory = () => {
-    if (!currentTheory) return null;
+    if (!currentTheory) {
+      return (
+        <SafeAreaView style={styles.container}>
+          <ScrollView 
+            style={styles.scrollView} 
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.adviceScrollContent}
+            automaticallyAdjustContentInsets={false}
+            contentInsetAdjustmentBehavior="never"
+          >
+            <View style={styles.adviceHeader}>
+              <TouchableOpacity
+                style={styles.backButton}
+                onPress={() => setCurrentView('advices')}
+              >
+                <Text style={styles.backButtonText}>← 戻る</Text>
+              </TouchableOpacity>
+              <Text style={styles.adviceHeaderTitle}>理論</Text>
+            </View>
+            
+            <View style={styles.errorContainer}>
+              <Text style={styles.errorText}>理論データが見つかりませんでした</Text>
+              <TouchableOpacity
+                style={styles.retryButton}
+                onPress={() => setCurrentView('advices')}
+              >
+                <Text style={styles.retryButtonText}>アドバイス画面に戻る</Text>
+              </TouchableOpacity>
+            </View>
+          </ScrollView>
+        </SafeAreaView>
+      );
+    }
 
     return (
       <SafeAreaView style={styles.container}>
-        <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-          <View style={styles.theoryHeader}>
+        <ScrollView 
+          ref={theoryScrollViewRef}
+          style={styles.scrollView} 
+          contentContainerStyle={styles.adviceScrollContent}
+          showsVerticalScrollIndicator={false}
+          automaticallyAdjustContentInsets={false}
+          contentInsetAdjustmentBehavior="never"
+          contentOffset={{ x: 0, y: 0 }}
+        >
+          <View style={[styles.adviceHeader, { marginTop: 0, paddingTop: 0 }]}>
             <TouchableOpacity
               style={styles.backButton}
               onPress={() => setCurrentView('advices')}
             >
               <Text style={styles.backButtonText}>← 戻る</Text>
             </TouchableOpacity>
-            <Text style={styles.theoryHeaderTitle}>関連理論</Text>
+            <Text style={styles.adviceHeaderTitle}>
+              {currentTheory.name || '関連理論'}
+            </Text>
           </View>
 
           {isLoadingTheory ? (
@@ -1946,90 +2096,103 @@ export default function App() {
               <Text style={styles.loadingSubtext}>しばらくお待ちください</Text>
             </View>
           ) : (
-            <View style={styles.theoryCard}>
-              {/* 関連理論がある場合は最初に表示 */}
-              {currentTheory.related_theories && currentTheory.related_theories.length > 0 ? (
+            <>
+              <View style={styles.adviceCard}>
+                {/* メインの理論（一番上）を表示 */}
+                <Text style={styles.adviceTitle}>メイン理論</Text>
+                <Text style={styles.adviceText}>
+                  {currentTheory.description || '理論の説明がありません'}
+                </Text>
+                  
+                {currentTheory.key_concepts && currentTheory.key_concepts.length > 0 && (
+                  <>
+                    <Text style={styles.adviceSubtitle}>主要概念</Text>
+                    {currentTheory.key_concepts.map((concept, conceptIndex) => (
+                      <Text key={conceptIndex} style={styles.adviceStep}>• {concept}</Text>
+                    ))}
+                  </>
+                )}
+                
+                {currentTheory.when_to_use && currentTheory.when_to_use.length > 0 && (
+                  <>
+                    <Text style={styles.adviceSubtitle}>使用場面</Text>
+                    {currentTheory.when_to_use.map((use, useIndex) => (
+                      <Text key={useIndex} style={styles.adviceStep}>• {use}</Text>
+                    ))}
+                  </>
+                )}
+                
+                {currentTheory.examples && currentTheory.examples.length > 0 && (
+                  <>
+                    <Text style={styles.adviceSubtitle}>具体例</Text>
+                    {currentTheory.examples.map((example, exampleIndex) => (
+                      <Text key={exampleIndex} style={styles.adviceStep}>• {example}</Text>
+                    ))}
+                  </>
+                )}
+                
+                {currentTheory.practical_tips && currentTheory.practical_tips.length > 0 && (
+                  <>
+                    <Text style={styles.adviceSubtitle}>実践のコツ</Text>
+                    {currentTheory.practical_tips.map((tip, tipIndex) => (
+                      <Text key={tipIndex} style={styles.adviceStep}>• {tip}</Text>
+                    ))}
+                  </>
+                )}
+              </View>
+
+              {/* 関連理論がある場合はリストアップ */}
+              {currentTheory.related_theories && currentTheory.related_theories.length > 1 && (
                 <>
-                  <Text style={styles.theorySubtitle}>関連理論</Text>
-                  {currentTheory.related_theories.map((theory, index) => (
-                    <View key={index} style={styles.relatedTheoryCard}>
-                      <Text style={styles.relatedTheoryTitle}>{theory.name}</Text>
-                      <View style={styles.theoryMeta}>
-                        <Text style={styles.theoryAcademicField}>{theory.academic_field}</Text>
-                      </View>
-                      <Text style={styles.relatedTheoryDescription}>{theory.description}</Text>
+                  {currentTheory.related_theories.slice(1).map((theory, index) => (
+                    <View key={index} style={styles.adviceCard}>
+                      <Text style={styles.adviceTitle}>
+                        {theory.name || `理論 ${index + 2}`}
+                      </Text>
+                      <Text style={styles.adviceText}>
+                        {theory.description || '理論の説明がありません'}
+                      </Text>
                       
                       {theory.key_concepts && theory.key_concepts.length > 0 && (
                         <>
-                          <Text style={styles.relatedTheorySubtitle}>主要概念</Text>
+                          <Text style={styles.adviceSubtitle}>主要概念</Text>
                           {theory.key_concepts.map((concept, conceptIndex) => (
-                            <Text key={conceptIndex} style={styles.relatedTheoryConcept}>• {concept}</Text>
+                            <Text key={conceptIndex} style={styles.adviceStep}>• {concept}</Text>
                           ))}
                         </>
                       )}
                       
                       {theory.when_to_use && theory.when_to_use.length > 0 && (
                         <>
-                          <Text style={styles.relatedTheorySubtitle}>使用場面</Text>
+                          <Text style={styles.adviceSubtitle}>使用場面</Text>
                           {theory.when_to_use.map((use, useIndex) => (
-                            <Text key={useIndex} style={styles.theoryUse}>• {use}</Text>
+                            <Text key={useIndex} style={styles.adviceStep}>• {use}</Text>
                           ))}
                         </>
                       )}
                       
                       {theory.examples && theory.examples.length > 0 && (
                         <>
-                          <Text style={styles.theorySubtitle}>具体例</Text>
+                          <Text style={styles.adviceSubtitle}>具体例</Text>
                           {theory.examples.map((example, exampleIndex) => (
-                            <Text key={exampleIndex} style={styles.theoryExample}>• {example}</Text>
+                            <Text key={exampleIndex} style={styles.adviceStep}>• {example}</Text>
                           ))}
                         </>
                       )}
                       
                       {theory.practical_tips && theory.practical_tips.length > 0 && (
                         <>
-                          <Text style={styles.relatedTheorySubtitle}>実践のコツ</Text>
+                          <Text style={styles.adviceSubtitle}>実践のコツ</Text>
                           {theory.practical_tips.map((tip, tipIndex) => (
-                            <Text key={tipIndex} style={styles.relatedTheoryTip}>• {tip}</Text>
+                            <Text key={tipIndex} style={styles.adviceStep}>• {tip}</Text>
                           ))}
                         </>
                       )}
                     </View>
                   ))}
                 </>
-              ) : (
-                <>
-                  <Text style={styles.theoryDescription}>{currentTheory.description}</Text>
-                  
-                  {currentTheory.key_concepts && currentTheory.key_concepts.length > 0 && (
-                    <>
-                      <Text style={styles.theorySubtitle}>主要概念</Text>
-                      {currentTheory.key_concepts.map((concept, index) => (
-                        <Text key={index} style={styles.theoryConcept}>• {concept}</Text>
-                      ))}
-                    </>
-                  )}
-                  
-                  {currentTheory.when_to_use && currentTheory.when_to_use.length > 0 && (
-                    <>
-                      <Text style={styles.theorySubtitle}>使用場面</Text>
-                      {currentTheory.when_to_use.map((use, index) => (
-                        <Text key={index} style={styles.theoryUse}>• {use}</Text>
-                      ))}
-                    </>
-                  )}
-                  
-                  {currentTheory.examples && currentTheory.examples.length > 0 && (
-                    <>
-                      <Text style={styles.theorySubtitle}>具体例</Text>
-                      {currentTheory.examples.map((example, index) => (
-                        <Text key={index} style={styles.theoryExample}>• {example}</Text>
-                      ))}
-                    </>
-                  )}
-                </>
               )}
-            </View>
+            </>
           )}
         </ScrollView>
       </SafeAreaView>
@@ -2038,26 +2201,76 @@ export default function App() {
 
   // 理論詳細を表示
   const showTheoryDetail = async (theoryId: string) => {
-    setSelectedTheoryId(theoryId);
-    setCurrentView('theoryDetail');
+    console.log('showTheoryDetail called with theoryId:', theoryId);
     setIsLoadingTheory(true);
     
-    // シンプルな理論情報を直接設定（API呼び出しなし）
-    const theoryInfo = getTheoryInfo(theoryId);
-    setSelectedTheoryData(theoryInfo);
-    setIsLoadingTheory(false);
+    try {
+      // エッジファンクションから理論詳細を取得
+      const response = await fetch('https://eqiqthlfjcbyqfudziar.supabase.co/functions/v1/theory-detail', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ theory_id: theoryId })
+      });
+
+      if (response.ok) {
+        const theoryData = await response.json();
+        console.log('Theory data fetched from API:', theoryData);
+        setSelectedTheoryData(theoryData);
+        setCurrentView('theoryDetail'); // 理論詳細画面に移動
+      } else {
+        console.error('Failed to fetch theory data from API:', response.status);
+        // フォールバック: ハードコードされた情報を使用
+        const theoryInfo = await getTheoryInfo(theoryId);
+        setSelectedTheoryData(theoryInfo);
+        setCurrentView('theoryDetail'); // 理論詳細画面に移動
+      }
+    } catch (error) {
+      console.error('Error fetching theory data from API:', error);
+      // フォールバック: ハードコードされた情報を使用
+      const theoryInfo = await getTheoryInfo(theoryId);
+      setSelectedTheoryData(theoryInfo);
+      setCurrentView('theoryDetail'); // 理論詳細画面に移動
+    } finally {
+      setIsLoadingTheory(false);
+    }
   };
 
   // 理論IDから基本情報を取得する関数
-  const getTheoryInfo = (theoryId: string) => {
+  const getTheoryInfo = async (theoryId: string) => {
+    try {
+      // エッジファンクションから理論詳細を取得
+      const response = await fetch('https://eqiqthlfjcbyqfudziar.supabase.co/functions/v1/theory-detail', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ theory_id: theoryId })
+      });
+
+      if (response.ok) {
+        const theoryData = await response.json();
+        console.log('Theory data fetched:', theoryData);
+        return theoryData;
+      } else {
+        console.error('Failed to fetch theory data:', response.status);
+        // フォールバック: ハードコードされた情報を使用
+        return getFallbackTheoryInfo(theoryId);
+      }
+    } catch (error) {
+      console.error('Error fetching theory data:', error);
+      // フォールバック: ハードコードされた情報を使用
+      return getFallbackTheoryInfo(theoryId);
+    }
+  };
+
+  // フォールバック用の理論情報（ハードコード）
+  const getFallbackTheoryInfo = (theoryId: string) => {
     const theoryMap: { [key: string]: any } = {
       'anchoring_effect': {
         name_ja: 'アンカリング効果',
         name_en: 'Anchoring Effect',
         academic_field: '行動経済学',
-        one_liner: '最初に提示された基準がその後の判断を左右する心理効果',
-        definition: '価格や条件の初提示は、その後の交渉や評価の基準点として強く影響を与える',
-        content: '人間の意思決定において、最初に提示された情報（アンカー）が基準となり、その後の判断に大きな影響を与える現象です。',
+        one_liner: '冒頭の基準提示で判断の軸を作る',
+        definition: '最初に提示された基準がその後の判断を左右する心理効果',
+        content: '価格や条件の初提示は、その後の交渉や評価の基準点として強く影響を与える',
         applicable_scenarios: ['価格交渉', '予算策定', 'KPI設定', '評価面談'],
         key_concepts: ['基準点の設定', '比較効果', '認知バイアス', '意思決定の歪み'],
         practical_tips: ['複数の選択肢を同時提示', '客観的な基準を事前に設定', 'アンカーの影響を認識する'],
@@ -2067,9 +2280,9 @@ export default function App() {
         name_ja: 'フレーミング効果',
         name_en: 'Framing Effect',
         academic_field: '行動経済学',
-        one_liner: '同じ情報でも提示の仕方によって受け取られ方や選好が変わる',
-        definition: '利得枠と損失枠の両面から事実を提示することで意思決定をコントロールする',
-        content: '同じ内容の情報でも、どのように表現するかによって受け手の印象や選択が大きく変わる現象です。',
+        one_liner: '同じ事実でも見せ方で選好が変わる',
+        definition: '同じ情報でも提示の仕方によって受け取られ方や選好が変わる',
+        content: '利得枠と損失枠の両面から事実を提示することで意思決定をコントロールする',
         applicable_scenarios: ['企画提案', '稟議承認', '営業トーク', '変更提案'],
         key_concepts: ['表現方法', '認知フレーム', '意思決定バイアス', 'コミュニケーション効果'],
         practical_tips: ['ポジティブな表現を心がける', '具体的な数値を示す', '相手の立場に立って表現する'],
@@ -2079,9 +2292,9 @@ export default function App() {
         name_ja: '損失回避',
         name_en: 'Loss Aversion',
         academic_field: '行動経済学',
-        one_liner: '人は利益を得るより損失を避けることを優先する傾向がある',
-        definition: '未導入時の損失額を明示することで行動を促す',
-        content: '人間は利益を得ることよりも、損失を避けることを強く求める心理的傾向があります。',
+        one_liner: '導入しない損失を可視化して行動を促す',
+        definition: '人は利益を得るより損失を避けることを優先する傾向がある',
+        content: '未導入時の損失額を明示することで行動を促す',
         applicable_scenarios: ['導入提案', '解約抑止', '業務改善', '変更推進'],
         key_concepts: ['損失の重み', '利益の軽視', '現状維持バイアス', 'リスク回避'],
         practical_tips: ['損失の具体的な金額を示す', '現状維持のコストを明示', '段階的な改善を提案'],
@@ -2884,7 +3097,9 @@ const styles = StyleSheet.create({
   theoryHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 20,
+    paddingHorizontal: 20,
+    paddingTop: 10,
+    paddingBottom: 10,
     backgroundColor: '#fff',
     borderBottomWidth: 1,
     borderBottomColor: '#e9ecef',
@@ -2896,7 +3111,9 @@ const styles = StyleSheet.create({
   },
   theoryCard: {
     backgroundColor: '#fff',
-    margin: 20,
+    marginHorizontal: 20,
+    marginTop: 0,
+    marginBottom: 20,
     padding: 20,
     borderRadius: 12,
     shadowColor: '#000',
@@ -3124,6 +3341,12 @@ const styles = StyleSheet.create({
   },
   theoryScrollContent: {
     paddingHorizontal: 20,
+    paddingTop: 0,
+  },
+  theoryContainer: {
+    flex: 1,
+    backgroundColor: '#f8f9fa',
+    paddingTop: 0,
   },
   theoryDetailHeader: {
     flexDirection: 'row',
@@ -3331,5 +3554,61 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#6c757d',
     textAlign: 'right',
+  },
+  adviceScrollContent: {
+    paddingHorizontal: 20,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 40,
+  },
+  errorText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#212529',
+    marginTop: 16,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  retryButton: {
+    backgroundColor: '#007bff',
+    borderRadius: 12,
+    padding: 16,
+    alignItems: 'center',
+  },
+  retryButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#fff',
+  },
+  noAdviceContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 40,
+  },
+  noAdviceText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#212529',
+    marginTop: 16,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  noAdviceSubtext: {
+    fontSize: 14,
+    color: '#6c757d',
+    textAlign: 'center',
+  },
+  mainTheoryCard: {
+    marginBottom: 20,
+  },
+  mainTheoryTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#212529',
+    marginBottom: 8,
   },
 });

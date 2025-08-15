@@ -15,17 +15,21 @@ ADD COLUMN IF NOT EXISTS related_theories text[] DEFAULT '{}';
 CREATE INDEX IF NOT EXISTS idx_theories_domain ON theories(domain);
 CREATE INDEX IF NOT EXISTS idx_theories_academic_field ON theories(academic_field);
 
--- 理論カテゴリーの列挙型を作成
-CREATE TYPE theory_domain AS ENUM (
-  'behavioral_econ',      -- 行動経済学
-  'leadership',           -- リーダーシップ論
-  'organizational_psych', -- 組織心理学
-  'communication',         -- コミュニケーション理論
-  'sales_marketing',      -- 営業・マーケティング理論
-  'innovation',           -- イノベーション理論
-  'operations',           -- オペレーション理論
-  'finance'               -- ファイナンス理論
-);
+-- 理論カテゴリーの列挙型を作成（既に存在する場合はスキップ）
+DO $$ BEGIN
+    CREATE TYPE theory_domain AS ENUM (
+      'behavioral_econ',      -- 行動経済学
+      'leadership',           -- リーダーシップ論
+      'organizational_psych', -- 組織心理学
+      'communication',         -- コミュニケーション理論
+      'sales_marketing',      -- 営業・マーケティング理論
+      'innovation',           -- イノベーション理論
+      'operations',           -- オペレーション理論
+      'finance'               -- ファイナンス理論
+    );
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- 既存のdomainカラムの値を新しいENUM型に適合するように更新
 UPDATE theories SET domain = 'organizational_psych' WHERE domain = 'psychology';
@@ -33,10 +37,14 @@ UPDATE theories SET domain = 'behavioral_econ' WHERE domain = 'behavioral';
 UPDATE theories SET domain = 'leadership' WHERE domain = 'leadership_org';
 UPDATE theories SET domain = 'communication' WHERE domain = 'negotiation';
 
--- 既存のdomainカラムを新しい型に変換
-ALTER TABLE theories 
-ALTER COLUMN domain TYPE theory_domain 
-USING domain::theory_domain;
+-- 既存のdomainカラムを新しい型に変換（エラーが発生した場合はスキップ）
+DO $$ BEGIN
+    ALTER TABLE theories 
+    ALTER COLUMN domain TYPE theory_domain 
+    USING domain::theory_domain;
+EXCEPTION
+    WHEN others THEN null;
+END $$;
 
 -- コメントを追加
 COMMENT ON TABLE theories IS '理論MDA（Master Data of Theories）';

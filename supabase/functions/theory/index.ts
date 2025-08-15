@@ -1,6 +1,6 @@
 // アドバイスに関連する理論をデータベースから選択して表示する機能
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { adminClient } from "../_shared/client.ts"
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -31,7 +31,7 @@ interface TheoryCard {
   academic_field?: string;
 }
 
-// アドバイス内容に基づいて理論を選択する関数
+// アドバイス内容を詳細分析して理論を選択する関数
 async function selectTheoriesForAdvice(
   adviceContext: string, 
   scene: string, 
@@ -39,181 +39,355 @@ async function selectTheoriesForAdvice(
   shortAdvice: string,
   adviceId?: string
 ): Promise<any> {
-  // Supabaseクライアントを作成（認証なし）
-  const supabaseUrl = Deno.env.get('SUPABASE_URL') || 'https://eqiqthlfjcbyqfudziar.supabase.co'
-  const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVxaXF0aGxmamNieXFmdWR6aWFyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ5NzI5NzQsImV4cCI6MjA1MDU0ODk3NH0.Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8'
-  
-  const sb = createClient(supabaseUrl, supabaseAnonKey)
-  
-  // アドバイスIDがある場合は、それに基づいて理論を選択
-  if (adviceId) {
-    console.log('Selecting theories based on advice ID:', adviceId);
-    
-    // アドバイスIDのハッシュ値を使用して理論を選択（一貫性を保つ）
-    const hash = simpleHash(adviceId);
-    const selectedTheories = await selectTheoriesByHash(hash, sb);
-    
-    return {
-      related_theories: selectedTheories,
-      summary: `アドバイスID ${adviceId} に基づいて選択された理論です。これらの理論を組み合わせることで、アドバイスの効果を最大化できます。`,
-      selection_method: "advice_id_based"
-    };
+  // Supabaseクライアントを作成
+  let sb;
+  try {
+    sb = adminClient();
+    console.log('Supabase client created successfully');
+  } catch (clientError) {
+    console.error('Failed to create Supabase client:', clientError);
+    throw new Error('Failed to initialize database connection');
   }
   
-  // アドバイス内容に基づいて理論を選択
-  console.log('Selecting theories based on advice content');
+  console.log('Analyzing advice content for theory selection...');
+  console.log('Scene:', scene);
+  console.log('Goal:', goal);
+  console.log('Short Advice:', shortAdvice);
+  console.log('Advice Context:', adviceContext);
   
-  // シーンと目標に基づいて理論ドメインを決定
-  const domain = determineDomainByScene(scene, goal);
+  // アドバイス内容の詳細分析
+  const analysis = analyzeAdviceContent(shortAdvice, adviceContext, scene, goal);
+  console.log('Advice analysis result:', analysis);
   
-  // アドバイス内容のキーワードを抽出
-  const keywords = extractKeywords(shortAdvice, adviceContext);
-  
-  // 理論を選択
-  const selectedTheories = await selectTheoriesByContent(domain, keywords, sb);
+  // 分析結果に基づいて理論を選択
+  const selectedTheories = await selectTheoriesByAnalysis(analysis, sb);
   
   return {
     related_theories: selectedTheories,
-    summary: `シーン「${scene}」と目標「${goal}」に基づいて選択された理論です。アドバイス内容「${shortAdvice}」に関連する理論を組み合わせることで、効果を最大化できます。`,
-    selection_method: "content_based"
+    summary: `アドバイス「${shortAdvice}」の内容を詳細分析し、最も関連性の高い理論を選択しました。`,
+    selection_method: "content_analysis_based",
+    analysis_summary: analysis
   };
 }
 
-// アドバイスIDのハッシュ値を使用して理論を選択（一貫性を保つ）
-async function selectTheoriesByHash(hash: number, sb: any): Promise<any[]> {
-  // ハッシュ値に基づいて理論を選択
-  const { data: theories, error } = await sb
-    .from("theories")
-    .select("*")
-    .limit(100);
+// アドバイス内容の詳細分析
+function analyzeAdviceContent(shortAdvice: string, context: string, scene: string, goal: string) {
+  const analysis: {
+    primary_intent: string;
+    communication_style: string;
+    leadership_aspects: string[];
+    psychological_factors: string[];
+    practical_approaches: string[];
+    keywords: string[];
+    complexity_level: string;
+    urgency_level: string;
+    target_audience: string;
+    success_metrics: string[];
+  } = {
+    primary_intent: '',           // 主要な意図
+    communication_style: '',      // コミュニケーションスタイル
+    leadership_aspects: [],       // リーダーシップ要素
+    psychological_factors: [],    // 心理的要素
+    practical_approaches: [],     // 実践的アプローチ
+    keywords: [],                 // 重要なキーワード
+    complexity_level: '',         // 複雑さレベル
+    urgency_level: '',           // 緊急度レベル
+    target_audience: '',         // 対象者
+    success_metrics: []           // 成功指標
+  };
   
-  if (error || !theories) {
-    console.error('Error fetching theories:', error);
-    return [];
+  // アドバイステキストの詳細分析
+  const fullText = `${shortAdvice} ${context}`.toLowerCase();
+  
+  // 主要な意図の特定
+  if (fullText.includes('説得') || fullText.includes('persuade') || fullText.includes('convince')) {
+    analysis.primary_intent = 'persuasion';
+  } else if (fullText.includes('合意') || fullText.includes('consensus') || fullText.includes('agreement')) {
+    analysis.primary_intent = 'consensus_building';
+  } else if (fullText.includes('改善') || fullText.includes('improve') || fullText.includes('enhance')) {
+    analysis.primary_intent = 'improvement';
+  } else if (fullText.includes('解決') || fullText.includes('solve') || fullText.includes('resolve')) {
+    analysis.primary_intent = 'problem_solving';
+  } else if (fullText.includes('動機') || fullText.includes('motivate') || fullText.includes('inspire')) {
+    analysis.primary_intent = 'motivation';
+  } else {
+    analysis.primary_intent = 'general_guidance';
   }
   
-  // ハッシュ値を使用して理論を選択（一貫性を保つ）
-  const selectedIndices = [
-    hash % theories.length,
-    (hash * 2) % theories.length,
-    (hash * 3) % theories.length
-  ];
+  // コミュニケーションスタイルの特定
+  if (fullText.includes('積極的') || fullText.includes('assertive') || fullText.includes('direct')) {
+    analysis.communication_style = 'assertive';
+  } else if (fullText.includes('共感的') || fullText.includes('empathetic') || fullText.includes('understanding')) {
+    analysis.communication_style = 'empathetic';
+  } else if (fullText.includes('論理的') || fullText.includes('logical') || fullText.includes('rational')) {
+    analysis.communication_style = 'logical';
+  } else if (fullText.includes('創造的') || fullText.includes('creative') || fullText.includes('innovative')) {
+    analysis.communication_style = 'creative';
+  } else {
+    analysis.communication_style = 'balanced';
+  }
   
-  const selectedTheories = selectedIndices.map(index => {
-    const theory = theories[index];
-    return {
-      id: theory.id,
-      name: theory.name_ja || theory.name_en,
-      description: theory.definition || theory.content || theory.one_liner,
-      relevance: `${theory.academic_field}の観点から、このアドバイスの実践を支援します`,
-      academic_field: theory.academic_field,
-      key_concepts: theory.key_concepts || [],
-      when_to_use: theory.applicable_scenarios ? [theory.applicable_scenarios] : [],
-      examples: theory.examples || [],
-      practical_tips: theory.practical_tips || []
-    };
-  });
+  // リーダーシップ要素の抽出
+  if (fullText.includes('リーダー') || fullText.includes('leader') || fullText.includes('指導')) {
+    analysis.leadership_aspects.push('leadership');
+  }
+  if (fullText.includes('チーム') || fullText.includes('team') || fullText.includes('協力')) {
+    analysis.leadership_aspects.push('team_management');
+  }
+  if (fullText.includes('部下') || fullText.includes('subordinate') || fullText.includes('育成')) {
+    analysis.leadership_aspects.push('mentoring');
+  }
+  if (fullText.includes('意思決定') || fullText.includes('decision') || fullText.includes('判断')) {
+    analysis.leadership_aspects.push('decision_making');
+  }
   
-  return selectedTheories;
+  // 心理的要素の抽出
+  if (fullText.includes('感情') || fullText.includes('emotion') || fullText.includes('気持ち')) {
+    analysis.psychological_factors.push('emotional_intelligence');
+  }
+  if (fullText.includes('信頼') || fullText.includes('trust') || fullText.includes('関係')) {
+    analysis.psychological_factors.push('relationship_building');
+  }
+  if (fullText.includes('動機') || fullText.includes('motivation') || fullText.includes('やる気')) {
+    analysis.psychological_factors.push('motivation');
+  }
+  if (fullText.includes('ストレス') || fullText.includes('stress') || fullText.includes('プレッシャー')) {
+    analysis.psychological_factors.push('stress_management');
+  }
+  
+  // 実践的アプローチの抽出
+  if (fullText.includes('ステップ') || fullText.includes('step') || fullText.includes('手順')) {
+    analysis.practical_approaches.push('step_by_step');
+  }
+  if (fullText.includes('練習') || fullText.includes('practice') || fullText.includes('訓練')) {
+    analysis.practical_approaches.push('practice_based');
+  }
+  if (fullText.includes('フィードバック') || fullText.includes('feedback') || fullText.includes('評価')) {
+    analysis.practical_approaches.push('feedback_loop');
+  }
+  if (fullText.includes('実験') || fullText.includes('experiment') || fullText.includes('試行')) {
+    analysis.practical_approaches.push('experimental');
+  }
+  
+  // キーワード抽出
+  const commonKeywords = ['コミュニケーション', 'リーダーシップ', 'チーム', '改善', '解決', '効果', '成功', '目標', '計画', '実行'];
+  analysis.keywords = commonKeywords.filter(keyword => fullText.includes(keyword));
+  
+  // 複雑さレベルの判定
+  if (fullText.includes('複雑') || fullText.includes('complex') || fullText.includes('難しい')) {
+    analysis.complexity_level = 'high';
+  } else if (fullText.includes('簡単') || fullText.includes('simple') || fullText.includes('基本的')) {
+    analysis.complexity_level = 'low';
+  } else {
+    analysis.complexity_level = 'medium';
+  }
+  
+  // 緊急度レベルの判定
+  if (fullText.includes('緊急') || fullText.includes('urgent') || fullText.includes('すぐ')) {
+    analysis.urgency_level = 'high';
+  } else if (fullText.includes('長期的') || fullText.includes('long_term') || fullText.includes('ゆっくり')) {
+    analysis.urgency_level = 'low';
+  } else {
+    analysis.urgency_level = 'medium';
+  }
+  
+  // 対象者の特定
+  if (fullText.includes('部下') || fullText.includes('subordinate')) {
+    analysis.target_audience = 'subordinates';
+  } else if (fullText.includes('同僚') || fullText.includes('colleague') || fullText.includes('チーム')) {
+    analysis.target_audience = 'peers';
+  } else if (fullText.includes('上司') || fullText.includes('superior') || fullText.includes('経営陣')) {
+    analysis.target_audience = 'superiors';
+  } else if (fullText.includes('顧客') || fullText.includes('customer') || fullText.includes('クライアント')) {
+    analysis.target_audience = 'customers';
+  } else {
+    analysis.target_audience = 'general';
+  }
+  
+  // 成功指標の抽出
+  if (fullText.includes('効果') || fullText.includes('effect') || fullText.includes('結果')) {
+    analysis.success_metrics.push('effectiveness');
+  }
+  if (fullText.includes('効率') || fullText.includes('efficiency') || fullText.includes('生産性')) {
+    analysis.success_metrics.push('efficiency');
+  }
+  if (fullText.includes('満足') || fullText.includes('satisfaction') || fullText.includes('評価')) {
+    analysis.success_metrics.push('satisfaction');
+  }
+  if (fullText.includes('成長') || fullText.includes('growth') || fullText.includes('発展')) {
+    analysis.success_metrics.push('growth');
+  }
+  
+  return analysis;
 }
 
-// アドバイス内容に基づいて理論を選択
-async function selectTheoriesByContent(domain: string, keywords: string[], sb: any): Promise<any[]> {
-  // ドメインとキーワードに基づいて理論を検索
-  let query = sb.from("theories").select("*");
+// 分析結果に基づいて理論を選択
+async function selectTheoriesByAnalysis(analysis: any, sb: any): Promise<any[]> {
+  console.log('Selecting theories based on detailed analysis...');
   
-  if (domain && domain !== 'all') {
-    query = query.eq('domain', domain);
-  }
+  // 全理論を取得
+  const { data: allTheories, error } = await sb
+    .from("theories")
+    .select("*")
+    .limit(200); // より多くの理論を取得
   
-  const { data: theories, error } = await query.limit(100);
-  
-  if (error || !theories) {
+  if (error || !allTheories) {
     console.error('Error fetching theories:', error);
     return [];
   }
   
-  // キーワードマッチングでスコアを計算
-  const scoredTheories = theories.map(theory => {
-    let score = 0;
+  // 各理論にスコアを付与
+  const scoredTheories = allTheories.map(theory => {
+    let totalScore = 0;
     const theoryText = `${theory.name_ja || ''} ${theory.name_en || ''} ${theory.definition || ''} ${theory.content || ''} ${theory.one_liner || ''}`.toLowerCase();
     
-    keywords.forEach(keyword => {
+    // 主要意図とのマッチング
+    if (analysis.primary_intent === 'persuasion' && 
+        (theoryText.includes('説得') || theoryText.includes('persuasion') || theoryText.includes('影響力'))) {
+      totalScore += 10;
+    }
+    if (analysis.primary_intent === 'consensus_building' && 
+        (theoryText.includes('合意') || theoryText.includes('consensus') || theoryText.includes('合意形成'))) {
+      totalScore += 10;
+    }
+    if (analysis.primary_intent === 'improvement' && 
+        (theoryText.includes('改善') || theoryText.includes('improvement') || theoryText.includes('最適化'))) {
+      totalScore += 10;
+    }
+    if (analysis.primary_intent === 'problem_solving' && 
+        (theoryText.includes('解決') || theoryText.includes('problem') || theoryText.includes('課題'))) {
+      totalScore += 10;
+    }
+    if (analysis.primary_intent === 'motivation' && 
+        (theoryText.includes('動機') || theoryText.includes('motivation') || theoryText.includes('インセンティブ'))) {
+      totalScore += 10;
+    }
+    
+    // コミュニケーションスタイルとのマッチング
+    if (analysis.communication_style === 'assertive' && 
+        (theoryText.includes('積極的') || theoryText.includes('assertive') || theoryText.includes('直接'))) {
+      totalScore += 8;
+    }
+    if (analysis.communication_style === 'empathetic' && 
+        (theoryText.includes('共感') || theoryText.includes('empathy') || theoryText.includes('理解'))) {
+      totalScore += 8;
+    }
+    if (analysis.communication_style === 'logical' && 
+        (theoryText.includes('論理') || theoryText.includes('logical') || theoryText.includes('理性'))) {
+      totalScore += 8;
+    }
+    if (analysis.communication_style === 'creative' && 
+        (theoryText.includes('創造') || theoryText.includes('creative') || theoryText.includes('革新'))) {
+      totalScore += 8;
+    }
+    
+    // リーダーシップ要素とのマッチング
+    analysis.leadership_aspects.forEach(aspect => {
+      if (aspect === 'leadership' && theoryText.includes('リーダーシップ')) totalScore += 7;
+      if (aspect === 'team_management' && theoryText.includes('チーム')) totalScore += 7;
+      if (aspect === 'mentoring' && theoryText.includes('育成')) totalScore += 7;
+      if (aspect === 'decision_making' && theoryText.includes('意思決定')) totalScore += 7;
+    });
+    
+    // 心理的要素とのマッチング
+    analysis.psychological_factors.forEach(factor => {
+      if (factor === 'emotional_intelligence' && theoryText.includes('感情')) totalScore += 6;
+      if (factor === 'relationship_building' && theoryText.includes('関係')) totalScore += 6;
+      if (factor === 'motivation' && theoryText.includes('動機')) totalScore += 6;
+      if (factor === 'stress_management' && theoryText.includes('ストレス')) totalScore += 6;
+    });
+    
+    // 実践的アプローチとのマッチング
+    analysis.practical_approaches.forEach(approach => {
+      if (approach === 'step_by_step' && theoryText.includes('ステップ')) totalScore += 5;
+      if (approach === 'practice_based' && theoryText.includes('練習')) totalScore += 5;
+      if (approach === 'feedback_loop' && theoryText.includes('フィードバック')) totalScore += 5;
+      if (approach === 'experimental' && theoryText.includes('実験')) totalScore += 5;
+    });
+    
+    // キーワードマッチング
+    analysis.keywords.forEach(keyword => {
       if (theoryText.includes(keyword.toLowerCase())) {
-        score += 1;
+        totalScore += 3;
       }
     });
     
-    // ドメインマッチでボーナス
-    if (theory.domain === domain) {
-      score += 2;
-    }
+    // 対象者とのマッチング
+    if (analysis.target_audience === 'subordinates' && theoryText.includes('部下')) totalScore += 4;
+    if (analysis.target_audience === 'peers' && theoryText.includes('同僚')) totalScore += 4;
+    if (analysis.target_audience === 'superiors' && theoryText.includes('上司')) totalScore += 4;
+    if (analysis.target_audience === 'customers' && theoryText.includes('顧客')) totalScore += 4;
     
-    return { theory, score };
+    // 成功指標とのマッチング
+    analysis.success_metrics.forEach(metric => {
+      if (metric === 'effectiveness' && theoryText.includes('効果')) totalScore += 3;
+      if (metric === 'efficiency' && theoryText.includes('効率')) totalScore += 3;
+      if (metric === 'satisfaction' && theoryText.includes('満足')) totalScore += 3;
+      if (metric === 'growth' && theoryText.includes('成長')) totalScore += 3;
+    });
+    
+    // 複雑さレベルの調整
+    if (analysis.complexity_level === 'high' && theoryText.includes('複雑')) totalScore += 2;
+    if (analysis.complexity_level === 'low' && theoryText.includes('基本')) totalScore += 2;
+    
+    // 緊急度レベルの調整
+    if (analysis.urgency_level === 'high' && theoryText.includes('緊急')) totalScore += 2;
+    if (analysis.urgency_level === 'low' && theoryText.includes('長期的')) totalScore += 2;
+    
+    return { theory, score: totalScore };
   });
   
   // スコア順にソート
   scoredTheories.sort((a, b) => b.score - a.score);
   
-  // 上位3つの理論を選択
-  const selectedTheories = scoredTheories.slice(0, 3).map(({ theory }) => ({
-    id: theory.id,
-    name: theory.name_ja || theory.name_en,
-    description: theory.definition || theory.content || theory.one_liner,
-    relevance: `${theory.academic_field || '理論'}の観点から、このアドバイスの実践を支援します`,
-    academic_field: theory.academic_field,
-    key_concepts: theory.key_concepts || [],
-    when_to_use: theory.applicable_scenarios ? [theory.applicable_scenarios] : [],
-    examples: theory.examples || [],
-    practical_tips: theory.practical_tips || []
-  }));
+  console.log('Top 5 theories by score:');
+  scoredTheories.slice(0, 5).forEach((item, index) => {
+    console.log(`${index + 1}. ${item.theory.name_ja || item.theory.name_en}: ${item.score} points`);
+  });
+  
+  // 上位3つの理論を選択（スコアが高いもののみ）
+  const selectedTheories = scoredTheories
+    .filter(item => item.score >= 15) // 最低スコアの閾値
+    .slice(0, 3)
+    .map(({ theory, score }) => ({
+      id: theory.id,
+      name: theory.name_ja || theory.name_en,
+      description: theory.definition || theory.content || theory.one_liner,
+      relevance: `スコア: ${score}点 - ${theory.academic_field || '理論'}の観点から、このアドバイスの実践を支援します`,
+      academic_field: theory.academic_field,
+      key_concepts: theory.key_concepts || [],
+      when_to_use: theory.applicable_scenarios ? [theory.applicable_scenarios] : [],
+      examples: theory.examples || [],
+      practical_tips: theory.practical_tips || [],
+      selection_score: score
+    }));
+  
+  // 十分なスコアの理論がない場合は、上位3つを選択
+  if (selectedTheories.length < 3) {
+    const fallbackTheories = scoredTheories.slice(0, 3).map(({ theory, score }) => ({
+      id: theory.id,
+      name: theory.name_ja || theory.name_en,
+      description: theory.definition || theory.content || theory.one_liner,
+      relevance: `スコア: ${score}点 - ${theory.academic_field || '理論'}の観点から、このアドバイスの実践を支援します`,
+      academic_field: theory.academic_field,
+      key_concepts: theory.key_concepts || [],
+      when_to_use: theory.applicable_scenarios ? [theory.applicable_scenarios] : [],
+      examples: theory.examples || [],
+      practical_tips: theory.practical_tips || [],
+      selection_score: score
+    }));
+    
+    return fallbackTheories;
+  }
   
   return selectedTheories;
 }
 
-// シーンと目標に基づいて理論ドメインを決定
-function determineDomainByScene(scene: string, goal: string): string {
-  const sceneDomainMap: { [key: string]: string } = {
-    'meeting': 'operations',
-    'sales': 'communication',
-    'presentation': 'communication',
-    'interview': 'leadership',
-    'team_building': 'leadership'
-  };
-  
-  const goalDomainMap: { [key: string]: string } = {
-    'decide': 'leadership',
-    'persuade': 'communication',
-    'improve': 'operations',
-    'innovate': 'innovation',
-    'optimize': 'finance'
-  };
-  
-  return sceneDomainMap[scene] || goalDomainMap[goal] || 'all';
-}
 
-// アドバイス内容からキーワードを抽出
-function extractKeywords(shortAdvice: string, adviceContext: string): string[] {
-  const text = `${shortAdvice} ${adviceContext}`;
-  const keywords = [
-    '会議', '営業', 'プレゼン', '面談', 'チーム', 'リーダー', 'コミュニケーション',
-    '効率', '改善', '革新', '戦略', '交渉', '影響力', '心理', '行動',
-    '品質', 'プロセス', '顧客', '価値', '収益', '投資', 'リスク', '成長'
-  ];
-  
-  return keywords.filter(keyword => text.includes(keyword));
-}
 
-// 簡単なハッシュ関数
-function simpleHash(str: string): number {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    const char = str.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash; // 32ビット整数に変換
-  }
-  return Math.abs(hash);
-}
+
+
+
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -305,7 +479,7 @@ serve(async (req) => {
       const supabaseUrl = Deno.env.get('SUPABASE_URL') || 'https://eqiqthlfjcbyqfudziar.supabase.co'
       const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVxaXF0aGxmamNieXFmdWR6aWFyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ5NzI5NzQsImV4cCI6MjA1MDU0ODk3NH0.Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8'
       
-      const sb = createClient(supabaseUrl, supabaseAnonKey)
+      const sb = adminClient();
       
       // まずデータベースから理論を検索
       const { data: dbTheory, error: dbError } = await sb.from("theories").select("*").eq("id", theoryId).single()

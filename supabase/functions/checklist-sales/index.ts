@@ -1,6 +1,7 @@
 // 営業・商談専用のチェックリスト生成Edge Function
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { generateAIAdvice, type AIContext } from "../_shared/ai-utils.ts"
+import { adminClient, diagnoseEnvironment } from "../_shared/client.ts"
 
 interface SalesChecklistRequest {
   scene: string;
@@ -40,6 +41,10 @@ serve(async (req) => {
   if (req.method !== "POST") return new Response("Method Not Allowed", { status: 405 })
   
   try {
+    // 環境変数の診断
+    const envDiagnosis = diagnoseEnvironment();
+    console.log('Environment diagnosis:', envDiagnosis);
+    
     const body: SalesChecklistRequest = await req.json()
     console.log('Sales checklist request received:', body);
     

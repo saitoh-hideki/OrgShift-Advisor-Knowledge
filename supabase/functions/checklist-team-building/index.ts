@@ -39,6 +39,12 @@ serve(async (req) => {
   if (req.method !== "POST") return new Response("Method Not Allowed", { status: 405 })
   
   try {
+    // 環境変数の確認
+    const openaiKey = Deno.env.get("OPENAI_API_KEY");
+    console.log('Environment variables check:', {
+      openaiKey: openaiKey ? 'set' : 'missing'
+    });
+    
     const body: TeamBuildingChecklistRequest = await req.json()
     console.log('Team building checklist request received:', body);
     

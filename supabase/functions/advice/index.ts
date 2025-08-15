@@ -1,7 +1,7 @@
 // POST: { scene, goal, participants, relationship, time_limit, stakes, [scene-specific details] }
 // res : { session_id, advices:[{theory_id, short_advice, expected_effect, caution, tips, related_theory, implementation_steps, success_indicators, common_mistakes}] }
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { adminClient } from "../_shared/client.ts"
+import { adminClient, diagnoseEnvironment } from "../_shared/client.ts"
 
 type Payload = {
   scene: string; 
@@ -333,27 +333,95 @@ serve(async (req) => {
     console.log('Advice function called with method:', req.method);
     console.log('Request URL:', req.url);
     
+    // 環境変数の詳細診断
+    console.log('=== Environment Diagnosis Start ===');
+    const envDiagnosis = diagnoseEnvironment();
+    console.log('=== Environment Diagnosis End ===');
+    
+    // 環境変数の確認
+    const supabaseUrl = Deno.env.get("SUPABASE_URL") || Deno.env.get("SUPABASE_PROJECT_URL");
+    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    const openaiKey = Deno.env.get("OPENAI_API_KEY");
+    
+    console.log('Environment variables check:', {
+      supabaseUrl: supabaseUrl ? 'set' : 'missing',
+      supabaseKey: supabaseKey ? 'set' : 'missing',
+      openaiKey: openaiKey ? 'set' : 'missing'
+    });
+    
+    if (!supabaseUrl || !supabaseKey) {
+      console.error('Missing Supabase environment variables');
+      return new Response(JSON.stringify({ 
+        error: "Server configuration error: Missing Supabase credentials",
+        details: {
+          supabaseUrl: supabaseUrl ? 'set' : 'missing',
+          supabaseKey: supabaseKey ? 'set' : 'missing',
+          availableKeys: Object.keys(Deno.env.toObject()).filter(k => k.includes("SUPABASE"))
+        }
+      }), {
+        status: 500,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
+    
     const body: Payload = await req.json()
     console.log('Request body:', body);
     
-    const sb = adminClient()
+    let sb;
+    try {
+      sb = adminClient()
+      console.log('Supabase client created successfully');
+    } catch (clientError) {
+      console.error('Failed to create Supabase client:', clientError);
+      return new Response(JSON.stringify({ 
+        error: "Server configuration error: Failed to initialize database connection",
+        details: clientError.message
+      }), {
+        status: 500,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
 
     console.log('Received request for scene:', body.scene);
 
     // 1) セッション保存
-    const { data: session, error: sessionError } = await sb.from("sessions").insert({
-      scene_id: body.scene, goal: body.goal, participants: body.participants ?? null,
-      relationship: body.relationship, time_limit: body.time_limit, stakes: body.stakes
-    }).select().single()
+    let session;
+    try {
+      const { data: sessionData, error: sessionError } = await sb.from("sessions").insert({
+        scene_id: body.scene, goal: body.goal, participants: body.participants ?? null,
+        relationship: body.relationship, time_limit: body.time_limit, stakes: body.stakes
+      }).select().single()
 
-    if (sessionError || !session) {
-      console.error('Session creation error:', sessionError)
+      if (sessionError) {
+        console.error('Session creation error:', sessionError);
+        return new Response(JSON.stringify({ 
+          error: "Failed to create session: " + sessionError.message 
+        }), {
+          status: 500,
+          headers: { "Content-Type": "application/json" }
+        });
+      }
+      
+      if (!sessionData) {
+        console.error('No session data returned');
+        return new Response(JSON.stringify({ 
+          error: "Failed to create session: No data returned" 
+        }), {
+          status: 500,
+          headers: { "Content-Type": "application/json" }
+        });
+      }
+      
+      session = sessionData;
+      console.log('Session created successfully:', session.id);
+    } catch (dbError) {
+      console.error('Database operation failed:', dbError);
       return new Response(JSON.stringify({ 
-        error: "Failed to create session" 
+        error: "Database operation failed: " + dbError.message 
       }), {
         status: 500,
         headers: { "Content-Type": "application/json" }
-      })
+      });
     }
 
     // 2) シーン別の専門アドバイザーにルーティング
