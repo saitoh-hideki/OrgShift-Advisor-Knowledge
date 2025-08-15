@@ -4,6 +4,7 @@
     "name_ja": "アンカリング効果",
     "name_en": "Anchoring Effect",
     "domain": "behavioral_econ",
+    "category": "behavioral_economics",
     "academic_field": "行動経済学",
     "one_liner": "冒頭の基準提示で判断の軸を作る",
     "definition": "最初に提示された基準がその後の判断を左右する心理効果",
@@ -35,6 +36,7 @@
     "name_ja": "フレーミング効果",
     "name_en": "Framing Effect",
     "domain": "behavioral_econ",
+    "category": "behavioral_economics",
     "academic_field": "行動経済学",
     "one_liner": "同じ情報でも提示の仕方によって受け取られ方や選好が変わる",
     "definition": "同じ情報でも提示の仕方によって受け取られ方や選好が変わる",
@@ -66,6 +68,7 @@
     "name_ja": "損失回避",
     "name_en": "Loss Aversion",
     "domain": "behavioral_econ",
+    "category": "behavioral_economics",
     "academic_field": "行動経済学",
     "one_liner": "人は利益を得るより損失を避けることを優先する傾向がある",
     "definition": "人は利益を得るより損失を避けることを優先する傾向がある",
@@ -97,6 +100,7 @@
     "name_ja": "社会的証明",
     "name_en": "Social Proof",
     "domain": "behavioral_econ",
+    "category": "behavioral_economics",
     "academic_field": "行動経済学",
     "one_liner": "他者の行動や事例が意思決定を後押しする",
     "definition": "他者の行動や事例が意思決定を後押しする",
@@ -128,6 +132,7 @@
     "name_ja": "アクティブリスニング",
     "name_en": "Active Listening",
     "domain": "communication",
+    "category": "communication_sales",
     "academic_field": "コミュニケーション理論",
     "one_liner": "相手の話を積極的に聴き理解を示す",
     "definition": "相手の話を積極的に聴き理解を示す",
@@ -154,5 +159,106 @@
     },
     "tags": ["コミュニケーション", "アクティブリスニング", "聴取", "相互理解"],
     "related_theories": ["nvc", "spin_selling"]
+  },
+  {
+    "id": "nvc",
+    "name_ja": "非暴力コミュニケーション",
+    "name_en": "Nonviolent Communication",
+    "domain": "communication",
+    "category": "communication_sales",
+    "academic_field": "コミュニケーション理論",
+    "one_liner": "観察・感情・ニーズ・要求の4要素で建設的な対話を実現",
+    "definition": "観察・感情・ニーズ・要求の4要素で建設的な対話を実現するコミュニケーション手法",
+    "content": "事実の観察、感情の表現、ニーズの明確化、具体的な要求を行う",
+    "applicable_scenarios": "対立解決、チーム構築、顧客対応",
+    "key_concepts": ["観察", "感情", "ニーズ", "要求", "共感"],
+    "examples": [
+      "「あなたが遅刻した」→「会議開始時刻に到着していない状況を観察した」",
+      "「イライラしている」→「時間通りに始められないことに焦りを感じている」",
+      "「時間を守ってほしい」→「スケジュール管理の協力を求めている」"
+    ],
+    "practical_tips": [
+      "事実と解釈を分けて観察する",
+      "感情を率直に表現する",
+      "ニーズを明確に伝える",
+      "具体的で実行可能な要求をする"
+    ],
+    "mechanism": "4要素の構造化されたコミュニケーションによる相互理解の促進",
+    "how_to": ["観察→感情→ニーズ→要求の順で表現"],
+    "templates": {
+      "meeting": "{{observation}}の状況で{{feeling}}を感じている。{{need}}が満たされていない。{{request}}を求めている。",
+      "presentation": "{{observation}}について{{feeling}}。{{need}}を満たすために{{request}}。",
+      "sales": "{{observation}}の状況で{{feeling}}。{{need}}を満たす{{request}}。"
+    },
+    "tags": ["コミュニケーション", "対立解決", "チーム構築", "顧客対応"],
+    "related_theories": ["active_listening", "conflict_resolution"]
+  },
+  {
+    "id": "spin_selling",
+    "name_ja": "SPINセリング",
+    "name_en": "SPIN Selling",
+    "domain": "communication",
+    "category": "communication_sales",
+    "academic_field": "営業理論",
+    "one_liner": "状況・問題・示唆・必要利益の4段階で営業を進める",
+    "definition": "状況・問題・示唆・必要利益の4段階で営業を進める営業手法",
+    "content": "顧客の現状を把握し、問題を明確化し、解決策の価値を示し、購買行動を促す",
+    "applicable_scenarios": "B2B営業、ソリューション提案",
+    "key_concepts": ["状況質問", "問題質問", "示唆質問", "必要利益質問"],
+    "examples": [
+      "状況質問：「現在のシステムはどのような構成ですか？」",
+      "問題質問：「そのシステムで困っていることはありますか？」",
+      "示唆質問：「その問題が解決されるとどのようなメリットがありますか？」",
+      "必要利益質問：「そのメリットを実現するために投資を検討されますか？」"
+    ],
+    "practical_tips": [
+      "顧客の話をよく聴く",
+      "問題の深刻さを理解する",
+      "解決策の価値を具体的に示す",
+      "購買の緊急性を認識させる"
+    ],
+    "mechanism": "段階的な質問による顧客のニーズ発見と価値認識の促進",
+    "how_to": ["状況把握→問題発見→価値提示→購買促進"],
+    "templates": {
+      "sales": "現在の{{current_situation}}について、{{problem}}の課題がありますね。{{solution}}により{{benefit}}が得られ、{{investment}}の価値があります。",
+      "meeting": "{{situation}}の現状で{{problem}}が発生。{{solution}}で{{benefit}}を実現し、{{action}}を検討。",
+      "presentation": "{{situation}}→{{problem}}→{{solution}}→{{benefit}}の流れで提案。"
+    },
+    "tags": ["営業", "B2B", "ソリューション提案", "顧客ニーズ発見"],
+    "related_theories": ["active_listening", "solution_selling"]
+  },
+  {
+    "id": "conflict_resolution",
+    "name_ja": "対立解決理論",
+    "name_en": "Conflict Resolution Theory",
+    "domain": "leadership_org_psychology",
+    "category": "leadership_org_psychology",
+    "academic_field": "組織心理学",
+    "one_liner": "対立を建設的な機会として活用し、関係性を強化する",
+    "definition": "対立を建設的な機会として活用し、関係性を強化する理論",
+    "content": "対立の原因を分析し、共通の利益を見出し、協力的な解決策を模索する",
+    "applicable_scenarios": "チーム対立、部門間調整、顧客クレーム対応",
+    "key_concepts": ["対立分析", "共通利益", "協力解決", "関係強化"],
+    "examples": [
+      "対立の背景にあるニーズを理解する",
+      "共通の目標を見出す",
+      "Win-Winの解決策を模索する",
+      "関係性を強化する機会として活用する"
+    ],
+    "practical_tips": [
+      "対立を避けずに正面から向き合う",
+      "感情的な反応を抑えて冷静に分析する",
+      "共通の利益に焦点を当てる",
+      "長期的な関係性を重視する"
+    ],
+    "mechanism": "対立の建設的活用による相互理解と関係性の深化",
+    "how_to": ["対立分析→共通利益発見→協力解決→関係強化"],
+    "templates": {
+      "meeting": "{{conflict}}の対立について、{{common_interest}}の共通点を見出し、{{collaborative_solution}}で解決し、{{relationship_strengthening}}を図る。",
+      "presentation": "{{conflict}}→{{analysis}}→{{solution}}→{{benefit}}の流れで対立を建設的に活用。",
+      "team_building": "{{conflict}}を{{opportunity}}として活用し、{{team_cohesion}}を強化。"
+    },
+    "tags": ["対立解決", "チーム構築", "組織開発", "関係性強化"],
+    "related_theories": ["active_listening", "nvc", "team_building"]
   }
 ]

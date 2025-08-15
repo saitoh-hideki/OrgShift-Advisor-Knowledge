@@ -126,6 +126,7 @@ export default function App() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [theoriesList, setTheoriesList] = useState<Theory[]>([]);
   const [isLoadingTheories, setIsLoadingTheories] = useState(false);
+  const [relatedTheories, setRelatedTheories] = useState<Theory[]>([]);
 
   // ScrollViewのref
   const adviceScrollViewRef = useRef<ScrollView>(null);
@@ -396,14 +397,35 @@ export default function App() {
       if (response.related_theories && response.related_theories.length > 0) {
         console.log('Setting related theories:', response.related_theories);
         
+        // 3個の理論をrelatedTheories状態に保存
+        const theories = response.related_theories.map((theory: any) => ({
+          id: theory.id,
+          name_ja: theory.name || '関連理論',
+          name_en: theory.name || 'Related Theory',
+          domain: theory.domain || 'Theory',
+          academic_field: theory.academic_field || 'Theory',
+          one_liner: theory.description || 'No one-liner available',
+          definition: theory.description || 'No definition available',
+          content: theory.description || 'No content available',
+          applicable_scenarios: theory.when_to_use || 'No scenarios available',
+          key_concepts: theory.key_concepts || [],
+          examples: theory.examples || [],
+          practical_tips: theory.practical_tips || [],
+          mechanism: 'No mechanism',
+          how_to: [],
+          tags: []
+        }));
+        
+        setRelatedTheories(theories);
+        
         // 一番上の理論をメインとして表示し、関連理論も含める
-        const topTheory = response.related_theories[0];
+        const topTheory = theories[0];
         console.log('Top theory to display:', topTheory);
         
         setCurrentTheory({
           id: 'related_theories',
-          name_ja: topTheory.name || '関連理論',
-          name_en: topTheory.name || 'Related Theory',
+          name_ja: topTheory.name_ja || '関連理論',
+          name_en: topTheory.name_en || 'Related Theory',
           domain: topTheory.domain || 'Theory',
           academic_field: topTheory.academic_field || 'Theory',
           one_liner: topTheory.one_liner || 'No one-liner available',
@@ -631,8 +653,8 @@ export default function App() {
             <TouchableOpacity 
               style={styles.categoryCard} 
               onPress={() => {
-                setSelectedCategory('leadership_org_psych');
-                getTheoriesByCategory('leadership_org_psych');
+                setSelectedCategory('leadership');
+                getTheoriesByCategory('leadership');
               }}
             >
               <Text style={styles.categoryCardTitle}>リーダーシップ・組織心理</Text>
@@ -835,7 +857,7 @@ export default function App() {
   const getCategoryTitle = (category: string) => {
     const titles: { [key: string]: string } = {
       'behavioral_econ': '行動経済学',
-      'leadership_org_psych': 'リーダーシップ・組織心理',
+              'leadership': 'リーダーシップ・組織心理',
       'communication': 'コミュニケーション・交渉',
       'strategy': '経営戦略',
       'innovation': 'イノベーション・プロダクト',
@@ -2079,7 +2101,7 @@ export default function App() {
               <Text style={styles.backButtonText}>← 戻る</Text>
             </TouchableOpacity>
             <Text style={styles.adviceHeaderTitle}>
-              {currentTheory.name_ja || '関連理論'}
+              理論
             </Text>
           </View>
 
@@ -2094,6 +2116,7 @@ export default function App() {
               <View style={styles.adviceCard}>
                 {/* メインの理論（一番上）を表示 */}
                 <Text style={styles.adviceTitle}>メイン理論</Text>
+                <Text style={styles.theoryName}>{currentTheory.name_ja}</Text>
                 <Text style={styles.adviceText}>
                   {currentTheory.one_liner || '理論の説明がありません'}
                 </Text>
@@ -2133,7 +2156,38 @@ export default function App() {
                 )}
               </View>
 
-              {/* 関連理論の表示は現在のTheory型ではサポートしていないため、コメントアウト */}
+              {/* 関連理論の表示 */}
+              {relatedTheories.length > 1 && (
+                <View style={styles.adviceCard}>
+                  <Text style={styles.adviceTitle}>関連理論</Text>
+                  {relatedTheories.slice(1).map((theory, index) => (
+                    <View key={theory.id} style={styles.relatedTheoryCard}>
+                      <Text style={styles.relatedTheoryTitle}>
+                        {theory.name_ja}
+                      </Text>
+                      <Text style={styles.adviceText}>
+                        {theory.one_liner || '理論の説明がありません'}
+                      </Text>
+                      
+                      {theory.key_concepts && theory.key_concepts.length > 0 && (
+                        <>
+                          <Text style={styles.adviceSubtitle}>主要概念</Text>
+                          {theory.key_concepts.map((concept, conceptIndex) => (
+                            <Text key={conceptIndex} style={styles.adviceStep}>• {concept}</Text>
+                          ))}
+                        </>
+                      )}
+                      
+                      {theory.applicable_scenarios && (
+                        <>
+                          <Text style={styles.adviceSubtitle}>適用場面</Text>
+                          <Text style={styles.adviceStep}>• {theory.applicable_scenarios}</Text>
+                        </>
+                      )}
+                    </View>
+                  ))}
+                </View>
+              )}
             </>
           )}
         </ScrollView>
@@ -2844,15 +2898,14 @@ const styles = StyleSheet.create({
   },
   relatedTheoryCard: {
     backgroundColor: '#f8f9fa',
-    borderRadius: 8,
+    borderRadius: 12,
     padding: 16,
     marginTop: 16,
-    marginBottom: 16,
     borderLeftWidth: 4,
     borderLeftColor: '#007bff',
   },
   relatedTheoryTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
     color: '#212529',
     marginBottom: 8,
@@ -3312,6 +3365,12 @@ const styles = StyleSheet.create({
   },
   mainTheoryTitle: {
     fontSize: 18,
+    fontWeight: '600',
+    color: '#212529',
+    marginBottom: 8,
+  },
+  theoryName: {
+    fontSize: 16,
     fontWeight: '600',
     color: '#212529',
     marginBottom: 8,

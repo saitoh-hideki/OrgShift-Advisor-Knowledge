@@ -44,17 +44,23 @@ serve(async (req) => {
       advice_id
     })
 
-    // シーンと目標に基づいて理論カテゴリーを特定
+    // シーンと目標に基づいて理論ドメインとカテゴリーを特定
+    let targetDomains = []
     let targetCategories = []
     if (scene.includes('面談') || scene.includes('interview')) {
-      targetCategories = ['leadership_org_psychology', 'communication_sales', 'negotiation_influence']
+      targetDomains = ['behavioral_econ', 'communication', 'leadership_org_psychology']
+      targetCategories = ['behavioral_economics', 'communication_sales', 'leadership_org_psychology']
     } else if (scene.includes('プレゼン') || scene.includes('presentation')) {
+      targetDomains = ['communication', 'innovation_product', 'strategy']
       targetCategories = ['communication_sales', 'innovation_product', 'strategy']
     } else if (scene.includes('会議') || scene.includes('meeting')) {
+      targetDomains = ['leadership_org_psychology', 'operations_project_management', 'communication']
       targetCategories = ['leadership_org_psychology', 'operations_project_management', 'communication_sales']
     } else if (scene.includes('営業') || scene.includes('sales')) {
-      targetCategories = ['communication_sales', 'negotiation_influence', 'behavioral_economics']
+      targetDomains = ['communication', 'behavioral_econ', 'negotiation_influence']
+      targetCategories = ['communication_sales', 'behavioral_economics', 'negotiation_influence']
     } else if (scene.includes('チーム構築') || scene.includes('team')) {
+      targetDomains = ['leadership_org_psychology', 'operations_project_management', 'strategy']
       targetCategories = ['leadership_org_psychology', 'operations_project_management', 'strategy']
     }
 
@@ -76,34 +82,61 @@ serve(async (req) => {
     // 理論検索クエリを構築
     const searchQuery = `${scene} ${goal} ${short_advice} ${advice_context || ''}`
     console.log('Search query:', searchQuery)
+    console.log('Target domains:', targetDomains)
     console.log('Target categories:', targetCategories)
     console.log('Priority keywords:', priorityKeywords)
 
-    // カテゴリー別に理論を検索
+    // ドメインとカテゴリー別に理論を検索
     let allTheories = []
     
-    if (targetCategories.length > 0) {
+    if (targetDomains.length > 0) {
+      // 特定ドメインから理論を取得
+      for (const domain of targetDomains) {
+        const { data: domainTheories, error } = await supabase
+          .from('theories')
+          .select('*')
+          .eq('domain', domain)
+          .limit(15) // 各ドメインからより多くの理論を取得
+        
+        if (!error && domainTheories) {
+          allTheories.push(...domainTheories)
+        }
+      }
+      
       // 特定カテゴリーから理論を取得
       for (const category of targetCategories) {
         const { data: categoryTheories, error } = await supabase
           .from('theories')
           .select('*')
           .eq('category', category)
-          .limit(10)
+          .limit(15) // 各カテゴリーからより多くの理論を取得
         
         if (!error && categoryTheories) {
           allTheories.push(...categoryTheories)
         }
       }
     } else {
-      // 全カテゴリーから理論を取得
+      // 全ドメインから理論を取得
       const { data: theories, error } = await supabase
         .from('theories')
         .select('*')
-        .limit(20)
+        .limit(50) // より多くの理論を取得
       
       if (!error && theories) {
         allTheories = theories
+      }
+    }
+
+    // 理論が不足している場合は、全理論を取得
+    if (allTheories.length < 3) {
+      console.log('Not enough theories found, fetching all theories...')
+      const { data: allTheoriesData, error } = await supabase
+        .from('theories')
+        .select('*')
+        .limit(100)
+      
+      if (!error && allTheoriesData) {
+        allTheories = allTheoriesData
       }
     }
 
@@ -111,17 +144,24 @@ serve(async (req) => {
       throw new Error('No theories found in database')
     }
 
+    console.log(`Found ${allTheories.length} theories to analyze`)
+
     // 理論の関連性スコアを計算
     const scoredTheories = allTheories.map(theory => {
       let score = 0
       
+      // ドメインマッチング
+      if (targetDomains.includes(theory.domain)) {
+        score += 10
+      }
+      
       // カテゴリーマッチング
-      if (targetCategories.includes(theory.category)) {
+      if (theory.category && targetCategories.includes(theory.category)) {
         score += 10
       }
       
       // キーワードマッチング
-      const theoryText = `${theory.name_ja} ${theory.definition || ''} ${theory.content || ''}`
+      const theoryText = `${theory.name_ja} ${theory.definition || ''} ${theory.content || ''} ${theory.one_liner || ''}`
       for (const keyword of priorityKeywords) {
         if (theoryText.includes(keyword)) {
           score += 5
@@ -140,18 +180,51 @@ serve(async (req) => {
         score += 2
       }
       
+      // タグとの関連性
+      if (theory.tags && Array.isArray(theory.tags)) {
+        for (const tag of theory.tags) {
+          if (scene.includes(tag) || goal.includes(tag)) {
+            score += 3
+          }
+        }
+      }
+      
       return { ...theory, relevanceScore: score }
     })
 
     // スコア順にソートして上位3件を選択
-    const topTheories = scoredTheories
+    let topTheories = scoredTheories
       .sort((a, b) => b.relevanceScore - a.relevanceScore)
       .slice(0, 3)
 
-    console.log('Selected theories with scores:', topTheories.map(t => ({
+    // 理論が3個未満の場合は、スコアに関係なく上位3個を選択
+    if (topTheories.length < 3) {
+      console.log(`Only ${topTheories.length} theories found, adding more theories...`)
+      const remainingTheories = scoredTheories
+        .filter(theory => !topTheories.some(top => top.id === theory.id))
+        .slice(0, 3 - topTheories.length)
+      
+      topTheories = [...topTheories, ...remainingTheories]
+      console.log(`Added ${remainingTheories.length} more theories, total: ${topTheories.length}`)
+    }
+
+    // それでも3個未満の場合は、全理論からランダムに選択
+    if (topTheories.length < 3) {
+      console.log(`Still only ${topTheories.length} theories, selecting randomly from all theories...`)
+      const randomTheories = allTheories
+        .filter(theory => !topTheories.some(top => top.id === theory.id))
+        .sort(() => Math.random() - 0.5)
+        .slice(0, 3 - topTheories.length)
+      
+      topTheories = [...topTheories, ...randomTheories]
+      console.log(`Added ${randomTheories.length} random theories, total: ${topTheories.length}`)
+    }
+
+    console.log('Final selected theories with scores:', topTheories.map(t => ({
       name: t.name_ja,
+      domain: t.domain,
       category: t.category,
-      score: t.relevanceScore
+      score: t.relevanceScore || 0
     })))
 
     // 選択された理論を適切な形式で返す
@@ -160,6 +233,7 @@ serve(async (req) => {
       name: theory.name_ja,
       description: theory.one_liner || theory.definition || '理論の説明',
       academic_field: theory.academic_field || '理論',
+      domain: theory.domain,
       category: theory.category,
       relevance_score: theory.relevanceScore,
       key_concepts: theory.key_concepts || [],
@@ -175,10 +249,11 @@ serve(async (req) => {
         search_query: searchQuery,
         advice_id: advice_id,
         selection_logic: {
+          target_domains: targetDomains,
           target_categories: targetCategories,
           priority_keywords: priorityKeywords,
           total_candidates: allTheories.length,
-          selection_criteria: 'カテゴリー、キーワード、関連性スコアに基づく選定'
+          selection_criteria: 'ドメイン、カテゴリー、キーワード、関連性スコアに基づく選定'
         }
       }),
       { 
