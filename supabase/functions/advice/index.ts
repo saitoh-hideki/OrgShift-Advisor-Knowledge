@@ -363,7 +363,49 @@ serve(async (req) => {
       time_limit: body.time_limit || "medium",
       stakes: body.stakes || "medium",
       participants: body.participants,
-      relationship: body.relationship
+      relationship: body.relationship,
+      
+      // 会議・ミーティング用の詳細設定
+      meeting_type: body.meeting_type,
+      meeting_format: body.meeting_format,
+      meeting_urgency: body.meeting_urgency,
+      meeting_frequency: body.meeting_frequency,
+      meeting_participants: body.meeting_participants,
+      meeting_tools: body.meeting_tools,
+      meeting_challenges: body.meeting_challenges,
+      
+      // 営業・商談用の詳細設定
+      customer_type: body.customer_type,
+      industry: body.industry,
+      customer_position: body.customer_position,
+      company_size: body.company_size,
+      sales_stage: body.sales_stage,
+      deal_size: body.deal_size,
+      competition_level: body.competition_level,
+      customer_pain_points: body.customer_pain_points,
+      
+      // プレゼンテーション用の詳細設定
+      presentation_purpose: body.presentation_purpose,
+      audience_type: body.audience_type,
+      presentation_format: body.presentation_format,
+      presentation_topics: body.presentation_topics,
+      audience_expertise: body.audience_expertise,
+      presentation_constraints: body.presentation_constraints,
+      
+      // 面談用の詳細設定
+      interview_type: body.interview_type,
+      interview_purpose: body.interview_purpose,
+      interview_relationship: body.interview_relationship,
+      interview_context: body.interview_context,
+      interview_outcomes: body.interview_outcomes,
+      
+      // チーム構築用の詳細設定
+      team_building_type: body.team_building_type,
+      team_maturity: body.team_maturity,
+      team_context: body.team_context,
+      team_size: body.team_size,
+      team_diversity: body.team_diversity,
+      team_challenges: body.team_challenges
     };
 
     console.log('Routing context:', context);
