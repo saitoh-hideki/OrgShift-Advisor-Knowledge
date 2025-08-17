@@ -1,144 +1,235 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { supabase } from '../lib/supabase'
+import React from 'react'
+import { 
+  Box, 
+  Container, 
+  Typography, 
+  Paper,
+  Grid,
+  Card,
+  CardContent,
+  AppBar,
+  Toolbar,
+  Drawer,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText
+} from '@mui/material'
+import {
+  Dashboard as DashboardIcon,
+  People as PeopleIcon,
+  School as SchoolIcon,
+  Lightbulb as AdviceIcon,
+  Checklist as ChecklistIcon,
+  Settings as SettingsIcon,
+  BarChart as ChartIcon,
+  Monitor as MonitorIcon
+} from '@mui/icons-material'
 
-export default function Home() {
-  const [stats, setStats] = useState({
-    totalSessions: 0,
-    totalTheories: 0,
-    totalFeedbacks: 0,
-    successRate: 0,
-  })
-  const [recentSessions, setRecentSessions] = useState<any[]>([])
-  const [theories, setTheories] = useState<any[]>([])
+// ダッシュボードの統計データ
+const dashboardStats = {
+  totalUsers: 1250,
+  activeUsers: 890,
+  newUsers: 45,
+  totalTheories: 100,
+  completedChecklists: 2340,
+  generatedAdvice: 5670
+}
 
-  useEffect(() => {
-    fetchStats()
-    fetchRecentSessions()
-    fetchTheories()
-  }, [])
+// メニュー項目
+const menuItems = [
+  { id: 'dashboard', label: 'ダッシュボード', icon: <DashboardIcon />, path: '/' },
+  { id: 'users', label: 'ユーザー管理', icon: <PeopleIcon />, path: '/users' },
+  { id: 'learning', label: '学習分析', icon: <SchoolIcon />, path: '/learning' },
+  { id: 'advice', label: 'アドバイス分析', icon: <AdviceIcon />, path: '/advice' },
+  { id: 'checklist', label: 'チェックリスト分析', icon: <ChecklistIcon />, path: '/checklist' },
+  { id: 'content', label: 'コンテンツ管理', icon: <SettingsIcon />, path: '/content' },
+  { id: 'analytics', label: 'データ分析', icon: <ChartIcon />, path: '/analytics' },
+  { id: 'monitoring', label: 'システム監視', icon: <MonitorIcon />, path: '/monitoring' }
+]
 
-  const fetchStats = async () => {
-    const [sessions, theories, feedbacks] = await Promise.all([
-      supabase.from('sessions').select('id', { count: 'exact' }),
-      supabase.from('theories').select('id', { count: 'exact' }),
-      supabase.from('feedbacks').select('result'),
-    ])
-
-    const successCount = feedbacks.data?.filter(f => f.result === 'success').length || 0
-    const totalFeedbacks = feedbacks.data?.length || 0
-
-    setStats({
-      totalSessions: sessions.count || 0,
-      totalTheories: theories.count || 0,
-      totalFeedbacks: totalFeedbacks,
-      successRate: totalFeedbacks > 0 ? (successCount / totalFeedbacks) * 100 : 0,
-    })
-  }
-
-  const fetchRecentSessions = async () => {
-    const { data } = await supabase
-      .from('sessions')
-      .select('*, session_advices(theory_id)')
-      .order('created_at', { ascending: false })
-      .limit(10)
-
-    setRecentSessions(data || [])
-  }
-
-  const fetchTheories = async () => {
-    const { data } = await supabase
-      .from('theories')
-      .select('*')
-      .order('name_ja')
-
-    setTheories(data || [])
-  }
-
-  const testAdviceAPI = async () => {
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/advice`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          scene: 'meeting',
-          goal: 'decide',
-          time_limit: 'short',
-          stakes: 'high',
-        }),
-      })
-      const data = await response.json()
-      alert('API Test Success: ' + JSON.stringify(data, null, 2))
-      fetchRecentSessions()
-      fetchStats()
-    } catch (err) {
-      alert('API Test Failed: ' + err)
-    }
-  }
-
+export default function AdminDashboard() {
   return (
-    <div className="container">
-      <h1 className="title">OrgShift Admin Dashboard</h1>
+    <Box sx={{ display: 'flex' }}>
+      {/* サイドバー */}
+      <Drawer
+        variant="permanent"
+        sx={{
+          width: 240,
+          flexShrink: 0,
+          '& .MuiDrawer-paper': {
+            width: 240,
+            boxSizing: 'border-box',
+            bgcolor: 'background.paper',
+            borderRight: '1px solid',
+            borderColor: 'divider'
+          },
+        }}
+      >
+        <Toolbar />
+        <Box sx={{ overflow: 'auto', mt: 2 }}>
+          <List>
+            {menuItems.map((item) => (
+              <ListItem 
+                key={item.id}
+                sx={{
+                  mx: 1,
+                  borderRadius: 1,
+                  mb: 0.5,
+                  cursor: 'pointer',
+                  '&:hover': {
+                    bgcolor: 'action.hover',
+                  },
+                }}
+              >
+                <ListItemIcon sx={{ minWidth: 40 }}>
+                  {item.icon}
+                </ListItemIcon>
+                <ListItemText 
+                  primary={item.label} 
+                  primaryTypographyProps={{
+                    fontSize: '0.875rem',
+                    fontWeight: 400
+                  }}
+                />
+              </ListItem>
+            ))}
+          </List>
+        </Box>
+      </Drawer>
 
-      <div className="stats">
-        <div className="stat">
-          <div className="stat-label">Total Sessions</div>
-          <div className="stat-value">{stats.totalSessions}</div>
-        </div>
-        <div className="stat">
-          <div className="stat-label">Total Theories</div>
-          <div className="stat-value">{stats.totalTheories}</div>
-        </div>
-        <div className="stat">
-          <div className="stat-label">Total Feedbacks</div>
-          <div className="stat-value">{stats.totalFeedbacks}</div>
-        </div>
-        <div className="stat">
-          <div className="stat-label">Success Rate</div>
-          <div className="stat-value">{stats.successRate.toFixed(1)}%</div>
-        </div>
-      </div>
+      {/* メインコンテンツ */}
+      <Box component="main" sx={{ flexGrow: 1 }}>
+        <AppBar 
+          position="fixed" 
+          sx={{ 
+            zIndex: (theme) => theme.zIndex.drawer + 1,
+            bgcolor: 'background.paper',
+            color: 'text.primary',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.12)'
+          }}
+        >
+          <Toolbar>
+            <Typography variant="h6" noWrap component="div" sx={{ fontWeight: 600 }}>
+              OrgShift 管理者ダッシュボード
+            </Typography>
+          </Toolbar>
+        </AppBar>
+        <Toolbar />
+        
+        <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
+          <Typography variant="h4" component="h1" gutterBottom>
+            OrgShift 管理者ダッシュボード
+          </Typography>
+          
+          {/* 統計カード */}
+          <Grid container spacing={3} sx={{ mb: 4 }}>
+            <Grid item xs={12} sm={6} md={3}>
+              <Card>
+                <CardContent>
+                  <Typography color="textSecondary" gutterBottom>
+                    総ユーザー数
+                  </Typography>
+                  <Typography variant="h4">
+                    {dashboardStats.totalUsers.toLocaleString()}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <Card>
+                <CardContent>
+                  <Typography color="textSecondary" gutterBottom>
+                    アクティブユーザー
+                  </Typography>
+                  <Typography variant="h4">
+                    {dashboardStats.activeUsers.toLocaleString()}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <Card>
+                <CardContent>
+                  <Typography color="textSecondary" gutterBottom>
+                    新規ユーザー（今月）
+                  </Typography>
+                  <Typography variant="h4">
+                    {dashboardStats.newUsers.toLocaleString()}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <Card>
+                <CardContent>
+                  <Typography color="textSecondary" gutterBottom>
+                    総理論数
+                  </Typography>
+                  <Typography variant="h4">
+                    {dashboardStats.totalTheories.toLocaleString()}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
 
-      <button className="button" onClick={testAdviceAPI}>
-        Test Advice API
-      </button>
+          {/* 追加統計カード */}
+          <Grid container spacing={3} sx={{ mb: 4 }}>
+            <Grid item xs={12} sm={6} md={3}>
+              <Card>
+                <CardContent>
+                  <Typography color="textSecondary" gutterBottom>
+                    完了チェックリスト
+                  </Typography>
+                  <Typography variant="h4">
+                    {dashboardStats.completedChecklists.toLocaleString()}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <Card>
+                <CardContent>
+                  <Typography color="textSecondary" gutterBottom>
+                    生成アドバイス
+                  </Typography>
+                  <Typography variant="h4">
+                    {dashboardStats.generatedAdvice.toLocaleString()}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
 
-      <div className="grid">
-        <div className="card">
-          <h2 style={{ marginBottom: '16px' }}>Recent Sessions</h2>
-          {recentSessions.map((session) => (
-            <div key={session.id} style={{ marginBottom: '12px', padding: '12px', background: '#f9f9f9', borderRadius: '4px' }}>
-              <div style={{ fontSize: '12px', color: '#666' }}>
-                {new Date(session.created_at).toLocaleString()}
-              </div>
-              <div style={{ fontSize: '14px', marginTop: '4px' }}>
-                Scene: {session.scene_id} | Goal: {session.goal || 'N/A'}
-              </div>
-              <div style={{ fontSize: '12px', marginTop: '4px', color: '#007AFF' }}>
-                {session.session_advices?.length || 0} advices generated
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="card">
-          <h2 style={{ marginBottom: '16px' }}>Available Theories</h2>
-          {theories.map((theory) => (
-            <div key={theory.id} style={{ marginBottom: '12px', padding: '12px', background: '#f9f9f9', borderRadius: '4px' }}>
-              <div style={{ fontSize: '14px', fontWeight: '600' }}>
-                {theory.name_ja}
-              </div>
-              <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
-                {theory.one_liner}
-              </div>
-              <div style={{ fontSize: '11px', marginTop: '4px' }}>
-                {theory.tags?.join(', ') || 'No tags'}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
+          {/* 学習状況 */}
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={6}>
+              <Paper sx={{ p: 3 }}>
+                <Typography variant="h6" gutterBottom>
+                  カテゴリー別学習進捗
+                </Typography>
+                <Typography variant="body2" color="textSecondary">
+                  行動経済学、リーダーシップ、コミュニケーションなどの学習進捗を表示します
+                </Typography>
+              </Paper>
+            </Grid>
+            
+            <Grid item xs={12} md={6}>
+              <Paper sx={{ p: 3 }}>
+                <Typography variant="h6" gutterBottom>
+                  最近のアクティビティ
+                </Typography>
+                <Typography variant="body2" color="textSecondary">
+                  ユーザーの学習活動やアドバイス生成の履歴がここに表示されます
+                </Typography>
+              </Paper>
+            </Grid>
+          </Grid>
+        </Container>
+      </Box>
+    </Box>
   )
 }
