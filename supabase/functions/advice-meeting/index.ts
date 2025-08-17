@@ -47,10 +47,19 @@ serve(async (req) => {
   try {
     const context: MeetingContext = await req.json()
     const openaiApiKey = Deno.env.get("OPENAI_API_KEY")
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")
     
     if (!openaiApiKey) {
       throw new Error("OpenAI API key not configured")
     }
+
+    if (!supabaseUrl || !supabaseServiceKey) {
+      throw new Error("Supabase configuration not found")
+    }
+
+    // Supabaseクライアントを作成
+    const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
     // 会議専用の詳細プロンプト
     const prompt = `あなたは会議・ミーティングの専門家です。
@@ -156,6 +165,55 @@ serve(async (req) => {
     
     const aiResponse = JSON.parse(jsonMatch[0])
     const advices: AIAdvice[] = aiResponse.advices || []
+
+    // セッションをデータベースに保存（詳細設定を含む）
+    try {
+      const { data: sessionData, error: sessionError } = await supabase
+        .from('sessions')
+        .insert({
+          scene_id: context.scene,
+          goal: context.goal,
+          participants: context.participants,
+          relationship: context.relationship,
+          time_limit: context.time_limit,
+          stakes: context.stakes,
+          // 会議専用の詳細設定を保存
+          meeting_type: context.meeting_type,
+          meeting_format: context.meeting_format,
+          meeting_urgency: context.meeting_urgency,
+          meeting_frequency: context.meeting_frequency,
+          meeting_participants: context.meeting_participants,
+          meeting_tools: context.meeting_tools,
+          meeting_challenges: context.meeting_challenges
+        })
+        .select()
+        .single()
+
+      if (sessionError) {
+        console.error('Session save error:', sessionError)
+        // セッション保存に失敗してもアドバイスは返す
+      } else {
+        console.log('Session saved successfully:', sessionData.id)
+        
+        // アドバイスも保存
+        for (const advice of advices) {
+          const { error: adviceError } = await supabase
+            .from('session_advices')
+            .insert({
+              session_id: sessionData.id,
+              theory_id: advice.theory_id,
+              short_advice: advice.short_advice
+            })
+          
+          if (adviceError) {
+            console.error('Advice save error:', adviceError)
+          }
+        }
+      }
+    } catch (dbError) {
+      console.error('Database operation error:', dbError)
+      // データベース操作に失敗してもアドバイスは返す
+    }
 
     return new Response(JSON.stringify({ advices }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }

@@ -33,6 +33,8 @@ interface ChecklistResponse {
   recommendations: string[];
   meeting_specific_tips: string[]; // 会議特有のコツ
   preparation_timeline: string[]; // 準備のタイムライン
+  is_ai_generated: boolean; // AI生成かどうかのフラグを追加
+  generation_time_ms?: number; // 生成時間を追加
 }
 
 serve(async (req) => {
@@ -70,6 +72,8 @@ serve(async (req) => {
 
     const prompt = `あなたは会議ファシリテーションと意思決定の専門家で、会議・ミーティングシーンに特化した最適なチェックリストを作成する専門家です。
 
+【重要】このプロンプトに対して、必ずJSON形式で回答してください。テキストのみの回答は絶対に受け付けません。
+
 【会議の詳細分析】
 - シーン: ${context.scene} (会議・ミーティング)
 - 目標: ${context.goal}
@@ -82,7 +86,7 @@ serve(async (req) => {
 ${body.additional_context ? `- 追加コンテキスト: ${body.additional_context}` : ''}
 
 【会議シーン特化のチェックリスト作成要求】
-この会議の状況に最適化された、実用的で効果的なチェックリストを作成してください。
+この会議の状況に最適化された、実用的で効果的なチェックリストを作成してください。必ず5-8個のチェックリスト項目を含めてください。
 
 【会議特有の構成要素】
 各チェックリスト項目には以下を含めてください：
@@ -116,15 +120,26 @@ ${getParticipantRolesSpecificPrompt(body.participant_roles)}
 ${getMeetingFormatSpecificPrompt(body.meeting_format)}
 
 【出力形式】
-JSON形式で返してください：
+必ず以下のJSON形式で返してください：
 {
   "checklist": [
     {
-      "id": "unique_id",
+      "id": "meeting_item_1",
       "category": "カテゴリ名",
       "question": "具体的な質問",
       "description": "項目の説明",
-      "importance": "critical|important|recommended",
+      "importance": "critical",
+      "examples": ["例1", "例2", "例3"],
+      "reasoning": "この重要度である理由",
+      "timing": "確認すべきタイミング",
+      "specific_advice": "この項目に関する具体的で実践的なアドバイス"
+    },
+    {
+      "id": "meeting_item_2",
+      "category": "カテゴリ名",
+      "question": "具体的な質問",
+      "description": "項目の説明",
+      "importance": "important",
       "examples": ["例1", "例2", "例3"],
       "reasoning": "この重要度である理由",
       "timing": "確認すべきタイミング",
@@ -155,28 +170,62 @@ JSON形式で返してください：
 - 参加者の役割に応じたコミュニケーションスタイルの調整
 - 会議の目的に応じた進行方法の選択
 - 会議後の成果測定と継続性の確保
-- 参加者の立場と関心事を考慮したアプローチ`
+- 参加者の立場と関心事を考慮したアプローチ
+
+【最終確認】
+必ずJSON形式で回答し、checklist配列に5-8個の項目を含めてください。テキストのみの回答は絶対に受け付けません。`
 
     try {
       console.log('Calling AI for meeting checklist...');
+      const startTime = Date.now();
       const aiResponse = await generateAIAdvice(prompt, context);
+      const generationTime = Date.now() - startTime;
       console.log('AI response received for meeting:', aiResponse);
+      console.log('Generation time:', generationTime, 'ms');
       
       // AIレスポンスからチェックリストを抽出
       const checklistData = extractChecklistFromAIResponse(aiResponse);
       console.log('Extracted meeting checklist data:', checklistData);
+      
+      // 生成時間とAI生成フラグを追加
+      checklistData.generation_time_ms = generationTime;
+      checklistData.is_ai_generated = true;
       
       return new Response(JSON.stringify(checklistData), {
         headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
       });
     } catch (error) {
       console.error("AI generation failed for meeting:", error);
-      // フォールバック用の会議特化チェックリスト
-      const fallbackChecklist = generateMeetingFallbackChecklist(body);
-      console.log('Using meeting fallback checklist:', fallbackChecklist);
-      return new Response(JSON.stringify(fallbackChecklist), {
-        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
-      });
+      
+      // AI生成に失敗した場合は、再試行を試みる
+      try {
+        console.log("Retrying AI generation for meeting checklist...");
+        const startTime = Date.now();
+        const aiResponse = await generateAIAdvice(prompt, context);
+        const generationTime = Date.now() - startTime;
+        console.log('AI response received on retry:', aiResponse);
+        console.log('Retry generation time:', generationTime, 'ms');
+        
+        const checklistData = extractChecklistFromAIResponse(aiResponse);
+        checklistData.generation_time_ms = generationTime;
+        checklistData.is_ai_generated = true;
+        
+        return new Response(JSON.stringify(checklistData), {
+          headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
+        });
+      } catch (retryError) {
+        console.error("AI generation retry also failed:", retryError);
+        
+        // 最後の手段としてフォールバック用の会議特化チェックリストを使用
+        console.log('All AI generation failed, using meeting fallback checklist');
+        const fallbackChecklist = generateMeetingFallbackChecklist(body);
+        fallbackChecklist.is_ai_generated = false;
+        fallbackChecklist.generation_time_ms = 0;
+        
+        return new Response(JSON.stringify(fallbackChecklist), {
+          headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
+        });
+      }
     }
   } catch (error) {
     console.error('Meeting checklist function error:', error);
@@ -340,13 +389,22 @@ function extractChecklistFromAIResponse(aiResponse: any): ChecklistResponse {
       // 直接チェックリストが含まれている場合
       if (aiResponse.checklist && Array.isArray(aiResponse.checklist)) {
         console.log('Found checklist in response');
-        return aiResponse;
+        return {
+          ...aiResponse,
+          is_ai_generated: true,
+          generation_time_ms: aiResponse.generation_time_ms || undefined
+        };
       }
       
       // アドバイスが含まれている場合
       if (aiResponse.advices && Array.isArray(aiResponse.advices)) {
         console.log('Found advices, converting to checklist format');
-        return convertAdvicesToChecklist(aiResponse.advices);
+        const checklist = convertAdvicesToChecklist(aiResponse.advices);
+        return {
+          ...checklist,
+          is_ai_generated: true,
+          generation_time_ms: aiResponse.generation_time_ms || undefined
+        };
       }
       
       // 配列の場合、最初の要素を確認
@@ -356,12 +414,21 @@ function extractChecklistFromAIResponse(aiResponse: any): ChecklistResponse {
         
         if (firstResponse.checklist && Array.isArray(firstResponse.checklist)) {
           console.log('Found checklist in first response');
-          return firstResponse;
+          return {
+            ...firstResponse,
+            is_ai_generated: true,
+            generation_time_ms: firstResponse.generation_time_ms || undefined
+          };
         }
         
         if (firstResponse.advices && Array.isArray(firstResponse.advices)) {
           console.log('Found advices in first response, converting to checklist format');
-          return convertAdvicesToChecklist(firstResponse.advices);
+          const checklist = convertAdvicesToChecklist(firstResponse.advices);
+          return {
+            ...checklist,
+            is_ai_generated: true,
+            generation_time_ms: firstResponse.generation_time_ms || undefined
+          };
         }
       }
     }
@@ -410,7 +477,9 @@ function convertAdvicesToChecklist(advices: any[]): ChecklistResponse {
       "会議前日までに資料を準備",
       "会議開始30分前に会議室を確認",
       "会議開始10分前に参加者を確認"
-    ]
+    ],
+    is_ai_generated: true,
+    generation_time_ms: undefined // AI生成ではないため
   };
 }
 
@@ -490,6 +559,8 @@ function generateMeetingFallbackChecklist(body: MeetingChecklistRequest): Checkl
       "会議前日までにアジェンダと資料を準備・共有",
       "会議開始1時間前に会議室・オンライン環境を確認",
       "会議開始30分前に参加者への最終確認"
-    ]
+    ],
+    is_ai_generated: false,
+    generation_time_ms: undefined
   };
 }

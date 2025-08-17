@@ -14,12 +14,19 @@ interface ChatRequest {
     goal: string;
     currentAdvice?: any;
     currentTheory?: any;
+    // 会議・ミーティングの詳細設定
     meetingType?: string;
-    meetingPurpose?: string;
-    meetingParticipants?: string;
-    meetingDuration?: string;
     meetingFormat?: string;
-    meetingConstraints?: string;
+    meetingUrgency?: string;
+    meetingFrequency?: string;
+    meetingParticipants?: string;
+    meetingTools?: string;
+    meetingChallenges?: string;
+    // 基本設定
+    participants?: number;
+    relationship?: string;
+    timeLimit?: string;
+    stakes?: string;
   };
   chatHistory?: Array<{
     role: 'user' | 'assistant';
@@ -111,32 +118,54 @@ async function generateMeetingAIResponse(message: string, context: any, chatHist
     // 会議特化のシステムプロンプトの構築
     let systemPrompt = `あなたは会議運営とファシリテーションの専門家です。ユーザーの会議に関する質問に対して、以下の点を考慮して具体的で実践的な回答を提供してください：
 
-1. 常に実用的で実行可能なアドバイスを提供する
-2. 会議の目的と目標を明確にする
-3. 参加者の関与と貢献を最大化する
-4. 効率的で効果的な会議運営を促進する
-5. 会議後のフォローアップと成果の最大化を支援する
-6. 具体的な例やステップを示す
+**重要: 常に現在の会議の状況と詳細設定を踏まえて、具体的で実用的なアドバイスを提供してください。**
 
-現在の会議コンテキスト：
-- シーン: ${context?.scene || '会議'}
+**現在の会議の詳細状況:**
+- シーン: ${context?.scene || '会議・ミーティング'}
 - 目標: ${context?.goal || '効果的な会議の実施'}
-- 会議タイプ: ${context?.meetingType || '定例会議・プロジェクト会議・意思決定会議'}
-- 会議の目的: ${context?.meetingPurpose || '情報共有・意思決定・問題解決・計画策定'}
-- 参加者: ${context?.meetingParticipants || '5-10名'}
-- 会議時間: ${context?.meetingDuration || '60分'}
-- 会議形式: ${context?.meetingFormat || '対面・オンライン・ハイブリッド'}
-- 制約: ${context?.meetingConstraints || '時間・参加者・リソース'}`;
+- 参加者数: ${context?.participants || '未指定'}人
+- 関係性: ${context?.relationship || '未指定'}
+- 時間制限: ${context?.timeLimit || '未指定'}
+- 重要度: ${context?.stakes || '未指定'}
+
+**会議の詳細設定:**
+- 会議の種類: ${context?.meetingType || '未指定'}
+- 会議形式: ${context?.meetingFormat || '未指定'}
+- 緊急度: ${context?.meetingUrgency || '未指定'}
+- 頻度: ${context?.meetingFrequency || '未指定'}
+- 参加者タイプ: ${context?.meetingParticipants || '未指定'}
+- 使用ツール: ${context?.meetingTools || '未指定'}
+- 想定される課題: ${context?.meetingChallenges || '未指定'}
+
+**回答の指針:**
+1. **状況特化**: 上記の詳細設定を必ず考慮して回答する
+2. **具体的な行動**: 抽象的なアドバイスではなく、具体的なステップや方法を示す
+3. **ツール活用**: 指定されたツールを効果的に活用する方法を含める
+4. **課題対策**: 想定される課題への具体的な対応策を提案する
+5. **時間管理**: 時間制限内での効率的な進行方法を考慮する
+6. **重要度対応**: 重要度に応じた準備レベルと進行の厳密性を提案する
+
+**具体的な要求:**
+- オンライン会議の場合は、技術的な準備や参加者のエンゲージメント向上策を含める
+- 緊急会議の場合は、迅速な意思決定プロセスとフォローアップ体制を含める
+- 定例会議の場合は、効率化と継続的な改善策を含める
+- 意思決定会議の場合は、合意形成プロセスと責任分担を含める
+- 参加者数や関係性に応じた具体的な進行方法を提案する`;
 
     if (context?.currentTheory) {
-      systemPrompt += `\n- 関連理論: ${context.currentTheory.name_ja || context.currentTheory.name} - ${context.currentTheory.one_liner || context.currentTheory.definition}`;
+      systemPrompt += `\n\n**関連理論:**
+- 理論名: ${context.currentTheory.name_ja || context.currentTheory.name}
+- 概要: ${context.currentTheory.one_liner || context.currentTheory.definition || '理論の説明'}
+この理論を活用して、現在の会議状況に適した具体的なアドバイスを提供してください。`;
     }
 
     if (context?.currentAdvice) {
-      systemPrompt += `\n- 関連アドバイス: ${context.currentAdvice.short_advice}`;
+      systemPrompt += `\n\n**関連アドバイス:**
+- アドバイス内容: ${context.currentAdvice.short_advice}
+このアドバイスを踏まえて、さらに具体的で実用的な回答を提供してください。`;
     }
 
-    systemPrompt += `\n\nユーザーの会議に関する質問に対して、このコンテキストを活かして具体的で実用的な回答を提供してください。会議の成功と成果最大化に直結する実践的なアドバイスを心がけてください。`;
+    systemPrompt += `\n\nユーザーの会議に関する質問に対して、上記の詳細なコンテキストを必ず考慮して、現在の会議状況に特化した具体的で実用的な回答を提供してください。一般的な回答ではなく、設定された状況に応じた具体的な行動指針を示してください。`;
 
     // チャット履歴を含むメッセージの構築
     const messages = [
@@ -164,6 +193,7 @@ async function generateMeetingAIResponse(message: string, context: any, chatHist
     });
 
     console.log("Calling OpenAI API for meeting with messages:", messages.length);
+    console.log("Context being used:", context);
     
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -199,50 +229,38 @@ async function generateMeetingAIResponse(message: string, context: any, chatHist
 
 // 会議特化のフォールバック用の回答生成（AI生成に失敗した場合）
 function generateMeetingFallbackResponse(message: string, context: any): string {
-  const messageLower = message.toLowerCase();
+  console.log("Generating fallback response for meeting chat");
   
-  // 基本的なキーワードマッチングによるフォールバック
-  if (messageLower.includes('会議') || messageLower.includes('meeting') || messageLower.includes('進行') || messageLower.includes('facilitation')) {
-    return `会議運営についてお答えします。
-
-現在の会議コンテキストを考慮すると、以下のポイントが重要です：
-
-**会議タイプ**: ${context?.meetingType || '定例会議・プロジェクト会議・意思決定会議'}
-**会議の目的**: ${context?.meetingPurpose || '情報共有・意思決定・問題解決・計画策定'}
-
-**効果的な会議運営のポイント**:
-1. 会議の目的と目標を明確にする
-2. 適切な参加者と時間配分を設定する
-3. 参加者の関与を促進する
-
-より詳細なアドバイスが必要でしたら、AIチャットが正常に動作するようになった際に再度お試しください。`;
+  // 基本的な会議アドバイスを提供
+  let fallbackResponse = "会議に関するご質問ですね。";
+  
+  if (context?.meetingType) {
+    fallbackResponse += `\n\n${context.meetingType}について、以下の点を考慮することをお勧めします：`;
+    
+    if (context.meetingType === '定例会議') {
+      fallbackResponse += "\n• 議題の優先順位付けと時間配分の最適化";
+      fallbackResponse += "\n• 参加者の準備状況の確認と事前資料の共有";
+      fallbackResponse += "\n• 前回の議事録とアクションアイテムの振り返り";
+    } else if (context.meetingType === '意思決定会議') {
+      fallbackResponse += "\n• 決定事項の明確化と責任者の特定";
+      fallbackResponse += "\n• 代替案の検討とリスク評価";
+      fallbackResponse += "\n• 合意形成プロセスの確立";
+    } else if (context.meetingType === 'ブレインストーミング') {
+      fallbackResponse += "\n• 創造的なアイデア発想のための環境作り";
+      fallbackResponse += "\n• 批判を避けた自由な発言の促進";
+      fallbackResponse += "\n• アイデアの整理と優先順位付け";
+    }
   }
   
-  if (messageLower.includes('参加者') || messageLower.includes('participant') || messageLower.includes('関与') || messageLower.includes('engagement')) {
-    return `会議参加者の関与促進についてお答えします。
-
-**参加者関与促進のポイント**:
-1. 全員が発言できる機会を作る
-2. 建設的な議論を促進する
-3. 参加者の意見を尊重する
-
-**目標「${context?.goal || '効果的な会議の実施'}」を達成するために**:
-- 参加者の多様な視点を活用する
-- 全員の貢献を認める
-- 会議後のアクションを明確にする
-
-より詳細なアドバイスが必要でしたら、AIチャットが正常に動作するようになった際に再度お試しください。`;
+  if (context?.meetingFormat === 'オンライン') {
+    fallbackResponse += "\n\nオンライン会議の場合は、技術的な準備と参加者のエンゲージメント向上を心がけてください。";
   }
   
-  // デフォルトのフォールバック回答
-  return `申し訳ございません。現在会議AIチャットの応答生成に問題が発生しております。
-
-現在の会議コンテキストについて、基本的なアドバイスとしては：
-
-1. **会議設計**: 目的と目標を明確にし、適切な参加者と時間を設定する
-2. **会議進行**: 効率的で効果的な会議運営を行い、参加者の関与を促進する
-3. **成果最大化**: 会議後のフォローアップとアクションを確実に実行する
-4. **継続改善**: 会議の効果を定期的に評価し、改善を図る
-
-より詳細で個別化されたアドバイスが必要でしたら、しばらく時間をおいて再度お試しください。`;
+  if (context?.meetingUrgency === '緊急') {
+    fallbackResponse += "\n\n緊急会議の場合は、迅速な意思決定と明確なアクションプランが重要です。";
+  }
+  
+  fallbackResponse += "\n\nより具体的なアドバイスが必要でしたら、再度お試しください。";
+  
+  return fallbackResponse;
 }

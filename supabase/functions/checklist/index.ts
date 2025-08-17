@@ -28,6 +28,8 @@ interface ChecklistResponse {
   checklist: ChecklistItem[];
   summary: string;
   recommendations: string[];
+  is_ai_generated: boolean; // AI生成かどうかのフラグを追加
+  generation_time_ms?: number; // 生成時間を追加
 }
 
 serve(async (req) => {
@@ -72,22 +74,77 @@ serve(async (req) => {
 
     // シーン別の専門チェックリスト関数にルーティング
     try {
-      const checklistData = await routeToSpecialistChecklist(body.scene, context, body.additional_context);
-      console.log('Specialist checklist generated:', checklistData);
+      const startTime = Date.now();
       
-      return new Response(JSON.stringify(checklistData), {
+      // シーンに応じた専用チェックリスト関数を呼び出し
+      console.log(`Routing to specialist checklist for scene: ${body.scene}`);
+      const specialistChecklist = await routeToSpecialistChecklist(body.scene, context, body.additional_context);
+      const generationTime = Date.now() - startTime;
+      
+      console.log('Specialist checklist generated successfully:', specialistChecklist);
+      console.log('Generation time:', generationTime, 'ms');
+      
+      // 生成時間とAI生成フラグを追加
+      specialistChecklist.generation_time_ms = generationTime;
+      specialistChecklist.is_ai_generated = true;
+      
+      return new Response(JSON.stringify(specialistChecklist), {
         headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
       });
     } catch (error) {
       console.error("Specialist checklist failed:", error);
       
-      // 専門関数が失敗した場合は、直接フォールバックチェックリストを使用
-      console.log("Using fallback checklist due to specialist failure");
-      const fallbackChecklist = generateFallbackChecklist(context);
-      
-      return new Response(JSON.stringify(fallbackChecklist), {
-        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
-      });
+      // 専門関数が失敗した場合は、汎用AIチェックリストを試行
+      try {
+        console.log("Trying generic AI checklist as fallback...");
+        const startTime = Date.now();
+        const genericChecklist = await generateGenericChecklist(context, body.additional_context);
+        const generationTime = Date.now() - startTime;
+        
+        console.log('Generic AI checklist generated successfully:', genericChecklist);
+        console.log('Generation time:', generationTime, 'ms');
+        
+        // 生成時間とAI生成フラグを追加
+        genericChecklist.generation_time_ms = generationTime;
+        genericChecklist.is_ai_generated = true;
+        
+        return new Response(JSON.stringify(genericChecklist), {
+          headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
+        });
+      } catch (genericError) {
+        console.error("Generic AI checklist also failed:", genericError);
+        
+        // さらに再試行を試みる
+        try {
+          console.log("Final retry attempt with generic AI...");
+          const startTime = Date.now();
+          const genericChecklist = await generateGenericChecklist(context, body.additional_context);
+          const generationTime = Date.now() - startTime;
+          
+          console.log('AI checklist generated successfully on final retry:', genericChecklist);
+          console.log('Final retry generation time:', generationTime, 'ms');
+          
+          // 生成時間とAI生成フラグを追加
+          genericChecklist.generation_time_ms = generationTime;
+          genericChecklist.is_ai_generated = true;
+          
+          return new Response(JSON.stringify(genericChecklist), {
+            headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
+          });
+        } catch (finalError) {
+          console.error("All AI generation attempts failed:", finalError);
+          
+          // 最後の手段としてフォールバックチェックリストを使用
+          console.log("Using fallback checklist as last resort");
+          const fallbackChecklist = generateFallbackChecklist(context);
+          fallbackChecklist.is_ai_generated = false;
+          fallbackChecklist.generation_time_ms = 0;
+          
+          return new Response(JSON.stringify(fallbackChecklist), {
+            headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
+          });
+        }
+      }
     }
   } catch (error) {
     console.error('Function error:', error);
@@ -112,63 +169,37 @@ async function routeToSpecialistChecklist(scene: string, context: AIContext, add
   
   if (specialistUrl) {
     try {
-      console.log(`Routing to specialist checklist: ${scene}`);
-      // 環境変数から直接認証情報を取得
-      const supabaseUrl = Deno.env.get('SUPABASE_URL');
-      const supabaseServiceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+      console.log(`Routing to specialist checklist: ${scene} at ${specialistUrl}`);
       
-      if (!supabaseServiceRoleKey) {
-        console.error('SUPABASE_SERVICE_ROLE_KEY not configured');
-        throw new Error('SUPABASE_SERVICE_ROLE_KEY not configured');
-      }
+      // シーン別の適切なパラメータを構築
+      const requestBody = buildSceneSpecificRequestBody(scene, context, additionalContext);
+      console.log('Request body for specialist:', requestBody);
       
       const response = await fetch(specialistUrl, {
         method: "POST",
         headers: { 
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${Deno.env.get('SUPABASE_ANON_KEY') || ''}`
         },
-        body: JSON.stringify({
-          scene: context.scene,
-          goal: context.goal,
-          time_limit: context.timeLimit,
-          stakes: context.stakes,
-          participants: context.participants,
-          relationship: context.relationship,
-          additional_context: additionalContext,
-          // シーン別関数で必要な追加フィールド
-          meeting_type: "定例会議", // デフォルト値
-          participants_count: context.participants || 2,
-          participant_roles: context.relationship ? [context.relationship] : ["参加者"],
-          meeting_format: "対面", // デフォルト値
-          // 他のシーン用のフィールドも追加
-          customer_type: "既存顧客",
-          industry: "IT",
-          customer_position: "担当者",
-          company_size: "中小企業",
-          sales_stage: "提案",
-          presentation_purpose: "情報共有",
-          audience_type: "社内",
-          presentation_format: "対面",
-          interview_type: "1on1",
-          interview_purpose: "進捗確認",
-          team_building_type: "チーム強化",
-          team_maturity: "成長期",
-          team_context: "プロジェクト進行中"
-        })
+        body: JSON.stringify(requestBody)
       });
       
       if (response.ok) {
         const data = await response.json();
+        console.log(`Specialist checklist ${scene} response received:`, data);
         return data;
       } else {
-        console.error(`Specialist checklist ${scene} failed with status:`, response.status);
+        const errorText = await response.text();
+        console.error(`Specialist checklist ${scene} failed with status: ${response.status}, error: ${errorText}`);
         
-        // 認証エラー（401）の場合は、フォールバックチェックリストを使用
+        // 認証エラー（401）の場合は、汎用AIチェックリストを試行
         if (response.status === 401) {
-          console.log(`Authentication failed for ${scene}, using fallback checklist`);
-          throw new Error('Authentication failed, using fallback');
+          console.log(`Authentication failed for ${scene}, trying generic AI checklist`);
+          throw new Error('Authentication failed, trying generic AI');
         }
         
+        // その他のエラーの場合も汎用AIを試行
+        console.log(`Specialist checklist ${scene} failed, trying generic AI as fallback`);
         throw new Error(`Specialist checklist failed with status: ${response.status}`);
       }
     } catch (error) {
@@ -182,9 +213,77 @@ async function routeToSpecialistChecklist(scene: string, context: AIContext, add
   throw new Error(`No specialist checklist available for scene: ${scene}`);
 }
 
-// 汎用AIチェックリスト生成
-async function generateGenericChecklist(context: AIContext, additionalContext?: string): Promise<ChecklistResponse> {
-  const prompt = `あなたは組織変革とリーダーシップの専門家で、各シーンに応じた最適なチェックリストを作成する専門家です。
+// シーン別の適切なリクエストボディを構築
+function buildSceneSpecificRequestBody(scene: string, context: AIContext, additionalContext?: string): any {
+  const baseBody = {
+    scene: context.scene,
+    goal: context.goal,
+    time_limit: context.timeLimit,
+    stakes: context.stakes,
+    participants: context.participants,
+    relationship: context.relationship,
+    additional_context: additionalContext
+  };
+
+  // シーン別の追加パラメータ
+  switch (scene) {
+    case 'meeting':
+      return {
+        ...baseBody,
+        meeting_type: "定例会議",
+        participants_count: context.participants || 2,
+        participant_roles: context.relationship ? [context.relationship] : ["参加者"],
+        meeting_format: "対面"
+      };
+    
+    case 'sales':
+      return {
+        ...baseBody,
+        customer_type: "既存顧客",
+        industry: "IT",
+        customer_position: "担当者",
+        company_size: "中小企業",
+        sales_stage: "提案"
+      };
+    
+    case 'presentation':
+      return {
+        ...baseBody,
+        presentation_purpose: "情報共有",
+        audience_type: "社内",
+        presentation_format: "対面"
+      };
+    
+    case 'interview':
+      return {
+        ...baseBody,
+        interview_type: "1on1",
+        interview_purpose: "進捗確認"
+      };
+    
+    case 'team_building':
+      return {
+        ...baseBody,
+        team_building_type: "チーム強化",
+        team_maturity: "成長期",
+        team_context: "プロジェクト進行中"
+      };
+    
+    default:
+      return baseBody;
+  }
+}
+
+// 汎用AIチェックリスト生成（再試行機能付き）
+async function generateGenericChecklist(context: AIContext, additionalContext?: string, retryCount: number = 0): Promise<ChecklistResponse> {
+  const maxRetries = 2; // 最大2回まで再試行
+  
+  try {
+    console.log(`Calling AI for generic checklist (attempt ${retryCount + 1}/${maxRetries + 1})...`);
+    
+    const prompt = `あなたは組織変革とリーダーシップの専門家で、各シーンに応じた最適なチェックリストを作成する専門家です。
+
+【重要】このプロンプトに対して、必ずJSON形式で回答してください。テキストのみの回答は絶対に受け付けません。
 
 【状況分析】
 - シーン: ${context.scene}
@@ -196,7 +295,7 @@ ${context.relationship ? `- 関係性: ${context.relationship}` : ''}
 ${additionalContext ? `- 追加コンテキスト: ${additionalContext}` : ''}
 
 【チェックリスト作成の要求】
-この状況に最適化された、実用的で効果的なチェックリストを作成してください。
+この状況に最適化された、実用的で効果的なチェックリストを作成してください。必ず5-8個のチェックリスト項目を含めてください。
 
 【チェックリストの構成要素】
 各チェックリスト項目には以下を含めてください：
@@ -218,15 +317,25 @@ ${additionalContext ? `- 追加コンテキスト: ${additionalContext}` : ''}
 ${getSceneSpecificPrompt(context.scene)}
 
 【出力形式】
-JSON形式で返してください：
+必ず以下のJSON形式で返してください：
 {
   "checklist": [
     {
-      "id": "unique_id",
+      "id": "item_1",
       "category": "カテゴリ名",
       "question": "具体的な質問",
       "description": "項目の説明",
-      "importance": "critical|important|recommended",
+      "importance": "critical",
+      "examples": ["例1", "例2", "例3"],
+      "reasoning": "この重要度である理由",
+      "timing": "確認すべきタイミング"
+    },
+    {
+      "id": "item_2",
+      "category": "カテゴリ名",
+      "question": "具体的な質問",
+      "description": "項目の説明",
+      "importance": "important",
       "examples": ["例1", "例2", "例3"],
       "reasoning": "この重要度である理由",
       "timing": "確認すべきタイミング"
@@ -245,10 +354,11 @@ JSON形式で返してください：
 - 参加者数や関係性に応じた項目の調整
 - 時間制限に応じた実行可能性の考慮
 - リスク要因の特定と対策の提案
-- 成功指標の明確化と測定方法の提示`
+- 成功指標の明確化と測定方法の提示
 
-  try {
-    console.log('Calling AI for generic checklist...');
+【最終確認】
+必ずJSON形式で回答し、checklist配列に5-8個の項目を含めてください。テキストのみの回答は絶対に受け付けません。`;
+
     const aiResponse = await generateAIAdvice(prompt, context);
     console.log('AI response received for generic:', aiResponse);
     
@@ -258,11 +368,18 @@ JSON形式で返してください：
     
     return checklistData;
   } catch (error) {
-    console.error("AI generation failed for generic:", error);
-    // フォールバック用の基本チェックリスト
-    const fallbackChecklist = generateFallbackChecklist(context);
-    console.log('Using generic fallback checklist:', fallbackChecklist);
-    return fallbackChecklist;
+    console.error(`AI generation failed for generic (attempt ${retryCount + 1}):`, error);
+    
+    // 再試行可能な場合は再試行
+    if (retryCount < maxRetries) {
+      console.log(`Retrying AI generation (${retryCount + 1}/${maxRetries})...`);
+      // 少し待ってから再試行
+      await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)));
+      return generateGenericChecklist(context, additionalContext, retryCount + 1);
+    }
+    
+    // 最大再試行回数に達した場合はエラーを投げる
+    throw new Error(`AI generation failed after ${maxRetries + 1} attempts: ${error.message}`);
   }
 }
 
@@ -317,17 +434,32 @@ function getSceneSpecificPrompt(scene: string): string {
 function extractChecklistFromAIResponse(aiResponse: any): ChecklistResponse {
   try {
     console.log('Extracting checklist from AI response:', aiResponse);
+    console.log('AI response type:', typeof aiResponse);
+    console.log('AI response keys:', aiResponse ? Object.keys(aiResponse) : 'null/undefined');
     
     if (aiResponse) {
       // 直接チェックリストが含まれている場合
       if (aiResponse.checklist && Array.isArray(aiResponse.checklist)) {
-        console.log('Found checklist in response');
-        return aiResponse;
+        console.log('Found checklist in response, items count:', aiResponse.checklist.length);
+        
+        // チェックリストの品質を検証
+        if (aiResponse.checklist.length >= 3) {
+          console.log('Checklist quality verified, returning response');
+          return aiResponse;
+        } else {
+          console.warn('Checklist too short, attempting to enhance...');
+          // 短すぎる場合は拡張を試みる
+          const enhancedChecklist = enhanceChecklist(aiResponse.checklist);
+          return {
+            ...aiResponse,
+            checklist: enhancedChecklist
+          };
+        }
       }
       
       // アドバイスが含まれている場合
       if (aiResponse.advices && Array.isArray(aiResponse.advices)) {
-        console.log('Found advices, converting to checklist format');
+        console.log('Found advices, converting to checklist format, count:', aiResponse.advices.length);
         return convertAdvicesToChecklist(aiResponse.advices);
       }
       
@@ -337,7 +469,7 @@ function extractChecklistFromAIResponse(aiResponse: any): ChecklistResponse {
         console.log('First response:', firstResponse);
         
         if (firstResponse.checklist && Array.isArray(firstResponse.checklist)) {
-          console.log('Found checklist in first response');
+          console.log('Found checklist in first response, items count:', firstResponse.checklist.length);
           return firstResponse;
         }
         
@@ -346,6 +478,12 @@ function extractChecklistFromAIResponse(aiResponse: any): ChecklistResponse {
           return convertAdvicesToChecklist(firstResponse.advices);
         }
       }
+      
+      // レスポンスの内容を詳しく確認
+      console.log('Response content analysis:');
+      console.log('- Has checklist:', !!aiResponse.checklist);
+      console.log('- Has advices:', !!aiResponse.advices);
+      console.log('- Response structure:', JSON.stringify(aiResponse, null, 2).substring(0, 500));
     }
     
     // フォールバック
@@ -355,6 +493,47 @@ function extractChecklistFromAIResponse(aiResponse: any): ChecklistResponse {
     console.error("Checklist extraction failed:", error);
     throw error;
   }
+}
+
+// チェックリストを拡張する関数
+function enhanceChecklist(checklist: any[]): any[] {
+  console.log('Enhancing checklist with additional items...');
+  
+  const enhancedItems = [...checklist];
+  
+  // 基本的な項目を追加
+  const basicItems = [
+    {
+      id: "enhanced_preparation",
+      category: "基本準備",
+      question: "目的と目標は明確に設定されていますか？",
+      description: "シーンの目的と期待される成果を明確にすることで、効果的な実行が可能になります。",
+      importance: "critical" as const,
+      examples: ["目標を具体的に設定", "成功指標を明確化", "期待される成果を定義"],
+      reasoning: "目的が不明確だと、効果的な実行が困難になります。",
+      timing: "シーン開始前"
+    },
+    {
+      id: "enhanced_execution",
+      category: "実行・進行",
+      question: "計画通りに実行できていますか？",
+      description: "計画を確実に実行することで、期待される成果を達成できます。",
+      importance: "important" as const,
+      examples: ["計画の進捗確認", "必要に応じた調整", "実行の記録"],
+      reasoning: "計画の実行が不十分だと、成果が期待通りに得られません。",
+      timing: "シーン進行中"
+    }
+  ];
+  
+  // 重複を避けて追加
+  basicItems.forEach(item => {
+    if (!enhancedItems.find(existing => existing.question === item.question)) {
+      enhancedItems.push(item);
+    }
+  });
+  
+  console.log('Enhanced checklist items count:', enhancedItems.length);
+  return enhancedItems;
 }
 
 // アドバイスをチェックリスト形式に変換
@@ -381,7 +560,8 @@ function convertAdvicesToChecklist(advices: any[]): ChecklistResponse {
       "各アドバイスを順番に確認してください",
       "実行可能な項目から始めてください",
       "必要に応じて調整を行ってください"
-    ]
+    ],
+    is_ai_generated: true
   };
 }
 
@@ -425,6 +605,7 @@ function generateFallbackChecklist(context: AIContext): ChecklistResponse {
       "各項目を順番に確認してください",
       "完了できない項目がある場合は、代替案を検討してください",
       "定期的にチェックリストを見直し、更新してください"
-    ]
+    ],
+    is_ai_generated: false
   };
 }

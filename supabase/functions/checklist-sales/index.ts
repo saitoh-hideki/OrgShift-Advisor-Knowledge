@@ -72,6 +72,8 @@ serve(async (req) => {
 
     const prompt = `あなたは営業戦略と顧客関係構築の専門家で、営業・商談シーンに特化した最適なチェックリストを作成する専門家です。
 
+【重要】このプロンプトに対して、必ずJSON形式で回答してください。テキストのみの回答は絶対に受け付けません。
+
 【営業の詳細分析】
 - シーン: ${context.scene} (営業・商談)
 - 目標: ${body.goal}
@@ -85,7 +87,7 @@ serve(async (req) => {
 ${body.additional_context ? `- 追加コンテキスト: ${body.additional_context}` : ''}
 
 【営業シーン特化のチェックリスト作成要求】
-この営業の状況に最適化された、実用的で効果的なチェックリストを作成してください。
+この営業の状況に最適化された、実用的で効果的なチェックリストを作成してください。必ず5-8個のチェックリスト項目を含めてください。
 
 【営業特有の構成要素】
 各チェックリスト項目には以下を含めてください：
@@ -122,15 +124,26 @@ ${getCustomerPositionSpecificPrompt(body.customer_position)}
 ${getCompanySizeSpecificPrompt(body.company_size)}
 
 【出力形式】
-JSON形式で返してください：
+必ず以下のJSON形式で返してください：
 {
   "checklist": [
     {
-      "id": "unique_id",
+      "id": "sales_item_1",
       "category": "カテゴリ名",
       "question": "具体的な質問",
       "description": "項目の説明",
-      "importance": "critical|important|recommended",
+      "importance": "critical",
+      "examples": ["例1", "例2", "例3"],
+      "reasoning": "この重要度である理由",
+      "timing": "確認すべきタイミング",
+      "specific_advice": "この項目に関する具体的で実践的なアドバイス"
+    },
+    {
+      "id": "sales_item_2",
+      "category": "カテゴリ名",
+      "question": "具体的な質問",
+      "description": "項目の説明",
+      "importance": "important",
       "examples": ["例1", "例2", "例3"],
       "reasoning": "この重要度である理由",
       "timing": "確認すべきタイミング",
@@ -166,7 +179,10 @@ JSON形式で返してください：
 - 顧客の組織構造に応じた意思決定者へのアプローチ
 - 時間制限に応じた営業戦略の調整
 - 長期的な顧客関係構築の視点
-- 業界特有の課題とソリューションの理解`
+- 業界特有の課題とソリューションの理解
+
+【最終確認】
+必ずJSON形式で回答し、checklist配列に5-8個の項目を含めてください。テキストのみの回答は絶対に受け付けません。`
 
     try {
       console.log('Calling AI for sales checklist...');

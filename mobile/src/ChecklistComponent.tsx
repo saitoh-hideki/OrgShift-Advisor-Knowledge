@@ -46,6 +46,8 @@ interface ChecklistResponse {
   audience_engagement_tips?: string[];
   interview_specific_tips?: string[];
   relationship_building_tips?: string[];
+  is_ai_generated?: boolean; // AI生成かどうかのフラグ
+  generation_time_ms?: number; // 生成時間（ミリ秒）
 }
 
 export default function ChecklistComponent({
@@ -248,6 +250,25 @@ export default function ChecklistComponent({
           <TouchableOpacity style={styles.regenerateButton} onPress={regenerateChecklist}>
             <Text style={styles.regenerateButtonText}>チェックリストを再生成</Text>
           </TouchableOpacity>
+        </View>
+
+        {/* AI生成状況の表示 */}
+        <View style={styles.aiStatusSection}>
+          <View style={styles.aiStatusRow}>
+            <View style={[
+              styles.aiStatusBadge,
+              { backgroundColor: checklist.is_ai_generated ? '#28a745' : '#6c757d' }
+            ]}>
+              <Text style={styles.aiStatusText}>
+                {checklist.is_ai_generated ? 'AI生成' : '定型テンプレート'}
+              </Text>
+            </View>
+            {checklist.generation_time_ms && checklist.generation_time_ms > 0 && (
+              <Text style={styles.generationTimeText}>
+                生成時間: {checklist.generation_time_ms}ms
+              </Text>
+            )}
+          </View>
         </View>
 
         {/* チェックリスト概要 */}
@@ -575,6 +596,31 @@ const styles = StyleSheet.create({
     color: '#495057',
     marginBottom: 8,
     lineHeight: 20,
+  },
+  aiStatusSection: {
+    padding: 20,
+    backgroundColor: '#fff',
+    marginTop: 12,
+  },
+  aiStatusRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  aiStatusBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+  },
+  aiStatusText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  generationTimeText: {
+    fontSize: 12,
+    color: '#6c757d',
+    fontFamily: 'monospace',
   },
   tipsSection: {
     padding: 20,
