@@ -23,7 +23,7 @@ interface TheoryMemo {
   one_liner: string;
   definition: string;
   content: string;
-  applicable_scenarios: string;
+  applicable_scenarios: string[];
   key_concepts: string[];
   examples: string[];
   practical_tips: string[];
@@ -166,7 +166,7 @@ async function listTheories(supabase: any, domain?: string) {
       one_liner: theory.one_liner,
       definition: theory.definition,
       content: theory.content,
-      applicable_scenarios: theory.applicable_scenarios,
+      applicable_scenarios: theory.applicable_scenarios || [],
       key_concepts: theory.key_concepts || [],
       examples: theory.examples || [],
       practical_tips: theory.practical_tips || [],
@@ -232,13 +232,19 @@ async function getTheory(supabase: any, theory_id: string) {
       one_liner: theory.one_liner,
       definition: theory.definition,
       content: theory.content,
-      applicable_scenarios: theory.applicable_scenarios,
-      key_concepts: theory.key_concepts || [],
-      examples: theory.examples || [],
-      practical_tips: theory.practical_tips || [],
+      applicable_scenarios: Array.isArray(theory.applicable_scenarios) ? theory.applicable_scenarios : 
+                           (typeof theory.applicable_scenarios === 'string' ? [theory.applicable_scenarios] : []),
+      key_concepts: Array.isArray(theory.key_concepts) ? theory.key_concepts : 
+                   (typeof theory.key_concepts === 'string' ? [theory.key_concepts] : []),
+      examples: Array.isArray(theory.examples) ? theory.examples : 
+               (typeof theory.examples === 'string' ? [theory.examples] : []),
+      practical_tips: Array.isArray(theory.practical_tips) ? theory.practical_tips : 
+                     (typeof theory.practical_tips === 'string' ? [theory.practical_tips] : []),
       mechanism: theory.mechanism,
-      how_to: theory.how_to || [],
-      tags: theory.tags || []
+      how_to: Array.isArray(theory.how_to) ? theory.how_to : 
+              (typeof theory.how_to === 'string' ? [theory.how_to] : []),
+      tags: Array.isArray(theory.tags) ? theory.tags : 
+            (typeof theory.tags === 'string' ? [theory.tags] : [])
     };
     
     return new Response(JSON.stringify(theoryMemo), {
@@ -302,7 +308,7 @@ async function searchTheories(supabase: any, search_query: string, domain?: stri
       one_liner: theory.one_liner,
       definition: theory.definition,
       content: theory.content,
-      applicable_scenarios: theory.applicable_scenarios,
+      applicable_scenarios: theory.applicable_scenarios || [],
       key_concepts: theory.key_concepts || [],
       examples: theory.examples || [],
       practical_tips: theory.practical_tips || [],

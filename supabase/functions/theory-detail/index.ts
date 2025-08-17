@@ -90,13 +90,19 @@ serve(async (req) => {
       one_liner: theory.one_liner || theory.definition || '理論の概要',
       definition: theory.definition || theory.content || '理論の定義',
       content: theory.content || theory.definition || '理論の詳細内容',
-      applicable_scenarios: theory.applicable_scenarios || [],
-      key_concepts: theory.key_concepts || [],
-      practical_tips: theory.practical_tips || [],
-      examples: theory.examples || [],
+      applicable_scenarios: Array.isArray(theory.applicable_scenarios) ? theory.applicable_scenarios : 
+                           (typeof theory.applicable_scenarios === 'string' ? [theory.applicable_scenarios] : []),
+      key_concepts: Array.isArray(theory.key_concepts) ? theory.key_concepts : 
+                   (typeof theory.key_concepts === 'string' ? [theory.key_concepts] : []),
+      practical_tips: Array.isArray(theory.practical_tips) ? theory.practical_tips : 
+                     (typeof theory.practical_tips === 'string' ? [theory.practical_tips] : []),
+      examples: Array.isArray(theory.examples) ? theory.examples : 
+               (typeof theory.examples === 'string' ? [theory.examples] : []),
       mechanism: theory.mechanism || '',
-      how_to: theory.how_to || '',
-      templates: theory.templates || []
+      how_to: Array.isArray(theory.how_to) ? theory.how_to : 
+              (typeof theory.how_to === 'string' ? [theory.how_to] : []),
+      templates: Array.isArray(theory.templates) ? theory.templates : 
+                (typeof theory.templates === 'string' ? [theory.templates] : [])
     }
     
     console.log('Returning theory data:', theoryData);

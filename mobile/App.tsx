@@ -133,7 +133,16 @@ export default function App() {
   const [theoriesList, setTheoriesList] = useState<Theory[]>([]);
   const [isLoadingTheories, setIsLoadingTheories] = useState(false);
   const [relatedTheories, setRelatedTheories] = useState<Theory[]>([]);
-  const [theoryCounts, setTheoryCounts] = useState<{ [key: string]: number }>({});
+  const [theoryCounts, setTheoryCounts] = useState<{ [key: string]: number }>({
+    behavioral_econ: 25,
+    leadership: 15,
+    communication: 20,
+    strategy: 10,
+    innovation: 20,
+    operations: 10,
+    finance: 10,
+    sales_marketing: 10
+  });
 
   // ScrollViewのref
   const adviceScrollViewRef = useRef<ScrollView>(null);
@@ -267,7 +276,12 @@ export default function App() {
   // 理論メモ画面に移動した時に理論数を取得
   useEffect(() => {
     if (currentView === 'theoryMemo') {
-      getAllTheoryCounts();
+      try {
+        getAllTheoryCounts();
+      } catch (error) {
+        console.error('Error in theory memo useEffect:', error);
+        // エラーが発生しても、デフォルト値で画面を表示
+      }
     }
   }, [currentView]);
 
@@ -821,16 +835,37 @@ export default function App() {
       }
 
       const data = await response.json();
-      setTheoriesList(data.theories || []);
+      
+      // 理論データの整合性チェック
+      const validatedTheories = (data.theories || []).map((theory: any) => ({
+        ...theory,
+        applicable_scenarios: Array.isArray(theory.applicable_scenarios) ? theory.applicable_scenarios : 
+                             (typeof theory.applicable_scenarios === 'string' ? [theory.applicable_scenarios] : []),
+        key_concepts: Array.isArray(theory.key_concepts) ? theory.key_concepts : 
+                     (typeof theory.key_concepts === 'string' ? [theory.key_concepts] : []),
+        examples: Array.isArray(theory.examples) ? theory.examples : 
+                 (typeof theory.examples === 'string' ? [theory.examples] : []),
+        practical_tips: Array.isArray(theory.practical_tips) ? theory.practical_tips : 
+                       (typeof theory.practical_tips === 'string' ? [theory.practical_tips] : [])
+      }));
+      
+      setTheoriesList(validatedTheories);
       
       // 理論数を更新
       setTheoryCounts(prev => ({
         ...prev,
-        [category]: data.theories?.length || 0
+        [category]: validatedTheories.length
       }));
     } catch (error) {
       console.error('Error fetching theories:', error);
       setTheoriesList([]);
+      
+      // ユーザーにエラーを通知
+      Alert.alert(
+        'エラー',
+        '理論一覧を読み込めませんでした。しばらく時間をおいて再度お試しください。',
+        [{ text: 'OK' }]
+      );
     } finally {
       setIsLoadingTheories(false);
     }
@@ -908,10 +943,35 @@ export default function App() {
       }
 
       const theoryData = await response.json();
-      setSelectedTheoryData(theoryData);
+      
+      // データの整合性チェックと正規化
+      const normalizedTheoryData = {
+        ...theoryData,
+        applicable_scenarios: Array.isArray(theoryData.applicable_scenarios) ? theoryData.applicable_scenarios : 
+                             (typeof theoryData.applicable_scenarios === 'string' ? [theoryData.applicable_scenarios] : []),
+        key_concepts: Array.isArray(theoryData.key_concepts) ? theoryData.key_concepts : 
+                     (typeof theoryData.key_concepts === 'string' ? [theoryData.key_concepts] : []),
+        examples: Array.isArray(theoryData.examples) ? theoryData.examples : 
+                 (typeof theoryData.examples === 'string' ? [theoryData.examples] : []),
+        practical_tips: Array.isArray(theoryData.practical_tips) ? theoryData.practical_tips : 
+                       (typeof theoryData.practical_tips === 'string' ? [theoryData.practical_tips] : []),
+        how_to: Array.isArray(theoryData.how_to) ? theoryData.how_to : 
+                (typeof theoryData.how_to === 'string' ? [theoryData.how_to] : []),
+        templates: Array.isArray(theoryData.templates) ? theoryData.templates : 
+                  (typeof theoryData.templates === 'string' ? [theoryData.templates] : [])
+      };
+      
+      setSelectedTheoryData(normalizedTheoryData);
     } catch (error) {
       console.error('Error fetching theory detail:', error);
       setSelectedTheoryData(null);
+      
+      // ユーザーにエラーを通知
+      Alert.alert(
+        'エラー',
+        '理論の詳細情報を読み込めませんでした。しばらく時間をおいて再度お試しください。',
+        [{ text: 'OK' }]
+      );
     } finally {
       setIsLoadingTheory(false);
     }
@@ -2334,7 +2394,7 @@ export default function App() {
                   {currentTheory.one_liner || '理論の説明がありません'}
                 </Text>
                   
-                {currentTheory.key_concepts && currentTheory.key_concepts.length > 0 && (
+                {currentTheory.key_concepts && Array.isArray(currentTheory.key_concepts) && currentTheory.key_concepts.length > 0 && (
                   <>
                     <Text style={styles.adviceSubtitle}>主要概念</Text>
                     {currentTheory.key_concepts.map((concept, conceptIndex) => (
@@ -2350,7 +2410,7 @@ export default function App() {
                   </>
                 )}
                 
-                {currentTheory.examples && currentTheory.examples.length > 0 && (
+                {currentTheory.examples && Array.isArray(currentTheory.examples) && currentTheory.examples.length > 0 && (
                   <>
                     <Text style={styles.adviceSubtitle}>具体例</Text>
                     {currentTheory.examples.map((example, exampleIndex) => (
@@ -2359,7 +2419,7 @@ export default function App() {
                   </>
                 )}
                 
-                {currentTheory.practical_tips && currentTheory.practical_tips.length > 0 && (
+                {currentTheory.practical_tips && Array.isArray(currentTheory.practical_tips) && currentTheory.practical_tips.length > 0 && (
                   <>
                     <Text style={styles.adviceSubtitle}>実践のコツ</Text>
                     {currentTheory.practical_tips.map((tip, tipIndex) => (
@@ -2382,7 +2442,7 @@ export default function App() {
                         {theory.one_liner || '理論の説明がありません'}
                       </Text>
                       
-                      {theory.key_concepts && theory.key_concepts.length > 0 && (
+                      {theory.key_concepts && Array.isArray(theory.key_concepts) && theory.key_concepts.length > 0 && (
                         <>
                           <Text style={styles.adviceSubtitle}>主要概念</Text>
                           {theory.key_concepts.map((concept, conceptIndex) => (
@@ -2509,7 +2569,7 @@ export default function App() {
               </View>
             )}
             
-            {selectedTheoryData.applicable_scenarios && selectedTheoryData.applicable_scenarios.length > 0 && (
+            {selectedTheoryData.applicable_scenarios && Array.isArray(selectedTheoryData.applicable_scenarios) && selectedTheoryData.applicable_scenarios.length > 0 && (
               <View style={styles.theorySection}>
                 <Text style={styles.theorySectionTitle}>適用場面</Text>
                 {selectedTheoryData.applicable_scenarios.map((scenario: string, index: number) => (
@@ -2520,7 +2580,7 @@ export default function App() {
               </View>
             )}
             
-            {selectedTheoryData.key_concepts && selectedTheoryData.key_concepts.length > 0 && (
+            {selectedTheoryData.key_concepts && Array.isArray(selectedTheoryData.key_concepts) && selectedTheoryData.key_concepts.length > 0 && (
               <View style={styles.theorySection}>
                 <Text style={styles.theorySectionTitle}>キーコンセプト</Text>
                 {selectedTheoryData.key_concepts.map((concept: string, index: number) => (
@@ -2531,12 +2591,45 @@ export default function App() {
               </View>
             )}
             
-            {selectedTheoryData.practical_tips && selectedTheoryData.practical_tips.length > 0 && (
+            {selectedTheoryData.practical_tips && Array.isArray(selectedTheoryData.practical_tips) && selectedTheoryData.practical_tips.length > 0 && (
               <View style={styles.theorySection}>
                 <Text style={styles.theorySectionTitle}>実践的なヒント</Text>
                 {selectedTheoryData.practical_tips.map((tip: string, index: number) => (
                   <Text key={index} style={styles.theoryListItem}>
                     • {tip}
+                  </Text>
+                ))}
+              </View>
+            )}
+            
+            {selectedTheoryData.examples && Array.isArray(selectedTheoryData.examples) && selectedTheoryData.examples.length > 0 && (
+              <View style={styles.theorySection}>
+                <Text style={styles.theorySectionTitle}>具体例</Text>
+                {selectedTheoryData.examples.map((example: string, index: number) => (
+                  <Text key={index} style={styles.theoryListItem}>
+                    • {example}
+                  </Text>
+                ))}
+              </View>
+            )}
+            
+            {selectedTheoryData.how_to && Array.isArray(selectedTheoryData.how_to) && selectedTheoryData.how_to.length > 0 && (
+              <View style={styles.theorySection}>
+                <Text style={styles.theorySectionTitle}>実践方法</Text>
+                {selectedTheoryData.how_to.map((step: string, index: number) => (
+                  <Text key={index} style={styles.theoryListItem}>
+                    {index + 1}. {step}
+                  </Text>
+                ))}
+              </View>
+            )}
+            
+            {selectedTheoryData.templates && Array.isArray(selectedTheoryData.templates) && selectedTheoryData.templates.length > 0 && (
+              <View style={styles.theorySection}>
+                <Text style={styles.theorySectionTitle}>テンプレート</Text>
+                {selectedTheoryData.templates.map((template: string, index: number) => (
+                  <Text key={index} style={styles.theoryListItem}>
+                    • {template}
                   </Text>
                 ))}
               </View>
