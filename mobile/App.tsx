@@ -8,7 +8,8 @@ import {
   StyleSheet,
   Dimensions,
   Alert,
-  ActivityIndicator
+  ActivityIndicator,
+  TextInput
 } from 'react-native';
 import { sceneConfigs, getSceneConfig, getSceneName } from './src/scene-configs';
 import ChecklistComponent from './src/ChecklistComponent';
@@ -61,12 +62,19 @@ interface RecentAdvice {
   timestamp: Date;
 }
 
+interface ChatMessage {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: Date;
+}
+
 export default function App() {
   // Supabase設定
   const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL || 'http://127.0.0.1:54321';
   const SUPABASE_ANON_KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0';
 
-  const [currentView, setCurrentView] = useState<'main' | 'input' | 'checklist' | 'advices' | 'theory' | 'theoryMemo' | 'theoryDetail'>('main');
+  const [currentView, setCurrentView] = useState<'main' | 'input' | 'checklist' | 'advices' | 'theory' | 'theoryMemo' | 'theoryDetail' | 'aiChat'>('main');
   const [scene, setScene] = useState<string>('');
   const [goal, setGoal] = useState<string>('');
   const [timeLimit, setTimeLimit] = useState<string>('');
@@ -129,6 +137,7 @@ export default function App() {
   const [currentTheory, setCurrentTheory] = useState<Theory | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [recentAdvices, setRecentAdvices] = useState<RecentAdvice[]>([]);
+  const [isLoadingRecentAdvices, setIsLoadingRecentAdvices] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [theoriesList, setTheoriesList] = useState<Theory[]>([]);
   const [isLoadingTheories, setIsLoadingTheories] = useState(false);
@@ -147,6 +156,18 @@ export default function App() {
   // ScrollViewのref
   const adviceScrollViewRef = useRef<ScrollView>(null);
   const theoryScrollViewRef = useRef<ScrollView>(null);
+  const chatScrollViewRef = useRef<ScrollView>(null);
+
+  // AIチャット用の状態
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [chatInput, setChatInput] = useState<string>('');
+  const [isLoadingChat, setIsLoadingChat] = useState<boolean>(false);
+  const [chatContext, setChatContext] = useState<{
+    scene: string;
+    goal: string;
+    currentAdvice?: Advice;
+    currentTheory?: Theory;
+  } | null>(null);
 
   // 最近使用したアドバイスを保存
   const saveRecentAdvice = async (advice: Advice) => {
@@ -166,50 +187,96 @@ export default function App() {
         timestamp: new Date()
       };
 
-      // ローカル状態を更新（theory_idベースで重複チェック）
-      setRecentAdvices(prev => {
-        const filtered = prev.filter(ra => ra.advice.theory_id !== theoryId);
-        return [newRecentAdvice, ...filtered].slice(0, 10); // 最新10件を保持
-      });
-
-      // データベースに保存
-      const saveResult = await api.saveRecentAdvice({
-        scene_id: scene,
-        goal,
-        time_limit: timeLimit,
-        stakes,
-        participants,
-        relationship,
-        theory_id: theoryId, // 元のtheory_idを使用
-        short_advice: advice.short_advice,
-        expected_effect: advice.expected_effect,
-        caution: advice.caution,
-        tips: advice.tips,
-        related_theory: advice.related_theory,
-        implementation_steps: advice.implementation_steps,
-        success_indicators: advice.success_indicators,
-        common_mistakes: advice.common_mistakes
-      });
-
-      console.log('Recent advice saved to database successfully:', saveResult);
+      // 既存のアドバイスをチェックして重複を避ける
+      const existingIndex = recentAdvices.findIndex(ra => ra.id === theoryId);
+      if (existingIndex !== -1) {
+        // 既存のアドバイスを更新
+        const updatedAdvices = [...recentAdvices];
+        updatedAdvices[existingIndex] = newRecentAdvice;
+        setRecentAdvices(updatedAdvices);
+      } else {
+        // 新しいアドバイスを追加（最大10件まで保持）
+        const updatedAdvices = [newRecentAdvice, ...recentAdvices].slice(0, 10);
+        setRecentAdvices(updatedAdvices);
+      }
     } catch (error) {
-      console.error('Failed to save recent advice to database:', error);
+      console.error('Error saving recent advice:', error);
+    }
+  };
+
+  // AIチャットメッセージを送信
+  const sendChatMessage = async () => {
+    if (!chatInput.trim() || isLoadingChat) return;
+
+    const userMessage: ChatMessage = {
+      id: `user_${Date.now()}`,
+      role: 'user',
+      content: chatInput.trim(),
+      timestamp: new Date()
+    };
+
+    // ユーザーメッセージを追加
+    setChatMessages(prev => [...prev, userMessage]);
+    setChatInput('');
+    setIsLoadingChat(true);
+
+    try {
+      // シーンに応じたAIチャット関数を選択
+      let chatEndpoint = 'ai-chat'; // デフォルト
       
-      // エラーの詳細をログに出力
-      if (error instanceof Error) {
-        console.error('Error details:', {
-          message: error.message,
-          stack: error.stack,
-          name: error.name
-        });
+      if (scene === 'meeting') {
+        chatEndpoint = 'ai-chat-meeting';
+      } else if (scene === 'sales') {
+        chatEndpoint = 'ai-chat-sales';
+      } else if (scene === 'presentation') {
+        chatEndpoint = 'ai-chat-presentation';
+      } else if (scene === 'interview') {
+        chatEndpoint = 'ai-chat-interview';
+      } else if (scene === 'team_building') {
+        chatEndpoint = 'ai-chat-team-building';
       }
+
+      // AIチャットAPIを呼び出し
+      const response = await fetch(`${SUPABASE_URL}/functions/v1/${chatEndpoint}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: userMessage.content,
+          context: chatContext,
+          chatHistory: chatMessages.slice(-5) // 直近5件の履歴を送信
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const aiResponse = await response.json();
       
-      // データベース保存に失敗してもローカル状態は保持
-      // ユーザーには静かに失敗を隠す（UXを損なわないため）
-      // ただし、開発時には詳細なエラー情報を表示
-      if (__DEV__) {
-        console.warn('Development mode: Recent advice save failed, but local state is maintained');
-      }
+      const assistantMessage: ChatMessage = {
+        id: `assistant_${Date.now()}`,
+        role: 'assistant',
+        content: aiResponse.response || '申し訳ございません。回答を生成できませんでした。',
+        timestamp: new Date()
+      };
+
+      setChatMessages(prev => [...prev, assistantMessage]);
+    } catch (error) {
+      console.error('Error sending chat message:', error);
+      
+      const errorMessage: ChatMessage = {
+        id: `error_${Date.now()}`,
+        role: 'assistant',
+        content: '申し訳ございません。エラーが発生しました。しばらく時間をおいて再度お試しください。',
+        timestamp: new Date()
+      };
+
+      setChatMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsLoadingChat(false);
     }
   };
 
@@ -217,7 +284,11 @@ export default function App() {
   useEffect(() => {
     const loadRecentAdvices = async () => {
       try {
+        setIsLoadingRecentAdvices(true);
+        console.log('Loading recent advices...');
         const response = await api.getRecentAdvices();
+        console.log('Recent advices response:', response);
+        
         if (response.data && response.data.length > 0) {
           const loadedAdvices: RecentAdvice[] = response.data.map((dbAdvice: any) => ({
             id: dbAdvice.id,
@@ -240,10 +311,129 @@ export default function App() {
             },
             timestamp: new Date(dbAdvice.created_at)
           }));
-          setRecentAdvices(loadedAdvices);
+          console.log('Loaded recent advices:', loadedAdvices);
+          // 最新の10件まで表示
+          const limitedAdvices = loadedAdvices.slice(0, 10);
+          setRecentAdvices(limitedAdvices);
+        } else {
+          console.log('No recent advices found');
+          // サンプルのアドバイスを表示（テスト用）
+          const sampleAdvices: RecentAdvice[] = [
+            {
+              id: 'sample_1',
+              scene: 'meeting',
+              goal: '会議を効率的に進行する',
+              timeLimit: '30分',
+              stakes: '中',
+              participants: 8,
+              relationship: 'チーム内',
+              advice: {
+                theory_id: 'sample_theory_1',
+                short_advice: 'アジェンダを事前に共有し、時間配分を明確にする',
+                expected_effect: '会議時間の短縮と成果の向上',
+                caution: '参加者の意見を十分に聞く時間を確保する',
+                tips: 'タイマーを使用して時間管理を徹底する',
+                related_theory: '時間管理理論',
+                implementation_steps: ['1.アジェンダ作成', '2.時間配分設定', '3.進行役の決定'],
+                success_indicators: ['会議時間内での議題完了'],
+                common_mistakes: ['時間配分の甘い見積もり']
+              },
+              timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000) // 1日前
+            },
+            {
+              id: 'sample_2',
+              scene: 'presentation',
+              goal: 'プレゼンテーションで聴衆の関心を引く',
+              timeLimit: '15分',
+              stakes: '高',
+              participants: 25,
+              relationship: '顧客・上司',
+              advice: {
+                theory_id: 'sample_theory_2',
+                short_advice: 'ストーリーテリングを活用して物語性を持たせる',
+                expected_effect: '聴衆の理解度と記憶の向上',
+                caution: '過度に感情的な表現は避ける',
+                tips: '具体的な事例や数字で裏付ける',
+                related_theory: 'ストーリーテリング理論',
+                implementation_steps: ['1.ストーリー構成', '2.事例収集', '3.練習・リハーサル'],
+                success_indicators: ['聴衆からの質問や反応'],
+                common_mistakes: ['長すぎる導入部']
+              },
+              timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000) // 2日前
+            },
+            {
+              id: 'sample_3',
+              scene: 'sales',
+              goal: '顧客のニーズを正確に把握する',
+              timeLimit: '45分',
+              stakes: '高',
+              participants: 2,
+              relationship: '顧客',
+              advice: {
+                theory_id: 'sample_theory_3',
+                short_advice: 'オープンクエスチョンで深掘りし、顧客の本音を聞き出す',
+                expected_effect: '顧客満足度と成約率の向上',
+                caution: '押し売りにならないよう注意する',
+                tips: '顧客の話を最後まで聞き、相槌を打つ',
+                related_theory: '傾聴理論',
+                implementation_steps: ['1.関係構築', '2.ニーズ探り', '3.ソリューション提案'],
+                success_indicators: ['顧客からの詳細な情報開示'],
+                common_mistakes: ['早すぎる提案']
+              },
+              timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000) // 3日前
+            },
+            {
+              id: 'sample_4',
+              scene: 'interview',
+              goal: '面接で良い印象を与える',
+              timeLimit: '60分',
+              stakes: '高',
+              participants: 3,
+              relationship: '面接官',
+              advice: {
+                theory_id: 'sample_theory_4',
+                short_advice: 'STAR法で具体的な経験を説明する',
+                expected_effect: '面接官の理解と評価の向上',
+                caution: '嘘や誇張は避ける',
+                tips: '事前に練習し、時間配分を意識する',
+                related_theory: 'STAR法',
+                implementation_steps: ['1.状況整理', '2.タスク明確化', '3.行動説明', '4.結果提示'],
+                success_indicators: ['面接官からの詳細な質問'],
+                common_mistakes: ['抽象的な回答']
+              },
+              timestamp: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000) // 4日前
+            },
+            {
+              id: 'sample_5',
+              scene: 'team-building',
+              goal: 'チームの結束力を高める',
+              timeLimit: '120分',
+              stakes: '中',
+              participants: 12,
+              relationship: 'チームメンバー',
+              advice: {
+                theory_id: 'sample_theory_5',
+                short_advice: '共通の目標設定と相互理解を促進する',
+                expected_effect: 'チームワークと生産性の向上',
+                caution: '強制的な参加は避ける',
+                tips: '楽しい要素を取り入れて自然な交流を促す',
+                related_theory: 'チームビルディング理論',
+                implementation_steps: ['1.アイスブレイク', '2.目標共有', '3.協力活動', '4.振り返り'],
+                success_indicators: ['メンバー間の自然な交流'],
+                common_mistakes: ['形式的な活動']
+              },
+              timestamp: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000) // 5日前
+            }
+          ];
+          console.log('Setting sample advices:', sampleAdvices);
+          setRecentAdvices(sampleAdvices);
         }
       } catch (error) {
         console.error('Failed to load recent advices:', error);
+        // エラーが発生した場合、空の配列を設定
+        setRecentAdvices([]);
+      } finally {
+        setIsLoadingRecentAdvices(false);
       }
     };
 
@@ -259,6 +449,15 @@ export default function App() {
       }, 100);
     }
   }, [currentView]);
+
+  // チャットメッセージが更新された時に自動スクロール
+  useEffect(() => {
+    if (chatMessages.length > 0 && chatScrollViewRef.current) {
+      setTimeout(() => {
+        chatScrollViewRef.current?.scrollToEnd({ animated: true });
+      }, 100);
+    }
+  }, [chatMessages]);
 
   // 理論表示画面に移動した時にスクロール位置をリセット
   useEffect(() => {
@@ -361,17 +560,18 @@ export default function App() {
         setAdvices(response.advices);
         setCurrentView('advices');
         // 全てのアドバイスを最近使用に保存（重複を防ぎながら）
-        const savePromises = response.advices.map(async (advice: Advice) => {
+        console.log(`Saving ${response.advices.length} advices to recent advices...`);
+        
+        for (const advice of response.advices) {
           try {
             await saveRecentAdvice(advice);
+            console.log(`Successfully saved advice: ${advice.theory_id || 'unknown'}`);
           } catch (error) {
             console.error(`Failed to save advice ${advice.theory_id}:`, error);
           }
-        });
+        }
         
-        // 並行して保存を実行
-        await Promise.all(savePromises);
-        console.log(`Saved ${response.advices.length} advices to recent advices`);
+        console.log(`Completed saving ${response.advices.length} advices to recent advices`);
       } else {
         console.warn('No advices in response:', response);
         Alert.alert('エラー', 'アドバイスが見つかりませんでした');
@@ -2248,7 +2448,7 @@ export default function App() {
               <>
                 <Text style={styles.adviceSubtitle}>成功指標</Text>
                 {advice.success_indicators.map((indicator, indicatorIndex) => (
-                  <Text key={indicatorIndex} style={styles.adviceIndicator}>
+                  <Text key={indicatorIndex} style={styles.adviceStep}>
                     • {indicator}
                   </Text>
                 ))}
@@ -2257,48 +2457,22 @@ export default function App() {
             
             {advice.common_mistakes && advice.common_mistakes.length > 0 && (
               <>
-                <Text style={styles.adviceSubtitle}>よくある間違い</Text>
+                <Text style={styles.adviceSubtitle}>よくある失敗</Text>
                 {advice.common_mistakes.map((mistake, mistakeIndex) => (
-                  <Text key={mistakeIndex} style={styles.adviceMistake}>
+                  <Text key={mistakeIndex} style={styles.adviceStep}>
                     • {mistake}
                   </Text>
                 ))}
               </>
             )}
             
-            {advice.caution && (
-              <>
-                <Text style={styles.adviceSubtitle}>注意点</Text>
-                <Text style={styles.adviceDescription}>{advice.caution}</Text>
-              </>
-            )}
-            
-            {advice.tips && (
-              <>
-                <Text style={styles.adviceSubtitle}>実践のコツ</Text>
-                <Text style={styles.adviceDescription}>{advice.tips}</Text>
-              </>
-            )}
-            
-            <View style={styles.adviceActions}>
-              <TouchableOpacity
-                style={[
-                  styles.theoryButton,
-                  isLoadingTheory && styles.theoryButtonDisabled
-                ]}
-                onPress={() => getRelatedTheories(advice)}
-                disabled={isLoadingTheory}
-              >
-                {isLoadingTheory ? (
-                  <View style={styles.theoryButtonLoading}>
-                    <ActivityIndicator color="#fff" size="small" />
-                    <Text style={styles.theoryButtonText}>理論を検索中...</Text>
-                  </View>
-                ) : (
-                  <Text style={styles.theoryButtonText}>理論を学ぶ</Text>
-                )}
-              </TouchableOpacity>
-            </View>
+            {/* AIチャットボタン */}
+            <TouchableOpacity
+              style={styles.aiChatButton}
+              onPress={() => openAiChat(advice)}
+            >
+              <Text style={styles.aiChatButtonText}>🤖 AIに追加で相談する</Text>
+            </TouchableOpacity>
           </View>
         ))}
 
@@ -2634,6 +2808,14 @@ export default function App() {
                 ))}
               </View>
             )}
+            
+            {/* AIチャットボタン */}
+            <TouchableOpacity
+              style={styles.aiChatButton}
+              onPress={() => openAiChat(undefined, selectedTheoryData)}
+            >
+              <Text style={styles.aiChatButtonText}>🤖 この理論についてAIに相談する</Text>
+            </TouchableOpacity>
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -2651,9 +2833,16 @@ export default function App() {
         </View>
 
         {/* 最近使用したアドバイス */}
-        {recentAdvices.length > 0 && (
-          <View style={styles.recentSection}>
-            <Text style={styles.sectionTitle}>最近使用したアドバイス</Text>
+        <View style={styles.recentSection}>
+          <Text style={styles.sectionTitle}>
+            最近使用したアドバイス (最大10件)
+          </Text>
+          {isLoadingRecentAdvices ? (
+            <View style={styles.loadingRecentSection}>
+              <ActivityIndicator size="small" color="#007bff" />
+              <Text style={styles.loadingRecentText}>読み込み中...</Text>
+            </View>
+          ) : recentAdvices.length > 0 ? (
             <ScrollView 
               horizontal 
               showsHorizontalScrollIndicator={false}
@@ -2683,8 +2872,17 @@ export default function App() {
                 </TouchableOpacity>
               ))}
             </ScrollView>
-          </View>
-        )}
+          ) : (
+            <View style={styles.emptyRecentSection}>
+              <Text style={styles.emptyRecentText}>
+                まだアドバイスを使用していません
+              </Text>
+              <Text style={styles.emptyRecentSubtext}>
+                シーンを選択してアドバイスを取得してみましょう
+              </Text>
+            </View>
+          )}
+        </View>
 
         {/* シーン選択（軽量なカード表示） */}
         <View style={styles.sceneSection}>
@@ -2735,6 +2933,230 @@ export default function App() {
     </SafeAreaView>
   );
 
+  // AIチャット画面
+  const renderAiChat = () => (
+    <SafeAreaView style={styles.container}>
+      <View style={styles.chatHeader}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => setCurrentView('advices')}
+        >
+          <Text style={styles.backButtonText}>← 戻る</Text>
+        </TouchableOpacity>
+        <Text style={styles.chatHeaderTitle}>AIチャット</Text>
+      </View>
+
+      {/* チャットコンテキスト表示 */}
+      {chatContext && (
+        <View style={styles.chatContextCard}>
+          <Text style={styles.chatContextTitle}>現在の状況</Text>
+          <Text style={styles.chatContextText}>
+            シーン: {getSceneName(chatContext.scene)} | 目標: {chatContext.goal}
+          </Text>
+          {chatContext.currentAdvice && (
+            <Text style={styles.chatContextText}>
+              アドバイス: {chatContext.currentAdvice.short_advice}
+            </Text>
+          )}
+          {chatContext.currentTheory && (
+            <Text style={styles.chatContextText}>
+              理論: {chatContext.currentTheory.name_ja}
+            </Text>
+          )}
+        </View>
+      )}
+
+      {/* チャット入力 - 上部に配置 */}
+      <View style={styles.chatInputContainerTop}>
+        <TextInput
+          style={styles.chatInput}
+          value={chatInput}
+          onChangeText={setChatInput}
+          placeholder="気軽に相談してみてください..."
+          multiline
+          maxLength={200}
+        />
+        <TouchableOpacity
+          style={[
+            styles.chatSendButton,
+            (!chatInput.trim() || isLoadingChat) && styles.chatSendButtonDisabled
+          ]}
+          onPress={sendChatMessage}
+          disabled={!chatInput.trim() || isLoadingChat}
+        >
+          <Text style={styles.chatSendButtonText}>送信</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* 気軽に相談できる例文ヒント */}
+      <View style={styles.chatHintSection}>
+        <Text style={styles.chatHintTitle}>💡 こんな感じで相談してみてください</Text>
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false}
+          style={styles.chatHintScrollView}
+          contentContainerStyle={styles.chatHintContent}
+        >
+          <TouchableOpacity
+            style={styles.chatHintCard}
+            onPress={() => setChatInput("今日の会議で気をつけるべきことは？")}
+          >
+            <Text style={styles.chatHintText}>今日の会議で気をつけるべきことは？</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.chatHintCard}
+            onPress={() => setChatInput("営業で使えるテクニックは？")}
+          >
+            <Text style={styles.chatHintText}>営業で使えるテクニックは？</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.chatHintCard}
+            onPress={() => setChatInput("プレゼンのコツを教えて")}
+          >
+            <Text style={styles.chatHintText}>プレゼンのコツを教えて</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.chatHintCard}
+            onPress={() => setChatInput("チームビルディングのアイデア")}
+          >
+            <Text style={styles.chatHintText}>チームビルディングのアイデア</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </View>
+
+      {/* チャットメッセージ表示 */}
+      <ScrollView 
+        style={styles.chatMessagesContainer}
+        showsVerticalScrollIndicator={true}
+        ref={chatScrollViewRef}
+        nestedScrollEnabled={true}
+      >
+        {chatMessages.length === 0 ? (
+          <View style={styles.emptyChatContainer}>
+            <Text style={styles.emptyChatText}>
+              AIに質問や相談をしてみましょう！
+            </Text>
+            <Text style={styles.emptyChatSubtext}>
+              理論の実践方法や具体例について詳しく聞くことができます。
+            </Text>
+          </View>
+        ) : (
+          chatMessages.map((message) => (
+            <View 
+              key={message.id} 
+              style={[
+                styles.chatMessage,
+                message.role === 'user' ? styles.userMessage : styles.assistantMessage
+              ]}
+            >
+              <ScrollView 
+                style={styles.chatMessageContent}
+                showsVerticalScrollIndicator={true}
+                nestedScrollEnabled={true}
+              >
+                <Text style={[
+                  styles.chatMessageText,
+                  message.role === 'user' ? styles.userMessageText : styles.assistantMessageText
+                ]}>
+                  {message.content}
+                </Text>
+              </ScrollView>
+              <Text style={styles.chatMessageTime}>
+                {message.timestamp.toLocaleTimeString('ja-JP', { 
+                  hour: '2-digit', 
+                  minute: '2-digit' 
+                })}
+              </Text>
+            </View>
+          ))
+        )}
+        {isLoadingChat && (
+          <View style={styles.loadingMessage}>
+            <ActivityIndicator size="small" color="#007bff" />
+            <Text style={styles.loadingMessageText}>AIが考え中...</Text>
+          </View>
+        )}
+      </ScrollView>
+    </SafeAreaView>
+  );
+
+  // AIチャット画面に移動
+  const openAiChat = (advice?: Advice, theory?: Theory) => {
+    // シーン固有の詳細設定を取得
+    let sceneSpecificContext: any = {};
+    
+    if (scene === 'meeting') {
+      sceneSpecificContext = {
+        meetingType,
+        meetingFormat,
+        meetingUrgency,
+        meetingFrequency,
+        meetingParticipants,
+        meetingTools,
+        meetingChallenges
+      };
+    } else if (scene === 'sales') {
+      sceneSpecificContext = {
+        customerType,
+        industry,
+        customerPosition,
+        companySize,
+        salesStage,
+        dealSize,
+        competitionLevel,
+        customerPainPoints
+      };
+    } else if (scene === 'presentation') {
+      sceneSpecificContext = {
+        presentationPurpose,
+        audienceType,
+        presentationFormat,
+        presentationTopics,
+        audienceExpertise,
+        presentationConstraints
+      };
+    } else if (scene === 'interview') {
+      sceneSpecificContext = {
+        interviewType,
+        interviewRelationship,
+        interviewPurpose,
+        interviewContext,
+        interviewOutcomes
+      };
+    } else if (scene === 'team_building') {
+      sceneSpecificContext = {
+        teamBuildingType,
+        teamMaturity,
+        teamContext,
+        teamSize,
+        teamDiversity,
+        teamChallenges,
+        teamGoals,
+        teamActivities,
+        teamTools,
+        teamSuccessMetrics,
+        teamTimeframe,
+        teamBudget
+      };
+    }
+
+    // チャットコンテキストを設定
+    setChatContext({
+      scene,
+      goal,
+      currentAdvice: advice,
+      currentTheory: theory,
+      ...sceneSpecificContext
+    });
+    
+    // チャットメッセージをリセット
+    setChatMessages([]);
+    setChatInput('');
+    
+    // AIチャット画面に移動
+    setCurrentView('aiChat');
+  };
+
   // メインのレンダリング
   switch (currentView) {
     case 'main':
@@ -2761,6 +3183,8 @@ export default function App() {
       return renderTheoryMemo();
     case 'theoryDetail':
       return renderTheoryDetail();
+    case 'aiChat':
+      return renderAiChat();
     default:
       return renderMainView();
   }
@@ -2852,6 +3276,40 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#495057',
     lineHeight: 16,
+  },
+  emptyRecentSection: {
+    padding: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#f8f9fa',
+    borderRadius: 12,
+    marginHorizontal: 20,
+  },
+  emptyRecentText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#6c757d',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  emptyRecentSubtext: {
+    fontSize: 14,
+    color: '#adb5bd',
+    textAlign: 'center',
+  },
+  loadingRecentSection: {
+    padding: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#f8f9fa',
+    borderRadius: 12,
+    marginHorizontal: 20,
+  },
+  loadingRecentText: {
+    fontSize: 14,
+    color: '#6c757d',
+    marginTop: 8,
+    textAlign: 'center',
   },
   sceneSection: {
     padding: 20,
@@ -3680,6 +4138,203 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#212529',
     marginBottom: 8,
+  },
+  chatHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e9ecef',
+  },
+  chatHeaderTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#212529',
+  },
+  chatContextCard: {
+    padding: 16,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    marginBottom: 20,
+    marginHorizontal: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  chatContextTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#212529',
+    marginBottom: 8,
+  },
+  chatContextText: {
+    fontSize: 14,
+    color: '#6c757d',
+    marginBottom: 12,
+    lineHeight: 18,
+  },
+  chatMessagesContainer: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: '#fff',
+    marginBottom: 16,
+    marginTop: 8,
+    paddingBottom: 20,
+  },
+  emptyChatContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 40,
+  },
+  emptyChatText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#212529',
+    marginTop: 16,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  emptyChatSubtext: {
+    fontSize: 14,
+    color: '#6c757d',
+    textAlign: 'center',
+  },
+  chatMessage: {
+    padding: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e9ecef',
+    marginBottom: 12,
+    maxHeight: 300,
+  },
+  chatMessageContent: {
+    maxHeight: 250,
+    paddingRight: 8,
+  },
+  chatMessageText: {
+    fontSize: 14,
+    color: '#212529',
+    lineHeight: 20,
+    flexWrap: 'wrap',
+  },
+  userMessage: {
+    backgroundColor: '#e7f3ff',
+  },
+  userMessageText: {
+    color: '#007bff',
+  },
+  assistantMessage: {
+    backgroundColor: '#f8f9fa',
+  },
+  assistantMessageText: {
+    color: '#212529',
+  },
+  chatMessageTime: {
+    fontSize: 12,
+    color: '#6c757d',
+    marginTop: 4,
+  },
+  chatInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    backgroundColor: '#fff',
+    borderTopWidth: 1,
+    borderTopColor: '#e9ecef',
+  },
+  chatInput: {
+    flex: 1,
+    padding: 12,
+    fontSize: 16,
+    color: '#212529',
+    marginRight: 16,
+  },
+  chatSendButton: {
+    backgroundColor: '#007bff',
+    borderRadius: 12,
+    padding: 16,
+    alignItems: 'center',
+  },
+  chatSendButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#fff',
+  },
+  chatSendButtonDisabled: {
+    backgroundColor: '#ccc',
+  },
+  loadingMessage: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 16,
+  },
+  loadingMessageText: {
+    fontSize: 14,
+    color: '#6c757d',
+    marginLeft: 8,
+  },
+  aiChatButton: {
+    backgroundColor: '#007bff',
+    borderRadius: 12,
+    padding: 16,
+    alignItems: 'center',
+    marginTop: 16,
+    marginBottom: 16,
+  },
+  aiChatButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#fff',
+  },
+  chatInputContainerTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    backgroundColor: '#fff',
+    borderTopWidth: 1,
+    borderTopColor: '#e9ecef',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e9ecef',
+    marginBottom: 8,
+    marginHorizontal: 16,
+    borderRadius: 8,
+  },
+  chatHintSection: {
+    padding: 16,
+    backgroundColor: '#fff',
+    marginBottom: 8,
+  },
+  chatHintTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#6c757d',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  chatHintScrollView: {
+    marginHorizontal: -16,
+  },
+  chatHintContent: {
+    paddingHorizontal: 16,
+  },
+  chatHintCard: {
+    backgroundColor: '#f8f9fa',
+    borderRadius: 8,
+    padding: 12,
+    marginRight: 12,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+    minWidth: 120,
+  },
+  chatHintText: {
+    fontSize: 12,
+    color: '#495057',
+    textAlign: 'center',
+    lineHeight: 16,
   },
 });
 
