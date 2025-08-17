@@ -209,7 +209,7 @@ export const sceneConfigs: SceneConfig[] = [
     ]
   },
   {
-    id: 'team_building',
+    id: 'team-building',
     name: 'チーム構築・チームビルディング',
     description: '高パフォーマンスチームの構築と維持のためのチェックリスト',
     goals: [

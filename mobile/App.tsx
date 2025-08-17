@@ -2374,6 +2374,325 @@ export default function App() {
             </View>
           )}
 
+          {/* チームビルディングの詳細設定 */}
+          {scene === 'team-building' && (
+            <View style={styles.detailSection}>
+              <Text style={styles.detailSectionTitle}>チームビルディングの詳細設定</Text>
+              
+              {/* チーム構築の種類 */}
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>チーム構築の種類:</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  <View style={styles.detailOptions}>
+                    {sceneConfig.teamBuildingTypes?.map((type) => (
+                      <TouchableOpacity
+                        key={type}
+                        style={[
+                          styles.detailOption,
+                          teamBuildingType === type && styles.selectedDetailOption
+                        ]}
+                        onPress={() => setTeamBuildingType(type)}
+                      >
+                        <Text style={[
+                          styles.detailOptionText,
+                          teamBuildingType === type && styles.selectedDetailOptionText
+                        ]}>
+                          {type}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </ScrollView>
+              </View>
+              
+              {/* チームの成熟度 */}
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>チームの成熟度:</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  <View style={styles.detailOptions}>
+                    {sceneConfig.teamMaturities?.map((maturity) => (
+                      <TouchableOpacity
+                        key={maturity}
+                        style={[
+                          styles.detailOption,
+                          teamMaturity === maturity && styles.selectedDetailOption
+                        ]}
+                        onPress={() => setTeamMaturity(maturity)}
+                      >
+                        <Text style={[
+                          styles.detailOptionText,
+                          teamMaturity === maturity && styles.selectedDetailOptionText
+                        ]}>
+                          {maturity}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </ScrollView>
+              </View>
+              
+              {/* チームの状況 */}
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>チームの状況:</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  <View style={styles.detailOptions}>
+                    {sceneConfig.teamContexts?.map((context) => (
+                      <TouchableOpacity
+                        key={context}
+                        style={[
+                          styles.detailOption,
+                          teamContext === context && styles.selectedDetailOption
+                        ]}
+                        onPress={() => setTeamContext(context)}
+                      >
+                        <Text style={[
+                          styles.detailOptionText,
+                          teamContext === context && styles.selectedDetailOptionText
+                        ]}>
+                          {context}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </ScrollView>
+              </View>
+              
+              {/* チームサイズ */}
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>チームサイズ:</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  <View style={styles.detailOptions}>
+                    {sceneConfig.teamSize?.map((size) => (
+                      <TouchableOpacity
+                        key={size}
+                        style={[
+                          styles.detailOption,
+                          teamSize === size && styles.selectedDetailOption
+                        ]}
+                        onPress={() => setTeamSize(size)}
+                      >
+                        <Text style={[
+                          styles.detailOptionText,
+                          teamSize === size && styles.selectedDetailOptionText
+                        ]}>
+                          {size}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </ScrollView>
+              </View>
+              
+              {/* チームの多様性 */}
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>チームの多様性:</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  <View style={styles.detailOptions}>
+                    {sceneConfig.teamDiversity?.map((diversity) => (
+                      <TouchableOpacity
+                        key={diversity}
+                        style={[
+                          styles.detailOption,
+                          teamDiversity === diversity && styles.selectedDetailOption
+                        ]}
+                        onPress={() => setTeamDiversity(diversity)}
+                      >
+                        <Text style={[
+                          styles.detailOptionText,
+                          teamDiversity === diversity && styles.selectedDetailOptionText
+                        ]}>
+                          {diversity}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </ScrollView>
+              </View>
+              
+              {/* チームの課題 */}
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>チームの課題:</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  <View style={styles.detailOptions}>
+                    {sceneConfig.teamChallenges?.map((challenge) => (
+                      <TouchableOpacity
+                        key={challenge}
+                        style={[
+                          styles.detailOption,
+                          teamChallenges === challenge && styles.selectedDetailOption
+                        ]}
+                        onPress={() => setTeamChallenges(challenge)}
+                      >
+                        <Text style={[
+                          styles.detailOptionText,
+                          teamChallenges === challenge && styles.selectedDetailOptionText
+                        ]}>
+                          {challenge}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </ScrollView>
+              </View>
+              
+              {/* チームの目標 */}
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>チームの目標:</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  <View style={styles.detailOptions}>
+                    {sceneConfig.teamGoals?.map((goal) => (
+                      <TouchableOpacity
+                        key={goal}
+                        style={[
+                          styles.detailOption,
+                          teamGoals === goal && styles.selectedDetailOption
+                        ]}
+                        onPress={() => setTeamGoals(goal)}
+                      >
+                        <Text style={[
+                          styles.detailOptionText,
+                          teamGoals === goal && styles.selectedDetailOptionText
+                        ]}>
+                          {goal}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </ScrollView>
+              </View>
+              
+              {/* チームの活動 */}
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>チームの活動:</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  <View style={styles.detailOptions}>
+                    {sceneConfig.teamActivities?.map((activity) => (
+                      <TouchableOpacity
+                        key={activity}
+                        style={[
+                          styles.detailOption,
+                          teamActivities === activity && styles.selectedDetailOption
+                        ]}
+                        onPress={() => setTeamActivities(activity)}
+                      >
+                        <Text style={[
+                          styles.detailOptionText,
+                          teamActivities === activity && styles.selectedDetailOptionText
+                        ]}>
+                          {activity}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </ScrollView>
+              </View>
+              
+              {/* チームのツール */}
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>チームのツール:</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  <View style={styles.detailOptions}>
+                    {sceneConfig.teamTools?.map((tool) => (
+                      <TouchableOpacity
+                        key={tool}
+                        style={[
+                          styles.detailOption,
+                          teamTools === tool && styles.selectedDetailOption
+                        ]}
+                        onPress={() => setTeamTools(tool)}
+                      >
+                        <Text style={[
+                          styles.detailOptionText,
+                          teamTools === tool && styles.selectedDetailOptionText
+                        ]}>
+                          {tool}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </ScrollView>
+              </View>
+              
+              {/* チームの成功指標 */}
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>チームの成功指標:</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  <View style={styles.detailOptions}>
+                    {sceneConfig.teamSuccessMetrics?.map((metric) => (
+                      <TouchableOpacity
+                        key={metric}
+                        style={[
+                          styles.detailOption,
+                          teamSuccessMetrics === metric && styles.selectedDetailOption
+                        ]}
+                        onPress={() => setTeamSuccessMetrics(metric)}
+                      >
+                        <Text style={[
+                          styles.detailOptionText,
+                          teamSuccessMetrics === metric && styles.selectedDetailOptionText
+                        ]}>
+                          {metric}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </ScrollView>
+              </View>
+              
+              {/* チームの時間枠 */}
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>チームの時間枠:</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  <View style={styles.detailOptions}>
+                    {sceneConfig.teamTimeframe?.map((timeframe) => (
+                      <TouchableOpacity
+                        key={timeframe}
+                        style={[
+                          styles.detailOption,
+                          teamTimeframe === timeframe && styles.selectedDetailOption
+                        ]}
+                        onPress={() => setTeamTimeframe(timeframe)}
+                      >
+                        <Text style={[
+                          styles.detailOptionText,
+                          teamTimeframe === timeframe && styles.selectedDetailOptionText
+                        ]}>
+                          {timeframe}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </ScrollView>
+              </View>
+              
+              {/* チームの予算 */}
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>チームの予算:</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  <View style={styles.detailOptions}>
+                    {sceneConfig.teamBudget?.map((budget) => (
+                      <TouchableOpacity
+                        key={budget}
+                        style={[
+                          styles.detailOption,
+                          teamBudget === budget && styles.selectedDetailOption
+                        ]}
+                        onPress={() => setTeamBudget(budget)}
+                      >
+                        <Text style={[
+                          styles.detailOptionText,
+                          teamBudget === budget && styles.selectedDetailOptionText
+                        ]}>
+                          {budget}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </ScrollView>
+              </View>
+            </View>
+          )}
+
           {/* アクションボタン */}
           <View style={styles.actionButtons}>
             <TouchableOpacity
